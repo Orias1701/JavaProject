@@ -1,5 +1,6 @@
 package project.appPack.UI.MainRegion;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,6 +13,10 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 public class InputPanel extends JPanel {
     private final JScrollPane inputScrollPane;
@@ -25,8 +30,8 @@ public class InputPanel extends JPanel {
         inputScrollPane = new JScrollPane(inputPanel);
         inputScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         inputScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        inputScrollPane.setPreferredSize(new Dimension(500, 300));
-        inputScrollPane.setMinimumSize(new Dimension(500, 300));
+        inputScrollPane.setPreferredSize(new Dimension(500, 330));
+        inputScrollPane.setMinimumSize(new Dimension(500, 330));
         inputScrollPane.setBorder(null);
         customizeScrollBar(inputScrollPane);
 
@@ -49,6 +54,12 @@ public class InputPanel extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
 
+        Border padding = new EmptyBorder(5, 10, 5, 10);
+
+        Border outerBorder = new LineBorder(Color.GRAY, 1);
+
+
+
         if (columnNames.length > 6) {
             for (int i = 0; i < columnNames.length; i++) {
                 String column = columnNames[i];
@@ -58,12 +69,13 @@ public class InputPanel extends JPanel {
                 gbc.gridx = colOffset;
                 gbc.gridy = row;
                 JLabel label = new JLabel(column + ":");
-                label.setPreferredSize(new Dimension(100, 30));
+                label.setPreferredSize(new Dimension(100, 40));
                 inputPanel.add(label, gbc);
 
                 gbc.gridx = colOffset + 1;
                 JTextField field = new JTextField(30);
-                field.setPreferredSize(new Dimension(300, 30));
+                field.setPreferredSize(new Dimension(300, 40));
+                field.setBorder(new CompoundBorder(outerBorder, padding));
                 inputPanel.add(field, gbc);
                 inputFields.put(column, field);
             }
@@ -73,12 +85,13 @@ public class InputPanel extends JPanel {
                 gbc.gridx = 0;
                 gbc.gridy = i;
                 JLabel label = new JLabel(column + ":");
-                label.setPreferredSize(new Dimension(100, 30));
+                label.setPreferredSize(new Dimension(100, 40));
                 inputPanel.add(label, gbc);
 
                 gbc.gridx = 1;
                 JTextField field = new JTextField(30);
-                field.setPreferredSize(new Dimension(300, 30));
+                field.setPreferredSize(new Dimension(300, 40));
+                field.setBorder(new CompoundBorder(outerBorder, padding));
                 inputPanel.add(field, gbc);
                 inputFields.put(column, field);
             }

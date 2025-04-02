@@ -26,25 +26,23 @@ public class ToolPanel extends JPanel {
     public ToolPanel(MainPanel parent) {
         this.parent = parent;
         setLayout(new GridBagLayout());
-        setPreferredSize(new Dimension(1280, 480));
-        setMinimumSize(new Dimension(1280, 480));
-        setMaximumSize(new Dimension(1280, 480));
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        setPreferredSize(new Dimension(1120, 400));
+        setMinimumSize(new Dimension(1120, 400));
+        setMaximumSize(new Dimension(1120, 400));
+        setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Ô nhập liệu (bên trái)
         inputPanel = new InputPanel();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
         add(inputPanel, gbc);
 
-        // Nút điều hướng (giữa)
         JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        navPanel.setPreferredSize(new Dimension(500, 50));
-        navPanel.setMinimumSize(new Dimension(500, 50));
+        navPanel.setPreferredSize(new Dimension(500, 80));
+        navPanel.setMinimumSize(new Dimension(500, 80));
         JButton firstButton = createNavButton("First", e -> navigateToFirst());
         JButton prevButton = createNavButton("Previous", e -> navigateToPrevious());
         JButton nextButton = createNavButton("Next", e -> navigateToNext());
@@ -56,7 +54,6 @@ public class ToolPanel extends JPanel {
         gbc.gridy = 1;
         add(navPanel, gbc);
 
-        // Nút hành động (bên phải)
         JPanel actionPanel = new JPanel();
         actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.Y_AXIS));
         actionPanel.setPreferredSize(new Dimension(200, 200));

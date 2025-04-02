@@ -2,7 +2,6 @@ package project.appPack.UI.MainRegion;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ public class TablePanel extends JPanel {
         JTableHeader header = table.getTableHeader();
         header.setBackground(Color.decode("#FF9500"));
         header.setFont(new Font("Arial", Font.BOLD, 14));
-        header.setPreferredSize(new Dimension(header.getWidth(), 40));
+        header.setPreferredSize(new java.awt.Dimension(header.getWidth(), 40));
 
         // Tùy chỉnh viền và renderer cho các cell
         Border lightOrangeBorder = BorderFactory.createLineBorder(Color.decode("#FFB580"), 1);
@@ -72,6 +71,7 @@ public class TablePanel extends JPanel {
         header.setDefaultRenderer(headerRenderer);
 
         JScrollPane tableScrollPane = new JScrollPane(table);
+        tableScrollPane.setMinimumSize(null); // Xóa kích thước tối thiểu để linh hoạt
         add(tableScrollPane, java.awt.BorderLayout.CENTER);
     }
 

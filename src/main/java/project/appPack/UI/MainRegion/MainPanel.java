@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 
 public class MainPanel extends JPanel {
-
     private final TablePanel tablePanel;
     private String currentTableName;
 
@@ -16,19 +15,25 @@ public class MainPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
+        // HeaderPanel chứa tableNameLabel và ToolPanel
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        
         // 1. Trên cùng: Tên bảng
         JLabel tableNameLabel = new JLabel("No table selected");
         tableNameLabel.setFont(tableNameLabel.getFont().deriveFont(20f));
         tableNameLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 0));
-        add(tableNameLabel, BorderLayout.NORTH);
+        headerPanel.add(tableNameLabel, BorderLayout.NORTH);
 
-        // 2. Phần công cụ
+        // 2. Phần công cụ (chiều cao cố định)
         ToolPanel toolPanel = new ToolPanel(this);
-        add(toolPanel, BorderLayout.CENTER);
+        headerPanel.add(toolPanel, BorderLayout.CENTER);
 
-        // 3. Phần bảng
+        // Thêm headerPanel vào NORTH
+        add(headerPanel, BorderLayout.NORTH);
+
+        // 3. Phần bảng (chiều cao linh hoạt)
         tablePanel = new TablePanel();
-        add(tablePanel, BorderLayout.SOUTH);
+        add(tablePanel, BorderLayout.CENTER); // Đặt ở CENTER để linh hoạt chiều cao
 
         // Cập nhật tên bảng
         this.addPropertyChangeListener("currentTableName", evt -> {
