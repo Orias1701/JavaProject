@@ -7,6 +7,8 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -32,7 +34,7 @@ public class ApiClient {
                 tableNames.add("Error: API returned " + response.statusCode());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            
             tableNames.add("Error connecting to API");
         }
         return tableNames;
@@ -52,7 +54,7 @@ public class ApiClient {
                 tableData = gson.fromJson(response.body(), new TypeToken<List<Map<String, Object>>>(){}.getType());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Error occurred while fetching table data", e);
         }
         return tableData;
     }
@@ -68,7 +70,7 @@ public class ApiClient {
         try {
             client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Error occurred while updating row", e);
         }
     }
 
@@ -83,7 +85,7 @@ public class ApiClient {
         try {
             client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Error occurred while updating row", e);
         }
     }
 
@@ -97,7 +99,7 @@ public class ApiClient {
         try {
             client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Error occurred while deleting row", e);
         }
     }
 }

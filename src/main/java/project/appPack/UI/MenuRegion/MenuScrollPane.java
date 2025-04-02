@@ -1,4 +1,4 @@
-package project.appPack.UI;
+package project.appPack.UI.MenuRegion;
 
 import java.awt.Color;
 import java.awt.Dimension;

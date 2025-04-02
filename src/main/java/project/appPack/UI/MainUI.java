@@ -7,6 +7,10 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import project.appPack.UI.MainRegion.MainPanel;
+import project.appPack.UI.MenuRegion.MenuPanel;
+import project.appPack.UI.MenuRegion.MenuScrollPane;
+
 public class MainUI extends JFrame {
 
     public MainUI() {
@@ -19,11 +23,11 @@ public class MainUI extends JFrame {
         getContentPane().setBackground(Color.decode("#FFFFFF"));
 
         // Khu vực chính
-        MainContentPanel mainContentPanel = new MainContentPanel();
-        add(mainContentPanel, BorderLayout.CENTER);
+        MainPanel mainPanel = new MainPanel();
+        add(mainPanel, BorderLayout.CENTER);
 
         // Menu trái
-        MenuPanel menuPanel = new MenuPanel(mainContentPanel);
+        MenuPanel menuPanel = new MenuPanel(mainPanel);
         MenuScrollPane scrollPanel = new MenuScrollPane(menuPanel);
         scrollPanel.setPreferredSize(new Dimension(160, 720));
         add(scrollPanel, BorderLayout.WEST);

@@ -1,4 +1,4 @@
-package project.appPack.UI;
+package project.appPack.UI.MenuRegion;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,9 +12,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import project.appPack.UI.ApiClient;
+import project.appPack.UI.MainRegion.MainPanel;
+
 public class MenuPanel extends JPanel {
 
-    public MenuPanel(final MainContentPanel mainContentPanel) {
+    public MenuPanel(final MainPanel MainPanel) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
         setBackground(Color.decode("#FFFFFF"));
@@ -42,7 +45,7 @@ public class MenuPanel extends JPanel {
                 new javax.swing.border.EmptyBorder(8, 12, 8, 12)
             ));
 
-            button.addActionListener(e -> mainContentPanel.updateTableData(name));
+            button.addActionListener(e -> MainPanel.updateTableData(name));
 
             add(button);
             add(Box.createRigidArea(new Dimension(0, 7)));
