@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -17,6 +19,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import project.appPack.UI.ApiClient;
+import project.appPack.UI.MenuRegion.MenuButton;
 
 public class TablePanel extends JPanel {
     private JTable table;
@@ -29,18 +32,15 @@ public class TablePanel extends JPanel {
         table = new JTable(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Tăng kích thước cell
         table.setRowHeight(40);
         table.setFont(new Font("Arial", Font.PLAIN, 14));
         table.setShowGrid(false);
 
-        // Tùy chỉnh header
         JTableHeader header = table.getTableHeader();
         header.setBackground(Color.decode("#FF9500"));
         header.setFont(new Font("Arial", Font.BOLD, 14));
         header.setPreferredSize(new java.awt.Dimension(header.getWidth(), 40));
 
-        // Tùy chỉnh viền và renderer cho các cell
         Border lightOrangeBorder = BorderFactory.createLineBorder(Color.decode("#FFB580"), 1);
         DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
             @Override
@@ -55,7 +55,6 @@ public class TablePanel extends JPanel {
         };
         table.setDefaultRenderer(Object.class, cellRenderer);
 
-        // Tùy chỉnh viền cho header
         DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -71,38 +70,44 @@ public class TablePanel extends JPanel {
         header.setDefaultRenderer(headerRenderer);
 
         JScrollPane tableScrollPane = new JScrollPane(table);
-        tableScrollPane.setMinimumSize(null); // Xóa kích thước tối thiểu để linh hoạt
+        tableScrollPane.setMinimumSize(null);
         add(tableScrollPane, java.awt.BorderLayout.CENTER);
     }
 
     public void updateTableData(String tableName) {
-        tableModel.setRowCount(0);
-        tableModel.setColumnCount(0);
-
-        List<Map<String, Object>> tableData = ApiClient.getTableData(tableName);
-        if (tableData == null || tableData.isEmpty()) {
-            tableModel.addColumn("Message");
-            tableModel.addRow(new Object[]{"No data available"});
-            return;
-        }
-
-        Map<String, Object> firstRow = tableData.get(0);
-        String[] columnNames = firstRow.keySet().toArray(String[]::new);
-        tableModel.setColumnIdentifiers(columnNames);
-
-        for (Map<String, Object> row : tableData) {
-            Object[] rowData = new Object[columnNames.length];
-            for (int i = 0; i < columnNames.length; i++) {
-                rowData[i] = row.get(columnNames[i]);
+        List<Map<String, String>> data = ApiClient.getTableData(tableName);
+        if (!data.isEmpty()) {
+            String[] columnNames = data.get(0).keySet().toArray(String[]::new);
+            String[][] rowData = new String[data.size()][columnNames.length];
+            for (int i = 0; i < data.size(); i++) {
+                Map<String, String> row = data.get(i);
+                for (int j = 0; j < columnNames.length; j++) {
+                    rowData[i][j] = row.get(columnNames[j]);
+                }
             }
-            tableModel.addRow(rowData);
-        }
-
-        if (tableModel.getRowCount() > 0) {
-            table.setRowSelectionInterval(0, 0);
+            tableModel.setDataVector(rowData, columnNames);
+        } else {
+            tableModel.setDataVector(new String[][]{}, new String[]{});
         }
     }
 
+    public void createMenuPanel(MainPanel mainPanel) {
+        Map<String, String> tableInfo = ApiClient.getTableInfo();
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        if (!tableInfo.containsKey("error")) {
+            for (Map.Entry<String, String> entry : tableInfo.entrySet()) {
+                String tableName = entry.getKey();
+                String tableComment = entry.getValue();
+                MenuButton button = new MenuButton(tableComment);
+                button.addActionListener(e -> mainPanel.updateTableData(tableName)); // Gọi với tableName
+                add(button);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, tableInfo.get("error"), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public JTable getTable() {
         return table;
     }

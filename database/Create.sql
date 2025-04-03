@@ -1,8 +1,6 @@
 -- Active: 1743462407381@@127.0.0.1@3306@khachsan
-
 USE khachsan;
 USE orders;
-
 
 CREATE TABLE IF NOT EXISTS Customers (
     ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -12,7 +10,7 @@ CREATE TABLE IF NOT EXISTS Customers (
     Phone VARCHAR(20) NOT NULL,
     Birthday DATE,
     UNIQUE (Customer_ID)
-);
+) COMMENT = 'Khách hàng';
 ALTER TABLE Customers COMMENT = 'Khách hàng';
 
 
@@ -22,7 +20,7 @@ CREATE TABLE IF NOT EXISTS Services (
     Service_Name VARCHAR(255) NOT NULL,
     Price DECIMAL(10, 2),
     UNIQUE (Service_ID)
-);
+) COMMENT = 'Dịch vụ';
 ALTER TABLE Services COMMENT = 'Dịch vụ';
 
 CREATE TABLE IF NOT EXISTS Orders (
@@ -33,32 +31,14 @@ CREATE TABLE IF NOT EXISTS Orders (
     Order_date DATE,
     Price DECIMAL(10, 2),
     UNIQUE (Order_ID)
-);
-ALTER TABLE Orders COMMENT = 'Đơn hàng';
+) COMMENT = 'Đơn hàng';
 
-CREATE TRIGGER before_insert_Customers
-BEFORE INSERT ON Customers
-FOR EACH ROW
-BEGIN
-    IF NEW.ID IS NULL THEN
-        SET NEW.ID = (SELECT IFNULL(MAX(ID), 0) + 1 FROM Customers);
-    END IF;
-END $$
+USE accounts;
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    role VARCHAR(50) NOT NULL
+) COMMENT 'Danh sách user';
 
-CREATE TRIGGER before_insert_services
-BEFORE INSERT ON Services
-FOR EACH ROW
-BEGIN
-    IF NEW.ID IS NULL THEN
-        SET NEW.ID = (SELECT IFNULL(MAX(ID), 0) + 1 FROM Services);
-    END IF;
-END $$
-
-CREATE TRIGGER before_insert_Orders
-BEFORE INSERT ON Orders
-FOR EACH ROW
-BEGIN
-    IF NEW.ID IS NULL THEN
-        SET NEW.ID = (SELECT IFNULL(MAX(ID), 0) + 1 FROM Orders);
-    END IF;
-END $$

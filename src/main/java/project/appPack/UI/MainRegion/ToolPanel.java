@@ -21,7 +21,7 @@ public class ToolPanel extends JPanel {
     private final MainPanel parent;
     private final InputPanel inputPanel;
     private final Map<String, javax.swing.JTextField> inputFields = new HashMap<>();
-    private String currentTableName; // Variable to store the current table name
+    private String currentTableName;
 
     public ToolPanel(MainPanel parent) {
         this.parent = parent;
