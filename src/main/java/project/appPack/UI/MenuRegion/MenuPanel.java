@@ -2,7 +2,7 @@ package project.appPack.UI.MenuRegion;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -29,9 +29,12 @@ public class MenuPanel extends JPanel {
         add(tableLabel);
         add(Box.createRigidArea(new Dimension(0, 20)));
 
-        List<String> tableNames = ApiClient.getTableNames();
-        for (String name : tableNames) {
-            MenuButton button = new MenuButton(name);
+        Map<String, String> tableInfo = ApiClient.getTableInfo();
+        for (Map.Entry<String, String> entry : tableInfo.entrySet()) {
+            String tableName = entry.getKey();
+            String tableComment = entry.getValue();
+
+            MenuButton button = new MenuButton(tableComment);
             button.setMaximumSize(new Dimension(130, 50));
             button.setPreferredSize(new Dimension(130, 50));
             button.setMinimumSize(new Dimension(130, 50));
@@ -45,7 +48,7 @@ public class MenuPanel extends JPanel {
                 new javax.swing.border.EmptyBorder(8, 12, 8, 12)
             ));
 
-            button.addActionListener(e -> MainPanel.updateTableData(name));
+            button.addActionListener(e -> MainPanel.updateTableData(tableName));
 
             add(button);
             add(Box.createRigidArea(new Dimension(0, 7)));

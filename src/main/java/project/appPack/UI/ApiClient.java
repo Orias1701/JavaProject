@@ -5,6 +5,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -18,8 +19,8 @@ public class ApiClient {
     private static final String BASE_URL = "http://localhost:8080/api/tables";
     private static final Gson gson = new Gson();
 
-    public static List<String> getTableNames() {
-        List<String> tableNames = new ArrayList<>();
+    public static Map<String, String> getTableInfo() {
+        Map<String, String> tableInfo = new HashMap<>();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
@@ -29,15 +30,31 @@ public class ApiClient {
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
-                tableNames = gson.fromJson(response.body(), new TypeToken<List<String>>(){}.getType());
+                List<Map<String, String>> tableList = gson.fromJson(response.body(), 
+                    new TypeToken<List<Map<String, String>>>(){}.getType());
+                for (Map<String, String> table : tableList) {
+                    String tableName = table.get("name");
+                    String tableComment = table.get("comment");
+                    tableInfo.put(tableName, tableComment);
+                }
             } else {
-                tableNames.add("Error: API returned " + response.statusCode());
+                tableInfo.put("error", "Error: API returned " + response.statusCode());
             }
-        } catch (Exception e) {
-            
-            tableNames.add("Error connecting to API");
+        } catch (java.net.http.HttpConnectTimeoutException e) {
+            tableInfo.put("error", "Connection timeout error while connecting to API");
+        } catch (java.net.http.HttpTimeoutException e) {
+            tableInfo.put("error", "Timeout error while connecting to API");
+        } catch (java.io.IOException e) {
+            tableInfo.put("error", "I/O error while connecting to API");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            tableInfo.put("error", "Request interrupted while connecting to API");
         }
-        return tableNames;
+        return tableInfo;
+    }
+
+    public static List<String> getTableNames() {
+        return new ArrayList<>(getTableInfo().keySet());
     }
 
     public static List<Map<String, Object>> getTableData(String tableName) {
@@ -53,8 +70,15 @@ public class ApiClient {
             if (response.statusCode() == 200) {
                 tableData = gson.fromJson(response.body(), new TypeToken<List<Map<String, Object>>>(){}.getType());
             }
-        } catch (Exception e) {
-            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Error occurred while fetching table data", e);
+        } catch (java.net.http.HttpConnectTimeoutException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Connection timeout error while fetching table data", e);
+        } catch (java.net.http.HttpTimeoutException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Timeout error while fetching table data", e);
+        } catch (java.io.IOException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "I/O error while fetching table data", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Request interrupted while fetching table data", e);
         }
         return tableData;
     }
@@ -69,8 +93,15 @@ public class ApiClient {
 
         try {
             client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (Exception e) {
-            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Error occurred while updating row", e);
+        } catch (java.net.http.HttpConnectTimeoutException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Connection timeout error occurred while updating row", e);
+        } catch (java.net.http.HttpTimeoutException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Timeout error occurred while updating row", e);
+        } catch (java.io.IOException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "I/O error occurred while updating row", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Request interrupted while updating row", e);
         }
     }
 
@@ -84,8 +115,15 @@ public class ApiClient {
 
         try {
             client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (Exception e) {
-            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Error occurred while updating row", e);
+        } catch (java.net.http.HttpConnectTimeoutException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Connection timeout error occurred while updating row", e);
+        } catch (java.net.http.HttpTimeoutException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Timeout error occurred while updating row", e);
+        } catch (java.io.IOException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "I/O error occurred while updating row", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Request interrupted while updating row", e);
         }
     }
 
@@ -98,8 +136,13 @@ public class ApiClient {
 
         try {
             client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (Exception e) {
-            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Error occurred while deleting row", e);
+        } catch (java.net.http.HttpTimeoutException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Timeout error occurred while deleting row", e);
+        } catch (java.io.IOException e) {
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "I/O error occurred while deleting row", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            Logger.getLogger(ApiClient.class.getName()).log(Level.SEVERE, "Request interrupted while deleting row", e);
         }
     }
 }

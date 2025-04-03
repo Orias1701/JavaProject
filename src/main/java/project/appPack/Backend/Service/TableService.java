@@ -1,6 +1,7 @@
 package project.appPack.Backend.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,21 @@ public class TableService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    public List<Map<String, String>> getTableInfo() {
+        String query = "SELECT TABLE_NAME, TABLE_COMMENT " +
+                       "FROM INFORMATION_SCHEMA.TABLES " +
+                       "WHERE TABLE_SCHEMA = DATABASE() " +
+                       "AND TABLE_TYPE = 'BASE TABLE'";
+        return jdbcTemplate.query(query, (rs, rowNum) -> {
+            Map<String, String> table = new HashMap<>();
+            String tableName = rs.getString("TABLE_NAME");
+            String tableComment = rs.getString("TABLE_COMMENT");
+            table.put("name", tableName);
+            table.put("comment", tableComment != null && !tableComment.isEmpty() ? tableComment : tableName); // Dự phòng nếu comment rỗng
+            return table;
+        });
+    }
 
     public List<String> getTableNames() {
         return jdbcTemplate.query("SHOW TABLES", (rs, rowNum) -> rs.getString(1));

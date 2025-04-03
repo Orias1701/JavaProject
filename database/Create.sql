@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS Customers (
     Birthday DATE,
     UNIQUE (Customer_ID)
 );
+ALTER TABLE Customers COMMENT = 'Khách hàng';
+
 
 CREATE TABLE IF NOT EXISTS Services (
     ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,6 +23,7 @@ CREATE TABLE IF NOT EXISTS Services (
     Price DECIMAL(10, 2),
     UNIQUE (Service_ID)
 );
+ALTER TABLE Services COMMENT = 'Dịch vụ';
 
 CREATE TABLE IF NOT EXISTS Orders (
     ID INT AUTO_INCREMENT PRIMARY KEY,
@@ -31,6 +34,7 @@ CREATE TABLE IF NOT EXISTS Orders (
     Price DECIMAL(10, 2),
     UNIQUE (Order_ID)
 );
+ALTER TABLE Orders COMMENT = 'Đơn hàng';
 
 CREATE TRIGGER before_insert_Customers
 BEFORE INSERT ON Customers

@@ -23,8 +23,8 @@ public class TableController {
     private TableService tableService;
 
     @GetMapping("/tables")
-    public List<String> getTables() {
-        return tableService.getTableNames();
+    public List<Map<String, String>> getTables() {
+        return tableService.getTableInfo();
     }
 
     @GetMapping("/tables/{tableName}")

@@ -22,11 +22,9 @@ public class MainUI extends JFrame {
 
         getContentPane().setBackground(Color.decode("#FFFFFF"));
 
-        // Khu vực chính
         MainPanel mainPanel = new MainPanel();
         add(mainPanel, BorderLayout.CENTER);
 
-        // Menu trái
         MenuPanel menuPanel = new MenuPanel(mainPanel);
         MenuScrollPane scrollPanel = new MenuScrollPane(menuPanel);
         scrollPanel.setPreferredSize(new Dimension(160, 720));
