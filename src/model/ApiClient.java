@@ -127,26 +127,28 @@ public class ApiClient {
         return tableInfo;
     }
 
+    /**
+     * Parses the JSON response from the API to extract table data and column comments.
+     *
+     * @param json The JSON response string.
+     * @return A TableDataResult object containing the parsed data and column comments.
+     */
     private static TableDataResult parseTableDataWithColumns(String json) {
         List<Map<String, String>> data = new ArrayList<>();
         Map<String, String> columnComments = new HashMap<>();
 
-        // Phân tích JSON thủ công
         try {
-            // Loại bỏ dấu ngoặc ngoài
             json = json.trim();
             if (!json.startsWith("{") || !json.endsWith("}")) {
                 return new TableDataResult(data, columnComments);
             }
             json = json.substring(1, json.length() - 1);
 
-            // Tách columns và data
             String[] parts = json.split(",\"data\":");
             if (parts.length != 2) {
                 return new TableDataResult(data, columnComments);
             }
 
-            // Phân tích columns
             String columnsJson = parts[0].replace("\"columns\":", "").trim();
             columnsJson = columnsJson.substring(1, columnsJson.length() - 1);
             if (!columnsJson.isEmpty()) {
@@ -167,7 +169,6 @@ public class ApiClient {
                 }
             }
 
-            // Phân tích data
             String dataJson = parts[1].substring(1, parts[1].length() - 1);
             if (!dataJson.isEmpty()) {
                 String[] rows = dataJson.split("},");
