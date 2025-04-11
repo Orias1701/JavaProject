@@ -23,8 +23,8 @@ public class ContentPanel extends JPanel {
         tableModel = new DefaultTableModel();
         table = new JTable(tableModel);
         table.setFillsViewportHeight(true);
-        table.setFont(Style.TEXT_N16);
-        table.setRowHeight(50);
+        table.setFont(Style.ROB_14);
+        table.setRowHeight(40);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
 
@@ -33,14 +33,19 @@ public class ContentPanel extends JPanel {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 if (c instanceof JLabel label) {
-                    label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+                    label.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.ACT_CL),
+                        BorderFactory.createEmptyBorder(0, 30, 0, 0)
+                    ));
+                    label.setFont(Style.ROB_14);
+                    label.setHorizontalAlignment(SwingConstants.LEFT);
                     label.setOpaque(true);
                     if (isSelected) {
-                        label.setBackground(table.getSelectionBackground());
-                        label.setForeground(table.getSelectionForeground());
+                        label.setBackground(Style.SEC_CL);
+                        label.setForeground(Style.ACT_CL);
                     } else {
-                        label.setBackground(Color.WHITE);
-                        label.setForeground(Color.BLACK);
+                        label.setBackground(Style.LIGHT_CL);
+                        label.setForeground(Style.DARK_CL);
                     }
                 }
                 return c;
@@ -55,10 +60,13 @@ public class ContentPanel extends JPanel {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 label.setBackground(Style.MAIN_CL);
-                label.setForeground(Color.WHITE);
-                label.setFont(label.getFont().deriveFont(Font.BOLD));
-                label.setHorizontalAlignment(CENTER);
-                label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.DARK_GRAY));
+                label.setForeground(Style.LIGHT_CL);
+                label.setFont(Style.ROB_16);
+                label.setHorizontalAlignment(SwingConstants.LEFT);
+                label.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, Style.ACT_CL),
+                    BorderFactory.createEmptyBorder(0, 30, 0, 0)
+                ));
                 label.setFont(Style.TITLE_16);
                 label.setPreferredSize(new Dimension(label.getWidth(), 40));
                 return label;

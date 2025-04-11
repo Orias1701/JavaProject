@@ -35,12 +35,12 @@ public class MenuPanel extends JPanel {
         setLayout(null);
         setOpaque(false);
         setPreferredSize(new Dimension(240, 720));
-        animationTimer = new Timer(10, e -> animateHighlight());
+        animationTimer = new Timer(0, e -> animateHighlight());
         int y = 20;
 
         // Home button
         MenuButton homeButton = createMenuButton("TRANG CHỦ", y);
-        homeButton.setFont(Style.HEADER_16);    
+        homeButton.setFont(Style.MONS_16);    
         homeButton.setForeground(Style.LIGHT_CL);
         homeButton.putClientProperty("tableName", "HOME");
         homeButton.setBounds(0, y, 240, 60);
@@ -70,7 +70,7 @@ public class MenuPanel extends JPanel {
     private MenuButton createMenuButton(String text, int y) {
         MenuButton button = new MenuButton(text);
         button.setBounds(0, y, 240, 60);
-        button.setFont(Style.HEADER_16);    
+        button.setFont(Style.MONS_16);    
         button.setForeground(Style.GRAY_CL);
         button.setBackground(Style.NO_CL);
         button.setBorder(BorderFactory.createEmptyBorder());

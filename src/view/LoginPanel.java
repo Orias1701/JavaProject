@@ -28,7 +28,7 @@ public class LoginPanel extends JPanel {
         gbc.insets = new Insets(10, 10, 10, 10);
 
         JLabel titleLabel = new JLabel("Đăng Nhập");
-        titleLabel.setFont(Style.HEADER_24);
+        titleLabel.setFont(Style.MONS_24);
         titleLabel.setForeground(Style.MAIN_CL);
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -37,7 +37,7 @@ public class LoginPanel extends JPanel {
         add(titleLabel, gbc);
 
         JLabel usernameLabel = new JLabel("Tên người dùng:");
-        usernameLabel.setFont(Style.HEADER_16);
+        usernameLabel.setFont(Style.MONS_16);
         usernameLabel.setForeground(Style.MAIN_CL);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -51,7 +51,7 @@ public class LoginPanel extends JPanel {
         add(usernameField, gbc);
 
         JLabel passwordLabel = new JLabel("Mật khẩu:");
-        passwordLabel.setFont(Style.HEADER_16);
+        passwordLabel.setFont(Style.MONS_16);
         passwordLabel.setForeground(Style.MAIN_CL);
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -65,7 +65,7 @@ public class LoginPanel extends JPanel {
         JButton loginButton = new JButton("Đăng nhập");
         loginButton.setBackground(Style.MAIN_CL);
         loginButton.setForeground(Style.LIGHT_CL);
-        loginButton.setFont(Style.HEADER_16);
+        loginButton.setFont(Style.MONS_16);
         loginButton.setOpaque(true);
         loginButton.setBorderPainted(false);
         gbc.gridx = 0;
