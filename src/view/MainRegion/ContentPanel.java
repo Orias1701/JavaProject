@@ -23,7 +23,8 @@ public class ContentPanel extends JPanel {
         tableModel = new DefaultTableModel();
         table = new JTable(tableModel);
         table.setFillsViewportHeight(true);
-        table.setRowHeight(25);
+        table.setFont(Style.TEXT_N16);
+        table.setRowHeight(50);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
 
@@ -51,19 +52,18 @@ public class ContentPanel extends JPanel {
         JTableHeader header = table.getTableHeader();
         header.setDefaultRenderer(new DefaultTableCellRenderer() {
             @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 label.setBackground(Style.MAIN_CL);
                 label.setForeground(Color.WHITE);
                 label.setFont(label.getFont().deriveFont(Font.BOLD));
                 label.setHorizontalAlignment(CENTER);
                 label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.DARK_GRAY));
+                label.setFont(Style.TITLE_16);
+                label.setPreferredSize(new Dimension(label.getWidth(), 40));
                 return label;
             }
         });
-
         scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
