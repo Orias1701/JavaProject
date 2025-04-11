@@ -23,7 +23,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `khachhang`;
 CREATE TABLE `khachhang` (
   `MaKhachHang` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT 'Mã khách hàng',
-  `TenKhachHang` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT 'Tên kkhách hàng',
+  `TenKhachHang` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT 'Tên khách hàng',
   `Sdt` varchar(15) NOT NULL COMMENT 'Số điện thoại',
   `TinhTrangKhach` enum('Đang ở','Đã rời đi','Hủy đặt phòng') NOT NULL COMMENT 'Tình trạng',
   PRIMARY KEY (`MaKhachHang`),
