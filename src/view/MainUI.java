@@ -1,11 +1,11 @@
 package view;
 
-import controller.MainController;
-import controller.SimpleServer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JFrame;
+
+import controller.MainCtrl;
 import view.FooterRegion.FooterPanel;
 import view.HeaderRegion.HeaderPanel;
 import view.MainRegion.ContentPanel;
@@ -22,7 +22,7 @@ public class MainUI extends JFrame {
 
         getContentPane().setBackground(Color.decode("#FFFFFF"));
 
-        SimpleServer.start();
+        MainCtrl.startServer();
 
         add(new LoginPanel(this));
 
@@ -46,7 +46,7 @@ public class MainUI extends JFrame {
         add(contentPanel, BorderLayout.CENTER);
 
         // Khởi tạo controller
-        new MainController(contentPanel, menuPanel);
+        new MainCtrl(contentPanel, menuPanel);
 
         revalidate();
         repaint();

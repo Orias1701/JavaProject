@@ -1,0 +1,30 @@
+[00:35:23, 13/04/2025] INFO: Server started on port 8080
+[00:35:27, 13/04/2025] INFO: Executing query: com.mysql.cj.jdbc.ClientPreparedStatement: SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'ql_khachsan' AND TABLE_TYPE = 'BASE TABLE'
+[00:35:27, 13/04/2025] INFO: Kiểm tra bảng loaiphong: tồn tại
+[00:35:27, 13/04/2025] INFO: Truy vấn khóa chính cho loaiphong: Maloai
+[00:35:27, 13/04/2025] INFO: Khóa chính Handler: Maloai
+[00:35:28, 13/04/2025] INFO: Kiểm tra bảng hoadon: tồn tại
+[00:35:28, 13/04/2025] INFO: Truy vấn khóa chính cho hoadon: MaHoaDon
+[00:35:28, 13/04/2025] INFO: Khóa chính Handler: MaHoaDon
+[00:35:35, 13/04/2025] INFO: Kiểm tra bảng hoadon: tồn tại
+[00:35:35, 13/04/2025] ERROR: Server error: Data truncation: Incorrect date value: '4' for column 'Ngay' at row 1 - Data truncation: Incorrect date value: '4' for column 'Ngay' at row 1
+[00:35:44, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
+[00:35:44, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
+[00:35:44, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang
+[00:35:48, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
+[00:35:49, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
+[00:35:49, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
+[00:35:49, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang
+[00:35:54, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
+[00:35:54, 13/04/2025] INFO: Xử lý PUT cho bảng: khachhang, Giá trị khóa chính: 3
+[00:35:54, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
+[00:35:54, 13/04/2025] INFO: Khóa chính: MaKhachHang
+[00:35:54, 13/04/2025] INFO: Body JSON: {"Sdt":"4","TinhTrangKhach":"Đã rời đi","MaKhachHang":"3","TenKhachHang":"4"}
+[00:35:55, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
+[00:35:55, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
+[00:35:55, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang
+[00:36:00, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
+[00:36:00, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
+[00:36:00, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
+[00:36:00, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
+[00:36:00, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang

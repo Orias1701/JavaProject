@@ -11,11 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Base64;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public abstract class BaseHandler implements HttpHandler {
-    
+public abstract class BaseHandler implements HttpHandler, HttpHandlerLogic {
     protected static final String ACCOUNTS_DB_URL;
     protected static final String DATA_DB_URL;
     protected static final String DB_USERNAME;
@@ -34,7 +31,8 @@ public abstract class BaseHandler implements HttpHandler {
         }
     }
 
-    protected boolean authenticate(HttpExchange exchange) throws IOException {
+    @Override
+    public boolean authenticate(HttpExchange exchange) throws IOException {
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Basic ")) {
             sendResponse(exchange, 401, "Unauthorized");
@@ -58,20 +56,20 @@ public abstract class BaseHandler implements HttpHandler {
                 return false;
             }
         } catch (Exception e) {
-            Logger.getLogger(BaseHandler.class.getName()).log(Level.SEVERE, "Server error", e);
+            LogHandler.logError("Authentication error: " + e.getMessage(), e);
             sendResponse(exchange, 500, "Server error: " + e.getMessage());
             return false;
         }
     }
 
-    protected void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
+    @Override
+    public void sendResponse(HttpExchange exchange, int statusCode, String response) throws IOException {
         byte[] responseBytes = response.getBytes("UTF-8");
         exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
         exchange.sendResponseHeaders(statusCode, responseBytes.length);
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(responseBytes);
             os.flush();
-            os.close();
         }
     }
 }

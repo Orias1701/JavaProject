@@ -6,12 +6,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class TablesHandler extends BaseHandler {
-    private static final Logger LOGGER = Logger.getLogger(TablesHandler.class.getName());
-
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         if (!"GET".equals(exchange.getRequestMethod())) {
@@ -23,11 +19,11 @@ public class TablesHandler extends BaseHandler {
         String schema = extractSchemaFromUrl(DATA_DB_URL);
 
         try (Connection conn = DriverManager.getConnection(DATA_DB_URL, DB_USERNAME, DB_PASSWORD);
-            PreparedStatement stmt = conn.prepareStatement(
+             PreparedStatement stmt = conn.prepareStatement(
                  "SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES " +
                  "WHERE TABLE_SCHEMA = ? AND TABLE_TYPE = 'BASE TABLE'")) {
             stmt.setString(1, schema);
-            LOGGER.info("Executing query: " + stmt.toString());
+            LogHandler.logInfo("Executing query: " + stmt.toString());
             ResultSet rs = stmt.executeQuery();
             StringBuilder json = new StringBuilder("[");
             boolean first = true;
@@ -42,7 +38,7 @@ public class TablesHandler extends BaseHandler {
             json.append("]");
             sendResponse(exchange, 200, json.toString());
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Server error", e);
+            LogHandler.logError("Server error: " + e.getMessage(), e);
             sendResponse(exchange, 500, "Server error: " + e.getMessage());
         }
     }
