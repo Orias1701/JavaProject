@@ -77,7 +77,7 @@ public class LoginPanel extends JPanel {
         add(loginButton, gbc);
 
         loginButton.addActionListener(e -> handleLogin());
-        LogHandler.logInfo("LoginPanel khởi tạo");
+        LogHandler.logInfo("LoginPanel initialized");
     }
 
     private void handleLogin() {

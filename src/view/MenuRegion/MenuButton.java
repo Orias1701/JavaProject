@@ -1,43 +1,33 @@
 package view.MenuRegion;
 
-import javax.swing.*;
+import view.Style;
+
 import java.awt.*;
 
-public class MenuButton extends JButton {
+public class MenuButton extends Style.RoundedButton {
     private boolean isActive = false;
 
     public MenuButton(String text) {
-        super(text);
-        setOpaque(false);
-        setContentAreaFilled(false);
-        setBorderPainted(false);
-        setFocusPainted(false);
+        super(text, 7, 10);
         setForeground(Color.BLACK);
         setFont(getFont().deriveFont(14f));
-        setCursor(new Cursor(Cursor.HAND_CURSOR));
+        setBackground(Style.NO_CL);
     }
 
     public void setActive(boolean active) {
         this.isActive = active;
+        if (active) {
+            setForeground(Style.LIGHT_CL);
+            setBackground(Style.NO_CL);
+        } else {
+            setForeground(Style.GRAY_CL);
+            setBackground(Style.NO_CL);
+        }
         repaint();
     }
 
     public boolean isActive() {
         return isActive;
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        if (getModel().isRollover() || isActive) {
-            g2.setColor(getBackground());
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 7, 10);
-        }
-
-        g2.dispose();
-        super.paintComponent(g);
     }
 
     @Override

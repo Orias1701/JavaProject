@@ -4,9 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 import controller.LogHandler;
 import controller.MainCtrl;
+import model.ApiClient;
+import model.ApiClient.TableDataResult;
 import view.FooterRegion.FooterPanel;
 import view.HeaderRegion.HeaderPanel;
 import view.MainRegion.ContentPanel;
@@ -41,6 +44,42 @@ public class MainUI extends JFrame {
         MenuPanel menuPanel = new MenuPanel();
         ContentPanel contentPanel = new ContentPanel();
 
+        // Thiết lập TableSelectionListener cho MenuPanel
+        menuPanel.setTableSelectionListener((tableName, tableComment) -> {
+            try {
+                // Gọi API để lấy dữ liệu bảng
+                TableDataResult result = ApiClient.getTableData(tableName);
+                if (result.data != null && !result.data.isEmpty()) {
+                    // Cập nhật ContentPanel với dữ liệu bảng và tableComment
+                    contentPanel.updateTableData(
+                        result.data,
+                        result.columnComments,
+                        result.keyColumn,
+                        tableName,
+                        tableComment
+                    );
+                } else {
+                    // Xử lý trường hợp không có dữ liệu
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Không có dữ liệu cho bảng " + tableComment,
+                        "Cảnh báo",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                    // Xóa nội dung bảng trong ContentPanel
+                    contentPanel.updateTableData(null, null, null, tableName, tableComment);
+                }
+            } catch (Exception ex) {
+                LogHandler.logError("Lỗi khi tải dữ liệu bảng: " + ex.getMessage(), ex);
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Lỗi khi tải dữ liệu: " + ex.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+
         add(headerPanel, BorderLayout.NORTH);
         add(footerPanel, BorderLayout.SOUTH);
         add(menuPanel, BorderLayout.WEST);
@@ -48,6 +87,7 @@ public class MainUI extends JFrame {
 
         new MainCtrl(contentPanel, menuPanel);
 
+        // Làm mới danh sách bảng
         menuPanel.refreshTableList();
 
         revalidate();

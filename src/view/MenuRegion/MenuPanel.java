@@ -18,11 +18,10 @@ public class MenuPanel extends JPanel {
     private final Timer animationTimer;
     private TableSelectionListener tableSelectionListener;
 
-    // Interface cho listener
     public interface TableSelectionListener {
         void onTableSelected(String tableName, String tableComment);
     }
-    
+
     public void setTableSelectionListener(TableSelectionListener listener) {
         this.tableSelectionListener = listener;
     }
@@ -40,7 +39,7 @@ public class MenuPanel extends JPanel {
 
         // Home button
         MenuButton homeButton = createMenuButton("TRANG CHỦ", y);
-        homeButton.setFont(Style.MONS_16);    
+        homeButton.setFont(Style.MONS_16);
         homeButton.setForeground(Style.LIGHT_CL);
         homeButton.putClientProperty("tableName", "HOME");
         homeButton.setBounds(0, y, 240, 60);
@@ -56,9 +55,7 @@ public class MenuPanel extends JPanel {
     }
 
     public void refreshTableList() {
-        int y = 80; // Bắt đầu từ vị trí sau nút "TRANG CHỦ"
-
-        // Xóa các nút bảng cũ (nếu có), giữ lại nút "TRANG CHỦ"
+        int y = 80;
         for (int i = menuButtons.size() - 1; i >= 0; i--) {
             MenuButton button = menuButtons.get(i);
             if (!"HOME".equals(button.getClientProperty("tableName"))) {
@@ -67,14 +64,12 @@ public class MenuPanel extends JPanel {
             }
         }
 
-        // Tải danh sách bảng từ API
         Map<String, String> tableInfo = ApiClient.getTableInfo();
         if (tableInfo.containsKey("error")) {
             LogHandler.logError("Không thể tải danh sách bảng: " + tableInfo.get("error"));
             return;
         }
 
-        // Tạo các nút cho từng bảng
         for (Map.Entry<String, String> entry : tableInfo.entrySet()) {
             String tableName = entry.getKey();
             String tableComment = entry.getValue();
@@ -88,28 +83,27 @@ public class MenuPanel extends JPanel {
         repaint();
     }
 
-    // creates a menu button
     private MenuButton createMenuButton(String text, int y) {
         MenuButton button = new MenuButton(text);
         button.setBounds(0, y, 240, 60);
-        button.setFont(Style.MONS_16);    
+        button.setFont(Style.MONS_16);
         button.setForeground(Style.GRAY_CL);
         button.setBackground(Style.NO_CL);
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
-        button.addActionListener(e -> {
-            moveHighlightTo(button);
-        });
+        button.setHorizontalAlignment(SwingConstants.LEFT);
+
+        button.addActionListener(e -> moveHighlightTo(button));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 if (!button.isActive()) {
                     button.setBackground(Style.SEC_CL);
+                    button.setForeground(Style.LIGHT_CL);
                     button.repaint();
                 }
             }
+
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 if (!button.isActive()) {
@@ -123,28 +117,24 @@ public class MenuPanel extends JPanel {
         return button;
     }
 
-    // highlight the selected button
     private void moveHighlightTo(MenuButton targetButton) {
         if (activeButton != null) {
             activeButton.setActive(false);
-            activeButton.setBackground(Style.NO_CL);
-            activeButton.setForeground(Style.GRAY_CL);
-            activeButton.repaint();
         }
+
         activeButton = targetButton;
         activeButton.setActive(true);
-        activeButton.setBackground(Style.NO_CL);
-        activeButton.setForeground(Style.LIGHT_CL);
         currentTableName = (String) activeButton.getClientProperty("tableName");
         String currentTableComment = activeButton.getText();
         LogHandler.logInfo("Tên bảng: " + currentTableName + ", Chú thích: " + currentTableComment);
+
         if (tableSelectionListener != null && !"HOME".equals(currentTableName)) {
             tableSelectionListener.onTableSelected(currentTableName, currentTableComment);
         }
+
         animationTimer.start();
     }
 
-    // highlight animates
     private void animateHighlight() {
         if (activeButton == null) return;
         int targetY = activeButton.getY();
@@ -160,7 +150,6 @@ public class MenuPanel extends JPanel {
         repaint();
     }
 
-    // set the current table name
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
