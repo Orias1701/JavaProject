@@ -4,9 +4,10 @@ import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -20,6 +21,8 @@ public class LoginPanel extends JPanel {
     private final JTextField usernameField;
     private final JPasswordField passwordField;
     private final MainUI parentFrame;
+    private final JLabel usernameErrorLabel;
+    private final JLabel passwordErrorLabel;
 
     public LoginPanel(MainUI parentFrame) {
         this.parentFrame = parentFrame;
@@ -52,17 +55,34 @@ public class LoginPanel extends JPanel {
         gbc.gridy = 1;
         add(usernameField, gbc);
 
+        usernameErrorLabel = new JLabel("");
+        usernameErrorLabel.setFont(Style.MONS_12);
+        usernameErrorLabel.setForeground(Color.RED);
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 10, 10, 10);
+        add(usernameErrorLabel, gbc);
+
         JLabel passwordLabel = new JLabel("Mật khẩu:");
         passwordLabel.setFont(Style.MONS_16);
         passwordLabel.setForeground(Style.MAIN_CL);
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
+        gbc.insets = new Insets(10, 10, 10, 10);
         add(passwordLabel, gbc);
 
         passwordField = new JPasswordField(20);
         gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         add(passwordField, gbc);
+
+        passwordErrorLabel = new JLabel("");
+        passwordErrorLabel.setFont(Style.MONS_12);
+        passwordErrorLabel.setForeground(Color.RED);
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        gbc.insets = new Insets(0, 10, 10, 10);
+        add(passwordErrorLabel, gbc);
 
         JButton loginButton = new JButton("Đăng nhập");
         loginButton.setBackground(Style.MAIN_CL);
@@ -71,26 +91,50 @@ public class LoginPanel extends JPanel {
         loginButton.setOpaque(true);
         loginButton.setBorderPainted(false);
         gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy = 5;
         gbc.gridwidth = 2;
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.CENTER;
         add(loginButton, gbc);
 
-        loginButton.addActionListener(e -> handleLogin());
+        loginButton.addActionListener(e -> attemptLogin());
+        KeyAdapter enterKeyListener = new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    attemptLogin();
+                }
+            }
+        };
+        usernameField.addKeyListener(enterKeyListener);
+        passwordField.addKeyListener(enterKeyListener);
+
         LogHandler.logInfo("LoginPanel initialized");
     }
 
-    private void handleLogin() {
+    private void attemptLogin() {
+
+        usernameErrorLabel.setText("");
+        passwordErrorLabel.setText("");
+
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword()).trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            LogHandler.logError("Đăng nhập thất bại: Tên người dùng hoặc mật khẩu trống");
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập tên người dùng và mật khẩu",
-                "Lỗi", JOptionPane.ERROR_MESSAGE);
+        if (username.isEmpty()) {
+            usernameErrorLabel.setText("Vui lòng nhập tên người dùng");
+            usernameField.requestFocusInWindow();
             return;
         }
 
+        if (password.isEmpty()) {
+            passwordErrorLabel.setText("Vui lòng nhập mật khẩu");
+            passwordField.requestFocusInWindow();
+            return;
+        }
+        handleLogin(username, password);
+    }
+
+    private void handleLogin(String username, String password) {
         LogHandler.logInfo("Thử đăng nhập - Tên người dùng: " + username);
 
         boolean success = ApiClient.login(username, password);
@@ -102,8 +146,8 @@ public class LoginPanel extends JPanel {
             parentFrame.showMainInterface();
         } else {
             LogHandler.logError("Đăng nhập thất bại cho người dùng: " + username);
-            JOptionPane.showMessageDialog(this, "Tài khoản hoặc mật khẩu không đúng",
-                "Lỗi", JOptionPane.ERROR_MESSAGE);
+            passwordErrorLabel.setText("Tài khoản hoặc mật khẩu không đúng");
+            usernameField.requestFocusInWindow();
         }
     }
 }
