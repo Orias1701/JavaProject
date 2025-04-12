@@ -1,10 +1,9 @@
 package controller;
 
 import model.ApiClient;
-import model.ApiClient.TableDataResult;
 import view.MainRegion.ContentPanel;
 import view.MenuRegion.MenuPanel;
-
+import model.ApiClient.TableDataResult;
 public class MainController {
     private final ContentPanel contentPanel;
     private final MenuPanel menuPanel;
