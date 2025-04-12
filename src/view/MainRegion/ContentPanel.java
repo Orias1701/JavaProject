@@ -6,6 +6,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 
+import controller.LogHandler;
+import controller.MainCtrl;
 import model.ApiClient;
 import model.ApiClient.ApiResponse;
 import model.ApiClient.TableDataResult;
@@ -173,7 +175,7 @@ public class ContentPanel extends JPanel {
             }
 
             String keyValue = inputFields.get(keyColumn).getText();
-            System.out.println("showFormDialog: actionType=" + actionType + ", keyColumn=" + keyColumn + ", keyValue=" + keyValue);
+            LogHandler.logInfo("showFormDialog: actionType=" + actionType + ", keyColumn=" + keyColumn + ", keyValue=" + keyValue);
 
             try {
                 if (actionType.equals("add")) {
@@ -181,7 +183,7 @@ public class ContentPanel extends JPanel {
                     for (String col : columnNames) {
                         rowData.put(col, inputFields.get(col).getText());
                     }
-                    ApiResponse response = ApiClient.addRow(tableName, rowData);
+                    ApiResponse response = MainCtrl.addRow(tableName, rowData);
                     if (response.success) {
                         JOptionPane.showMessageDialog(this, "Thêm dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                         refreshTable();
@@ -195,7 +197,7 @@ public class ContentPanel extends JPanel {
                     for (String col : columnNames) {
                         rowData.put(col, inputFields.get(col).getText());
                     }
-                    ApiResponse response = ApiClient.updateRow(tableName, keyColumn, keyValue, rowData);
+                    ApiResponse response = MainCtrl.updateRow(tableName, keyColumn, keyValue, rowData);
                     if (response.success) {
                         JOptionPane.showMessageDialog(this, "Cập nhật dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                         refreshTable();
@@ -209,7 +211,7 @@ public class ContentPanel extends JPanel {
                             "Bạn có chắc chắn muốn xóa " + keyColumn + ": " + keyValue + "?",
                             "Xác nhận", JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
-                        ApiResponse response = ApiClient.deleteRow(tableName, keyColumn, keyValue);
+                        ApiResponse response = MainCtrl.deleteRow(tableName, keyColumn, keyValue);
                         if (response.success) {
                             JOptionPane.showMessageDialog(this, "Xóa dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                             refreshTable();
@@ -220,6 +222,7 @@ public class ContentPanel extends JPanel {
                     }
                 }
             } catch (Exception ex) {
+                LogHandler.logError("Lỗi kết nối: " + ex.getMessage(), ex);
                 JOptionPane.showMessageDialog(this, "Lỗi kết nối: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                 dialog.dispose();
             }
@@ -250,6 +253,7 @@ public class ContentPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Không có dữ liệu để hiển thị sau khi làm mới", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             }
         } catch (Exception ex) {
+            LogHandler.logError("Lỗi khi làm mới dữ liệu: " + ex.getMessage(), ex);
             JOptionPane.showMessageDialog(this, "Lỗi khi làm mới dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
         table.revalidate();
@@ -259,8 +263,8 @@ public class ContentPanel extends JPanel {
     public void updateTableData(List<Map<String, String>> data, Map<String, String> columnComments, String keyColumn, String tableName) {
         this.keyColumn = keyColumn;
         this.tableName = tableName;
-        System.out.println("Khóa chính ContentPanel: " + keyColumn);
-        System.out.println("Tên bảng ContentPanel: " + tableName);
+        LogHandler.logInfo("Khóa chính ContentPanel: " + keyColumn);
+        LogHandler.logInfo("Tên bảng ContentPanel: " + tableName);
         tableModel.setRowCount(0);
         tableModel.setColumnCount(0);
         

@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import controller.LogHandler;
+import controller.MainCtrl;
 import model.ApiClient;
 
 public class LoginPanel extends JPanel {
@@ -75,18 +77,31 @@ public class LoginPanel extends JPanel {
         add(loginButton, gbc);
 
         loginButton.addActionListener(e -> handleLogin());
+        LogHandler.logInfo("LoginPanel khởi tạo");
     }
 
     private void handleLogin() {
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
-        System.out.println("Login attempt - Username: " + username + ", Password: " + password);
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            LogHandler.logError("Đăng nhập thất bại: Tên người dùng hoặc mật khẩu trống");
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập tên người dùng và mật khẩu",
+                "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        LogHandler.logInfo("Thử đăng nhập - Tên người dùng: " + username);
 
         boolean success = ApiClient.login(username, password);
 
         if (success) {
+            LogHandler.logInfo("Đăng nhập thành công cho người dùng: " + username);
+            String authHeader = "Basic " + java.util.Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
+            MainCtrl.setAuthHeader(authHeader);
             parentFrame.showMainInterface();
         } else {
+            LogHandler.logError("Đăng nhập thất bại cho người dùng: " + username);
             JOptionPane.showMessageDialog(this, "Tài khoản hoặc mật khẩu không đúng",
                 "Lỗi", JOptionPane.ERROR_MESSAGE);
         }

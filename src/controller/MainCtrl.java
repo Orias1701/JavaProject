@@ -1,17 +1,22 @@
 package controller;
 
-import com.sun.net.httpserver.HttpServer;
+import model.ApiClient;
+import model.TableDataOperationsClient;
 import view.MainRegion.ContentPanel;
 import view.MenuRegion.MenuPanel;
-import model.ApiClient;
-import model.ApiClient.TableDataResult;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Map;
+// import java.util.logging.Logger;
 
+import com.sun.net.httpserver.HttpServer;
 
 public class MainCtrl {
+    // private static final Logger LOGGER = Logger.getLogger(MainCtrl.class.getName());
     private final ContentPanel contentPanel;
     private final MenuPanel menuPanel;
+    private static TableDataOperationsClient operationsClient;
 
     public MainCtrl(ContentPanel contentPanel, MenuPanel menuPanel) {
         if (contentPanel == null || menuPanel == null) {
@@ -22,7 +27,7 @@ public class MainCtrl {
 
         menuPanel.setTableSelectionListener((tableName, tableComment) -> {
             if (tableName != null && !tableName.isEmpty()) {
-                TableDataResult result = ApiClient.getTableData(tableName);
+                ApiClient.TableDataResult result = ApiClient.getTableData(tableName);
                 contentPanel.updateTableData(result.data, result.columnComments, result.keyColumn, tableName);
             } else {
                 LogHandler.logError("Invalid table name received");
@@ -38,6 +43,35 @@ public class MainCtrl {
         return menuPanel;
     }
 
+    public static void setAuthHeader(String authHeader) {
+        operationsClient = new TableDataOperationsClient(authHeader);
+        LogHandler.logInfo("TableDataOperationsClient được khởi tạo với authHeader");
+    }
+
+    public static ApiClient.ApiResponse addRow(String tableName, Map<String, Object> data) {
+        if (operationsClient == null) {
+            LogHandler.logError("Không thể thực hiện addRow: operationsClient là null. Người dùng có thể chưa đăng nhập.");
+            return new ApiClient.ApiResponse(false, "Vui lòng đăng nhập trước khi thực hiện thao tác này");
+        }
+        return operationsClient.addRow(tableName, data);
+    }
+
+    public static ApiClient.ApiResponse updateRow(String tableName, String keyColumn, Object keyValue, Map<String, Object> data) {
+        if (operationsClient == null) {
+            LogHandler.logError("Không thể thực hiện updateRow: operationsClient là null. Người dùng có thể chưa đăng nhập.");
+            return new ApiClient.ApiResponse(false, "Vui lòng đăng nhập trước khi thực hiện thao tác này");
+        }
+        return operationsClient.updateRow(tableName, keyColumn, keyValue, data);
+    }
+
+    public static ApiClient.ApiResponse deleteRow(String tableName, String keyColumn, Object keyValue) {
+        if (operationsClient == null) {
+            LogHandler.logError("Không thể thực hiện deleteRow: operationsClient là null. Người dùng có thể chưa đăng nhập.");
+            return new ApiClient.ApiResponse(false, "Vui lòng đăng nhập trước khi thực hiện thao tác này");
+        }
+        return operationsClient.deleteRow(tableName, keyColumn, keyValue);
+    }
+
     public static void startServer() {
         new Thread(() -> {
             try {
@@ -49,15 +83,8 @@ public class MainCtrl {
                 server.start();
                 LogHandler.logInfo("Server started on port 8080");
             } catch (IOException e) {
-                LogHandler.logError("Server error: " + e.getMessage(), e);
+                LogHandler.logError("Lỗi server: " + e.getMessage(), e);
             }
         }).start();
-    }
-
-    public static void main(String[] args) {
-        ContentPanel contentPanel = new ContentPanel();
-        MenuPanel menuPanel = new MenuPanel();
-        new MainCtrl(contentPanel, menuPanel);
-        startServer();
     }
 }

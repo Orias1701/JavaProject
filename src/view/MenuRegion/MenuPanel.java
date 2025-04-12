@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import javax.swing.*;
 
+import controller.LogHandler;
 import model.ApiClient;
 import view.Style;
 
@@ -31,7 +32,6 @@ public class MenuPanel extends JPanel {
     }
 
     public MenuPanel() {
-        System.out.println("MenuPanel initialized");
         setLayout(null);
         setOpaque(false);
         setPreferredSize(new Dimension(240, 720));
@@ -51,10 +51,30 @@ public class MenuPanel extends JPanel {
         highlightRect.setLocation(0, homeButton.getY());
         add(homeButton);
         menuButtons.add(homeButton);
-        y += 60;
 
-        // Table buttons
+        LogHandler.logInfo("MenuPanel initialized");
+    }
+
+    public void refreshTableList() {
+        int y = 80; // Bắt đầu từ vị trí sau nút "TRANG CHỦ"
+
+        // Xóa các nút bảng cũ (nếu có), giữ lại nút "TRANG CHỦ"
+        for (int i = menuButtons.size() - 1; i >= 0; i--) {
+            MenuButton button = menuButtons.get(i);
+            if (!"HOME".equals(button.getClientProperty("tableName"))) {
+                remove(button);
+                menuButtons.remove(i);
+            }
+        }
+
+        // Tải danh sách bảng từ API
         Map<String, String> tableInfo = ApiClient.getTableInfo();
+        if (tableInfo.containsKey("error")) {
+            LogHandler.logError("Không thể tải danh sách bảng: " + tableInfo.get("error"));
+            return;
+        }
+
+        // Tạo các nút cho từng bảng
         for (Map.Entry<String, String> entry : tableInfo.entrySet()) {
             String tableName = entry.getKey();
             String tableComment = entry.getValue();
@@ -64,6 +84,8 @@ public class MenuPanel extends JPanel {
             menuButtons.add(button);
             y += 60;
         }
+
+        repaint();
     }
 
     // creates a menu button
@@ -115,7 +137,7 @@ public class MenuPanel extends JPanel {
         activeButton.setForeground(Style.LIGHT_CL);
         currentTableName = (String) activeButton.getClientProperty("tableName");
         String currentTableComment = activeButton.getText();
-        System.out.println("Table name: " + currentTableName + ", Comment: " + currentTableComment);
+        LogHandler.logInfo("Tên bảng: " + currentTableName + ", Chú thích: " + currentTableComment);
         if (tableSelectionListener != null && !"HOME".equals(currentTableName)) {
             tableSelectionListener.onTableSelected(currentTableName, currentTableComment);
         }

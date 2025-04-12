@@ -1,30 +1,32 @@
-[00:35:23, 13/04/2025] INFO: Server started on port 8080
-[00:35:27, 13/04/2025] INFO: Executing query: com.mysql.cj.jdbc.ClientPreparedStatement: SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'ql_khachsan' AND TABLE_TYPE = 'BASE TABLE'
-[00:35:27, 13/04/2025] INFO: Kiểm tra bảng loaiphong: tồn tại
-[00:35:27, 13/04/2025] INFO: Truy vấn khóa chính cho loaiphong: Maloai
-[00:35:27, 13/04/2025] INFO: Khóa chính Handler: Maloai
-[00:35:28, 13/04/2025] INFO: Kiểm tra bảng hoadon: tồn tại
-[00:35:28, 13/04/2025] INFO: Truy vấn khóa chính cho hoadon: MaHoaDon
-[00:35:28, 13/04/2025] INFO: Khóa chính Handler: MaHoaDon
-[00:35:35, 13/04/2025] INFO: Kiểm tra bảng hoadon: tồn tại
-[00:35:35, 13/04/2025] ERROR: Server error: Data truncation: Incorrect date value: '4' for column 'Ngay' at row 1 - Data truncation: Incorrect date value: '4' for column 'Ngay' at row 1
-[00:35:44, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
-[00:35:44, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
-[00:35:44, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang
-[00:35:48, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
-[00:35:49, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
-[00:35:49, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
-[00:35:49, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang
-[00:35:54, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
-[00:35:54, 13/04/2025] INFO: Xử lý PUT cho bảng: khachhang, Giá trị khóa chính: 3
-[00:35:54, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
-[00:35:54, 13/04/2025] INFO: Khóa chính: MaKhachHang
-[00:35:54, 13/04/2025] INFO: Body JSON: {"Sdt":"4","TinhTrangKhach":"Đã rời đi","MaKhachHang":"3","TenKhachHang":"4"}
-[00:35:55, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
-[00:35:55, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
-[00:35:55, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang
-[00:36:00, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
-[00:36:00, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
-[00:36:00, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
-[00:36:00, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
-[00:36:00, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang
+[01:50:43, 13/04/2025] INFO: Start
+[01:50:43, 13/04/2025] INFO: MainUI constructor
+[01:50:43, 13/04/2025] INFO: LoginPanel khởi tạo
+[01:50:43, 13/04/2025] INFO: Server started on port 8080
+[01:50:45, 13/04/2025] INFO: Thử đăng nhập - Tên người dùng: 1
+[01:50:46, 13/04/2025] INFO: Login response status: 200
+[01:50:46, 13/04/2025] INFO: Login response body: Login successful
+[01:50:46, 13/04/2025] INFO: Đăng nhập thành công cho người dùng: 1
+[01:50:46, 13/04/2025] INFO: TableDataOperationsClient được khởi tạo với authHeader
+[01:50:46, 13/04/2025] INFO: Show main interface
+[01:50:46, 13/04/2025] INFO: MenuPanel initialized
+[01:50:46, 13/04/2025] INFO: Executing query: com.mysql.cj.jdbc.ClientPreparedStatement: SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'ql_khachsan' AND TABLE_TYPE = 'BASE TABLE'
+[01:50:46, 13/04/2025] INFO: Table info status: 200
+[01:50:46, 13/04/2025] INFO: Table info body: [{"name":"chitietphieusddv","comment":"CHI TIẾT"},{"name":"dichvu","comment":"DỊCH VỤ"},{"name":"hoadon","comment":"HÓA ĐƠN"},{"name":"khachhang","comment":"KHÁCH HÀNG"},{"name":"loaiphong","comment":"LOẠI PHÒNG"},{"name":"nhanvien","comment":"NHÂN VIÊN"},{"name":"phieudatphong","comment":"PHIẾU ĐẶT PHÒNG"},{"name":"phieusddv","comment":"PHIẾU DỊCH VỤ"},{"name":"phong","comment":"QUẢN LÝ PHÒNG"}]
+[01:50:48, 13/04/2025] INFO: Tên bảng: khachhang, Chú thích: KHÁCH HÀNG
+[01:50:48, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
+[01:50:48, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
+[01:50:48, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang
+[01:50:48, 13/04/2025] INFO: Table data status: 200
+[01:50:48, 13/04/2025] INFO: Table data body: {"keyColumn":"MaKhachHang","columns":[{"name":"Sdt","comment":"Số điện thoại"},{"name":"TinhTrangKhach","comment":"Tình trạng"},{"name":"MaKhachHang","comment":"Mã khách hàng"},{"name":"TenKhachHang","comment":"Tên khách hàng"}],"data":[{"MaKhachHang":"KH001","TenKhachHang":"Nguyen Van B","Sdt":"0987654325","TinhTrangKhach":"Đang ở"},{"MaKhachHang":"KH002","TenKhachHang":"Le Thi B","Sdt":"0977654321","TinhTrangKhach":"Đã rời đi"},{"MaKhachHang":"KH003","TenKhachHang":"Tran Van C","Sdt":"0967654321","TinhTrangKhach":"Hủy đặt phòng"}]}
+[01:50:48, 13/04/2025] INFO: Khóa chính API: MaKhachHang
+[01:50:48, 13/04/2025] INFO: Khóa chính ContentPanel: MaKhachHang
+[01:50:48, 13/04/2025] INFO: Tên bảng ContentPanel: khachhang
+[01:50:48, 13/04/2025] INFO: Tên bảng: loaiphong, Chú thích: LOẠI PHÒNG
+[01:50:48, 13/04/2025] INFO: Kiểm tra bảng loaiphong: tồn tại
+[01:50:48, 13/04/2025] INFO: Truy vấn khóa chính cho loaiphong: Maloai
+[01:50:48, 13/04/2025] INFO: Khóa chính Handler: Maloai
+[01:50:48, 13/04/2025] INFO: Table data status: 200
+[01:50:48, 13/04/2025] INFO: Table data body: {"keyColumn":"Maloai","columns":[{"name":"TenLoaiPhong","comment":"Tên loại phòng"},{"name":"Maloai","comment":"Mã loại phòng"},{"name":"GiaLoai","comment":"Giá loại phòng"}],"data":[{"Maloai":"LP001","TenLoaiPhong":"VIP","GiaLoai":"2000000.00"},{"Maloai":"LP002","TenLoaiPhong":"Đơn","GiaLoai":"800000.00"},{"Maloai":"LP003","TenLoaiPhong":"Đôi","GiaLoai":"1200000.00"}]}
+[01:50:48, 13/04/2025] INFO: Khóa chính API: Maloai
+[01:50:48, 13/04/2025] INFO: Khóa chính ContentPanel: Maloai
+[01:50:48, 13/04/2025] INFO: Tên bảng ContentPanel: loaiphong

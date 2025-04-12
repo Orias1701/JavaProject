@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JFrame;
 
+import controller.LogHandler;
 import controller.MainCtrl;
 import view.FooterRegion.FooterPanel;
 import view.HeaderRegion.HeaderPanel;
@@ -22,6 +23,7 @@ public class MainUI extends JFrame {
 
         getContentPane().setBackground(Color.decode("#FFFFFF"));
 
+        LogHandler.logInfo("MainUI constructor");
         MainCtrl.startServer();
 
         add(new LoginPanel(this));
@@ -30,23 +32,23 @@ public class MainUI extends JFrame {
     }
 
     public void showMainInterface() {
+        LogHandler.logInfo("Show main interface");
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 
-        // Khởi tạo các vùng
         HeaderPanel headerPanel = new HeaderPanel();
         FooterPanel footerPanel = new FooterPanel();
         MenuPanel menuPanel = new MenuPanel();
         ContentPanel contentPanel = new ContentPanel();
 
-        // Thêm vào layout
         add(headerPanel, BorderLayout.NORTH);
         add(footerPanel, BorderLayout.SOUTH);
         add(menuPanel, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 
-        // Khởi tạo controller
         new MainCtrl(contentPanel, menuPanel);
+
+        menuPanel.refreshTableList();
 
         revalidate();
         repaint();
