@@ -9,6 +9,8 @@ public class Style {
     // Color
     public static final Color LIGHT_CL = Color.WHITE;
     public static final Color DARK_CL = Color.BLACK;
+    public static final Color GREEN = Color.decode("#00A251");
+    public static final Color RED = Color.decode("#C90000");
     public static final Color GRAY_CL = Color.decode("#444444");
     public static final Color MAIN_CL = Color.decode("#9E88FF");
     public static final Color SEC_CL = Color.decode("#D7CEFF");
@@ -24,7 +26,7 @@ public class Style {
     public static final Font MONS_20 = new Font("Montserrat", Font.BOLD, 20);
     public static final Font MONS_24 = new Font("Montserrat", Font.BOLD, 24);
     public static final Font MONS_28 = new Font("Montserrat", Font.BOLD, 28);
-    public static final Font ROB_12 = new Font("Roboto", Font.PLAIN, 12);
+    public static final Font ROB_B14 = new Font("Roboto", Font.BOLD, 14);
     public static final Font ROB_14 = new Font("Roboto", Font.PLAIN, 14);
     public static final Font ROB_16 = new Font("Roboto", Font.BOLD, 16);
     public static final Font ROB_20 = new Font("Roboto", Font.BOLD, 20);
@@ -36,14 +38,6 @@ public class Style {
     public static final Font NOR_20 = new Font("Arial", Font.BOLD, 20);
     public static final Font NOR_24 = new Font("Arial", Font.BOLD, 24);
     public static final Font NOR_28 = new Font("Arial", Font.BOLD, 28);
-    public static final Font TITLE_20 = new Font("Segoe UI", Font.BOLD, 20);
-    public static final Font TITLE_16 = new Font("Segoe UI", Font.BOLD, 16);
-    public static final Font BUTTON = new Font("Segoe UI", Font.BOLD, 14);
-    public static final Font TEXT_N = new Font("Segoe UI", Font.PLAIN, 12);
-    public static final Font TEXT_N16 = new Font("Segoe UI", Font.PLAIN, 16);
-    public static final Font TEXT_B = new Font("Segoe UI", Font.BOLD, 12);
-    public static final Font TEXT_I = new Font("Segoe UI", Font.ITALIC, 12);
-    public static final Font TEXT_BI = new Font("Segoe UI", Font.BOLD | Font.ITALIC, 12);
 
     // Size
     public static final Dimension MENU_WIDTH = new Dimension(240, 0);

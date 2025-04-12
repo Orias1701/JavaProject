@@ -19,9 +19,9 @@ public class MenuPanel extends JPanel {
 
     // Interface cho listener
     public interface TableSelectionListener {
-        void onTableSelected(String tableName);
+        void onTableSelected(String tableName, String tableComment);
     }
-
+    
     public void setTableSelectionListener(TableSelectionListener listener) {
         this.tableSelectionListener = listener;
     }
@@ -114,9 +114,10 @@ public class MenuPanel extends JPanel {
         activeButton.setBackground(Style.NO_CL);
         activeButton.setForeground(Style.LIGHT_CL);
         currentTableName = (String) activeButton.getClientProperty("tableName");
-        System.out.println("Table name: " + currentTableName);
+        String currentTableComment = activeButton.getText();
+        System.out.println("Table name: " + currentTableName + ", Comment: " + currentTableComment);
         if (tableSelectionListener != null && !"HOME".equals(currentTableName)) {
-            tableSelectionListener.onTableSelected(currentTableName);
+            tableSelectionListener.onTableSelected(currentTableName, currentTableComment);
         }
         animationTimer.start();
     }
