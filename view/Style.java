@@ -47,6 +47,9 @@ public class Style {
     public static final Font NOR_20 = new Font("Arial", Font.BOLD, 20);
     public static final Font NOR_24 = new Font("Arial", Font.BOLD, 24);
     public static final Font NOR_28 = new Font("Arial", Font.BOLD, 28);
+    public static final Font SC_BI = new Font("Overlock SC", Font.BOLD | Font.ITALIC, 24);
+    public static final Font SC_B = new Font("Overlock SC", Font.BOLD, 24);
+    public static final Font SC_S = new Font("Overlock SC", Font.BOLD, 18);
 
     // Size
     public static final Dimension MENU_WIDTH = new Dimension(240, 0);
