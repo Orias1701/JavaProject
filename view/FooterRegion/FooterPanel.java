@@ -26,7 +26,7 @@ public class FooterPanel extends JPanel {
         gbc.insets = new java.awt.Insets(0, 0, 0, 20);
         add(timeLabel, gbc);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss   dd - MM - yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH : mm : ss   dd - MM - yyyy");
         timeLabel.setText(LocalDateTime.now().format(formatter));
 
         Timer timer = new Timer(1000, e -> {
