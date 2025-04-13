@@ -51,7 +51,8 @@ public class FormDialogPanel implements FormDialogHandler {
         // Tạo các trường nhập liệu
         for (int i = 0; i < tablePanel.getColumnNames().size(); i++) {
             String col = tablePanel.getColumnNames().get(i);
-            JLabel label = new JLabel(col + ":");
+            String comment = tablePanel.getColumnComments().get(i);
+            JLabel label = new JLabel(comment + ":");
             label.setFont(Style.MONS_14);
             label.setForeground(Style.DARK_CL);
 
@@ -79,12 +80,11 @@ public class FormDialogPanel implements FormDialogHandler {
             inputFields.put(col, field);
         }
 
-        // Thêm JScrollPane cho form
+        // Thêm JScrollPane
         JScrollPane scrollPane = new JScrollPane(formPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setBackground(Style.LIGHT_CL);
 
-        // Tạo panel nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         buttonPanel.setBackground(Style.LIGHT_CL);
 

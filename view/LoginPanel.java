@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import controller.LogHandler;
 import controller.MainCtrl;
 import model.ApiClient;
+// import view.Style;
 
 public class LoginPanel extends JPanel {
 

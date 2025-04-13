@@ -17,7 +17,7 @@ import view.MenuRegion.MenuPanel;
 
 public class MainUI extends JFrame {
 
-    private ContentPanel contentPanel; // Lưu tham chiếu ContentPanel
+    private ContentPanel contentPanel;
 
     public MainUI() {
         setTitle("Hotel Management System");
@@ -46,13 +46,10 @@ public class MainUI extends JFrame {
         MenuPanel menuPanel = new MenuPanel();
         contentPanel = new ContentPanel();
 
-        // Thiết lập TableSelectionListener cho MenuPanel
         menuPanel.setTableSelectionListener((tableName, tableComment) -> {
             try {
-                // Gọi API để lấy dữ liệu bảng
                 TableDataResult result = ApiClient.getTableData(tableName);
                 if (result.data != null && !result.data.isEmpty()) {
-                    // Cập nhật ContentPanel với dữ liệu bảng và tableComment
                     contentPanel.updateTableData(
                         result.data,
                         result.columnComments,
@@ -61,14 +58,12 @@ public class MainUI extends JFrame {
                         tableComment
                     );
                 } else {
-                    // Xử lý trường hợp không có dữ liệu
                     JOptionPane.showMessageDialog(
                         this,
                         "Không có dữ liệu cho bảng " + tableComment,
                         "Cảnh báo",
                         JOptionPane.WARNING_MESSAGE
                     );
-                    // Xóa nội dung bảng trong ContentPanel
                     contentPanel.updateTableData(null, null, null, tableName, tableComment);
                 }
             } catch (Exception ex) {
