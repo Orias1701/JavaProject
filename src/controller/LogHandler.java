@@ -13,6 +13,20 @@ public class LogHandler {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss, dd/MM/yyyy");
     private static boolean isFirstWrite = true;
 
+    // Khởi tạo shutdown hook để xóa nội dung file log khi chương trình kết thúc
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try (FileWriter writer = new FileWriter(LOG_FILE, false)) {
+                // Ghi đè file với nội dung rỗng để làm trống
+                writer.write("");
+                writer.flush();
+                LOGGER.info("Log file content cleared on shutdown: " + LOG_FILE);
+            } catch (IOException e) {
+                LOGGER.severe("Failed to clear log file content on shutdown: " + e.getMessage());
+            }
+        }));
+    }
+
     public static void logInfo(String message) {
         String logMessage = String.format("[%s] INFO: %s%n", DATE_FORMAT.format(new Date()), message);
         LOGGER.info(message);
