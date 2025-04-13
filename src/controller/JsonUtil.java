@@ -2,6 +2,7 @@ package controller;
 
 import java.sql.ResultSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JsonUtil {
@@ -34,6 +35,20 @@ public class JsonUtil {
             if (!firstColumn) columnsJson.append(",");
             columnsJson.append("{\"name\":\"").append(entry.getKey())
                        .append("\",\"comment\":\"").append(entry.getValue().replace("\"", "\\\""))
+                       .append("\"}");
+            firstColumn = false;
+        }
+        columnsJson.append("]");
+        return columnsJson.toString();
+    }
+
+    public static String buildColumnsJsonFromList(List<Map<String, String>> columns) {
+        StringBuilder columnsJson = new StringBuilder("[");
+        boolean firstColumn = true;
+        for (Map<String, String> column : columns) {
+            if (!firstColumn) columnsJson.append(",");
+            columnsJson.append("{\"name\":\"").append(column.get("name"))
+                       .append("\",\"comment\":\"").append(column.get("comment").replace("\"", "\\\""))
                        .append("\"}");
             firstColumn = false;
         }

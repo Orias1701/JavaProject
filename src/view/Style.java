@@ -11,11 +11,13 @@ public class Style {
     public static final Color LIGHT_CL = Color.WHITE;
     public static final Color DARK_CL = Color.BLACK;
     public static final Color GREEN = Color.decode("#00A251");
+    public static final Color BLUE = Color.decode("#0072C6");
     public static final Color RED = Color.decode("#C90000");
     public static final Color GRAY_CL = Color.decode("#444444");
     public static final Color MAIN_CL = Color.decode("#9E88FF");
     public static final Color SEC_CL = Color.decode("#D7CEFF");
     public static final Color TRD_CL = Color.decode("#7C68D4");
+    public static final Color FTH_CL = Color.decode("#F3E8FF");
     public static final Color ACT_CL = Color.decode("#6430AD");
     public static final Color BUTTON_CL = Color.decode("#43327C");
     public static final Color NO_CL = new Color(0, 0, 0, 0);
@@ -86,4 +88,32 @@ public class Style {
             super.paintComponent(g);
         }
     }
-}
+    public static class RoundBorder implements Border {
+        private final int radius;
+        private final Color color;
+
+        public RoundBorder(Color color, int radius) {
+            this.color = color;
+            this.radius = radius;
+        }
+
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(color);
+            g2.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
+            g2.dispose();
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c) {
+            return new Insets(radius / 2, radius / 2, radius / 2, radius / 2);
+        }
+
+        @Override
+        public boolean isBorderOpaque() {
+            return false;
+        }
+    }
+}   

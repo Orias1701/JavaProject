@@ -2,13 +2,13 @@ package model;
 
 import controller.LogHandler;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class JsonParser {
     public Map<String, String> parseTableInfo(String json) {
-        Map<String, String> tableInfo = new HashMap<>();
+        Map<String, String> tableInfo = new LinkedHashMap<>(); // Sử dụng LinkedHashMap để giữ thứ tự
         json = json.substring(1, json.length() - 1);
         if (json.isEmpty()) return tableInfo;
 
@@ -25,14 +25,14 @@ public class JsonParser {
                 if ("name".equals(key)) name = value;
                 if ("comment".equals(key)) comment = value;
             }
-            tableInfo.put(name, comment);
+            tableInfo.put(name, comment); // Thứ tự được giữ bởi LinkedHashMap
         }
         return tableInfo;
     }
 
     public ApiClient.TableDataResult parseTableDataWithColumns(String json) {
         List<Map<String, String>> data = new ArrayList<>();
-        Map<String, String> columnComments = new HashMap<>();
+        Map<String, String> columnComments = new LinkedHashMap<>();
         String keyColumn = "";
 
         try {
@@ -85,7 +85,7 @@ public class JsonParser {
                 for (String row : rows) {
                     row = row.replace("{", "").replace("}", "").trim();
                     String[] keyValuePairs = row.split(",");
-                    Map<String, String> rowData = new HashMap<>();
+                    Map<String, String> rowData = new LinkedHashMap<>();
                     for (String pair : keyValuePairs) {
                         String[] kv = pair.split(":");
                         String key = kv[0].replace("\"", "").trim();

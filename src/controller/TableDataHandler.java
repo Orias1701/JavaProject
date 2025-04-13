@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TableDataHandler extends BaseHandler implements TableDataInterface {
@@ -62,15 +65,36 @@ public class TableDataHandler extends BaseHandler implements TableDataInterface 
     public void handleGet(HttpExchange exchange, Connection conn, String tableName) throws Exception {
         String keyColumn = DatabaseUtil.getKeyColumn(conn, tableName);
         LogHandler.logInfo("Khóa chính Handler: " + keyColumn);
-        Map<String, String> columnMetadata = DatabaseUtil.getColumnMetadata(conn, tableName);
-        String columnsJson = JsonUtil.buildColumnsJson(columnMetadata);
 
-        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + tableName);
-        ResultSet rs = stmt.executeQuery();
-        String dataJson = JsonUtil.buildDataJson(rs);
+        // Lấy metadata cột theo thứ tự ORDINAL_POSITION
+        List<Map<String, String>> columns = new ArrayList<>();
+        String query = "SELECT COLUMN_NAME AS name, COLUMN_COMMENT AS comment " +
+                      "FROM INFORMATION_SCHEMA.COLUMNS " +
+                      "WHERE TABLE_NAME = ? ORDER BY ORDINAL_POSITION";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, tableName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, String> column = new LinkedHashMap<>();
+                    String name = rs.getString("name");
+                    String comment = rs.getString("comment") != null ? rs.getString("comment") : "";
+                    column.put("name", name);
+                    column.put("comment", comment);
+                    columns.add(column);
+                }
+            }
+        }
 
-        String json = "{\"keyColumn\":\"" + (keyColumn != null ? keyColumn : "") + "\",\"columns\":" + columnsJson + ",\"data\":" + dataJson + "}";
-        sendResponse(exchange, 200, json);
+        // Tạo JSON cho columns
+        String columnsJson = JsonUtil.buildColumnsJsonFromList(columns);
+
+        // Lấy dữ liệu bảng
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + tableName);
+             ResultSet rs = stmt.executeQuery()) {
+            String dataJson = JsonUtil.buildDataJson(rs);
+            String json = "{\"keyColumn\":\"" + (keyColumn != null ? keyColumn : "") + "\",\"columns\":" + columnsJson + ",\"data\":" + dataJson + "}";
+            sendResponse(exchange, 200, json);
+        }
     }
 
     @Override
