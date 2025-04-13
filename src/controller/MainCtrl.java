@@ -8,12 +8,10 @@ import view.MenuRegion.MenuPanel;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Map;
-// import java.util.logging.Logger;
 
 import com.sun.net.httpserver.HttpServer;
 
 public class MainCtrl {
-    // private static final Logger LOGGER = Logger.getLogger(MainCtrl.class.getName());
     private final ContentPanel contentPanel;
     private final MenuPanel menuPanel;
     private static TableDataOperationsClient operationsClient;

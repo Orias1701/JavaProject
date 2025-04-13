@@ -13,7 +13,6 @@ public class LogHandler {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:ss, dd/MM/yyyy");
     private static boolean isFirstWrite = true;
 
-    // Khởi tạo shutdown hook để xóa nội dung file log khi chương trình kết thúc
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try (FileWriter writer = new FileWriter(LOG_FILE, false)) {
