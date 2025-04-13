@@ -1,0 +1,194 @@
+[18:57:59, 13/04/2025] INFO: Start
+[18:57:59, 13/04/2025] INFO: MainUI constructor
+[18:57:59, 13/04/2025] INFO: LoginPanel initialized
+[18:57:59, 13/04/2025] INFO: Server started on port 8080
+[18:58:07, 13/04/2025] INFO: Thử đăng nhập - Tên người dùng: admin
+[18:58:07, 13/04/2025] INFO: Login response status: 200
+[18:58:07, 13/04/2025] INFO: Login response body: Login successful
+[18:58:07, 13/04/2025] INFO: Đăng nhập thành công cho người dùng: admin
+[18:58:07, 13/04/2025] INFO: TableDataOperationsClient được khởi tạo với authHeader
+[18:58:07, 13/04/2025] INFO: Show main interface
+[18:58:07, 13/04/2025] INFO: MenuPanel initialized
+[18:58:07, 13/04/2025] INFO: Executing query: com.mysql.cj.jdbc.ClientPreparedStatement: SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'ql_khachsan' AND TABLE_TYPE = 'BASE TABLE'
+[18:58:07, 13/04/2025] INFO: Table info status: 200
+[18:58:07, 13/04/2025] INFO: Table info body: [{"name":"chitietphieusddv","comment":"chitietphieusddv"},{"name":"dichvu","comment":"dichvu"},{"name":"hoadon","comment":"hoadon"},{"name":"khachhang","comment":"khachhang"},{"name":"loaiphong","comment":"loaiphong"},{"name":"nhanvien","comment":"nhanvien"},{"name":"phieudatphong","comment":"phieudatphong"},{"name":"phieukiemtrachitiet","comment":"phieukiemtrachitiet"},{"name":"phieukiemtraphong","comment":"phieukiemtraphong"},{"name":"phieusddv","comment":"phieusddv"},{"name":"phong","comment":"Phòng"},{"name":"thietbi","comment":"thietbi"},{"name":"thietbiphong","comment":"thietbiphong"}]
+[18:58:10, 13/04/2025] INFO: Tên bảng: chitietphieusddv, Chú thích: chitietphieusddv
+[18:58:10, 13/04/2025] INFO: Kiểm tra bảng chitietphieusddv: tồn tại
+[18:58:10, 13/04/2025] INFO: Truy vấn khóa chính cho chitietphieusddv: MaPhieuSDDV
+[18:58:10, 13/04/2025] INFO: Khóa chính Handler: MaPhieuSDDV
+[18:58:10, 13/04/2025] INFO: Table data status: 200
+[18:58:10, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuSDDV","columns":[{"name":"MaPhieuSDDV","comment":""},{"name":"MaDichVu","comment":""},{"name":"SoLuongDichVu","comment":""}],"data":[{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV001","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV002","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV003","SoLuongDichVu":"3"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV004","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV005","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV006","SoLuongDichVu":"2"}]}
+[18:58:10, 13/04/2025] INFO: Khóa chính API: MaPhieuSDDV
+[18:58:10, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuSDDV
+[18:58:10, 13/04/2025] INFO: Tên bảng TablePanel: chitietphieusddv
+[18:58:10, 13/04/2025] INFO: Chú thích bảng TablePanel: chitietphieusddv
+[18:58:13, 13/04/2025] INFO: Tên bảng: chitietphieusddv, Chú thích: chitietphieusddv
+[18:58:13, 13/04/2025] INFO: Kiểm tra bảng chitietphieusddv: tồn tại
+[18:58:13, 13/04/2025] INFO: Truy vấn khóa chính cho chitietphieusddv: MaPhieuSDDV
+[18:58:13, 13/04/2025] INFO: Khóa chính Handler: MaPhieuSDDV
+[18:58:13, 13/04/2025] INFO: Table data status: 200
+[18:58:13, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuSDDV","columns":[{"name":"MaPhieuSDDV","comment":""},{"name":"MaDichVu","comment":""},{"name":"SoLuongDichVu","comment":""}],"data":[{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV001","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV002","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV003","SoLuongDichVu":"3"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV004","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV005","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV006","SoLuongDichVu":"2"}]}
+[18:58:13, 13/04/2025] INFO: Khóa chính API: MaPhieuSDDV
+[18:58:13, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuSDDV
+[18:58:13, 13/04/2025] INFO: Tên bảng TablePanel: chitietphieusddv
+[18:58:13, 13/04/2025] INFO: Chú thích bảng TablePanel: chitietphieusddv
+[18:58:13, 13/04/2025] INFO: Tên bảng: dichvu, Chú thích: dichvu
+[18:58:13, 13/04/2025] INFO: Kiểm tra bảng dichvu: tồn tại
+[18:58:13, 13/04/2025] INFO: Truy vấn khóa chính cho dichvu: MaDichVu
+[18:58:13, 13/04/2025] INFO: Khóa chính Handler: MaDichVu
+[18:58:13, 13/04/2025] INFO: Table data status: 200
+[18:58:13, 13/04/2025] INFO: Table data body: {"keyColumn":"MaDichVu","columns":[{"name":"MaDichVu","comment":""},{"name":"LoaiDichVu","comment":""},{"name":"GiaDichVu","comment":""}],"data":[{"MaDichVu":"DV001","LoaiDichVu":"Ăn uống","GiaDichVu":"500000.00"},{"MaDichVu":"DV002","LoaiDichVu":"Giặt ủi","GiaDichVu":"200000.00"},{"MaDichVu":"DV003","LoaiDichVu":"Spa","GiaDichVu":"1000000.00"},{"MaDichVu":"DV004","LoaiDichVu":"Thuê xe","GiaDichVu":"300000.00"},{"MaDichVu":"DV005","LoaiDichVu":"Công viên","GiaDichVu":"150000.00"},{"MaDichVu":"DV006","LoaiDichVu":"Massage","GiaDichVu":"800000.00"},{"MaDichVu":"DV007","LoaiDichVu":"Bể bơi","GiaDichVu":"250000.00"}]}
+[18:58:13, 13/04/2025] INFO: Khóa chính API: MaDichVu
+[18:58:13, 13/04/2025] INFO: Khóa chính TablePanel: MaDichVu
+[18:58:13, 13/04/2025] INFO: Tên bảng TablePanel: dichvu
+[18:58:13, 13/04/2025] INFO: Chú thích bảng TablePanel: dichvu
+[18:58:14, 13/04/2025] INFO: Tên bảng: hoadon, Chú thích: hoadon
+[18:58:14, 13/04/2025] INFO: Kiểm tra bảng hoadon: tồn tại
+[18:58:14, 13/04/2025] INFO: Truy vấn khóa chính cho hoadon: MaHoaDon
+[18:58:14, 13/04/2025] INFO: Khóa chính Handler: MaHoaDon
+[18:58:14, 13/04/2025] INFO: Table data status: 200
+[18:58:14, 13/04/2025] INFO: Table data body: {"keyColumn":"MaHoaDon","columns":[{"name":"MaHoaDon","comment":""},{"name":"MaNhanVien","comment":""},{"name":"MaKhachHang","comment":""},{"name":"Ngay","comment":""}],"data":[{"MaHoaDon":"HD001","MaNhanVien":"NV001","MaKhachHang":"KH001","Ngay":"2025-03-01"},{"MaHoaDon":"HD002","MaNhanVien":"NV002","MaKhachHang":"KH002","Ngay":"2025-03-02"},{"MaHoaDon":"HD003","MaNhanVien":"NV003","MaKhachHang":"KH003","Ngay":"2025-03-03"}]}
+[18:58:14, 13/04/2025] INFO: Khóa chính API: MaHoaDon
+[18:58:14, 13/04/2025] INFO: Khóa chính TablePanel: MaHoaDon
+[18:58:14, 13/04/2025] INFO: Tên bảng TablePanel: hoadon
+[18:58:14, 13/04/2025] INFO: Chú thích bảng TablePanel: hoadon
+[18:58:14, 13/04/2025] INFO: Tên bảng: loaiphong, Chú thích: loaiphong
+[18:58:14, 13/04/2025] INFO: Kiểm tra bảng loaiphong: tồn tại
+[18:58:14, 13/04/2025] INFO: Truy vấn khóa chính cho loaiphong: Maloai
+[18:58:14, 13/04/2025] INFO: Khóa chính Handler: Maloai
+[18:58:14, 13/04/2025] INFO: Table data status: 200
+[18:58:14, 13/04/2025] INFO: Table data body: {"keyColumn":"Maloai","columns":[{"name":"Maloai","comment":""},{"name":"TenLoaiPhong","comment":""},{"name":"GiaLoai","comment":""}],"data":[{"Maloai":"LP001","TenLoaiPhong":"VIP","GiaLoai":"2000000.00"},{"Maloai":"LP002","TenLoaiPhong":"Đơn","GiaLoai":"800000.00"},{"Maloai":"LP003","TenLoaiPhong":"Đôi","GiaLoai":"1200000.00"}]}
+[18:58:14, 13/04/2025] INFO: Khóa chính API: Maloai
+[18:58:14, 13/04/2025] INFO: Khóa chính TablePanel: Maloai
+[18:58:14, 13/04/2025] INFO: Tên bảng TablePanel: loaiphong
+[18:58:14, 13/04/2025] INFO: Chú thích bảng TablePanel: loaiphong
+[18:58:15, 13/04/2025] INFO: Tên bảng: khachhang, Chú thích: khachhang
+[18:58:15, 13/04/2025] INFO: Kiểm tra bảng khachhang: tồn tại
+[18:58:15, 13/04/2025] INFO: Truy vấn khóa chính cho khachhang: MaKhachHang
+[18:58:15, 13/04/2025] INFO: Khóa chính Handler: MaKhachHang
+[18:58:15, 13/04/2025] INFO: Table data status: 200
+[18:58:15, 13/04/2025] INFO: Table data body: {"keyColumn":"MaKhachHang","columns":[{"name":"MaKhachHang","comment":""},{"name":"TenKhachHang","comment":""},{"name":"Sdt","comment":""},{"name":"TinhTrangKhach","comment":""}],"data":[{"MaKhachHang":"KH001","TenKhachHang":"Nguyen Van A","Sdt":"0987654321","TinhTrangKhach":"Đang ở"},{"MaKhachHang":"KH002","TenKhachHang":"Le Thi B","Sdt":"0977654321","TinhTrangKhach":"Đã rời đi"},{"MaKhachHang":"KH003","TenKhachHang":"Tran Van C","Sdt":"0967654321","TinhTrangKhach":"Hủy đặt phòng"},{"MaKhachHang":"KH004","TenKhachHang":"Pham Thi D","Sdt":"0957654321","TinhTrangKhach":"Đang ở"},{"MaKhachHang":"KH005","TenKhachHang":"Hoang Van E","Sdt":"0947654321","TinhTrangKhach":"Đã rời đi"}]}
+[18:58:15, 13/04/2025] INFO: Khóa chính API: MaKhachHang
+[18:58:15, 13/04/2025] INFO: Khóa chính TablePanel: MaKhachHang
+[18:58:15, 13/04/2025] INFO: Tên bảng TablePanel: khachhang
+[18:58:15, 13/04/2025] INFO: Chú thích bảng TablePanel: khachhang
+[18:58:15, 13/04/2025] INFO: Tên bảng: nhanvien, Chú thích: nhanvien
+[18:58:15, 13/04/2025] INFO: Kiểm tra bảng nhanvien: tồn tại
+[18:58:15, 13/04/2025] INFO: Truy vấn khóa chính cho nhanvien: MaNhanVien
+[18:58:15, 13/04/2025] INFO: Khóa chính Handler: MaNhanVien
+[18:58:15, 13/04/2025] INFO: Table data status: 200
+[18:58:15, 13/04/2025] INFO: Table data body: {"keyColumn":"MaNhanVien","columns":[{"name":"MaNhanVien","comment":""},{"name":"MaNhanVien","comment":""},{"name":"TenNhanVien","comment":""},{"name":"TenNhanVien","comment":""},{"name":"Sdt","comment":""},{"name":"ChucVu","comment":""},{"name":"GioiTinh","comment":""},{"name":"Luong1Gio","comment":""},{"name":"ChucVu","comment":""},{"name":"GioiTinh","comment":""},{"name":"SoDienThoai","comment":""},{"name":"Tuoi","comment":""}],"data":[{"MaNhanVien":"NV001","TenNhanVien":"Nguyen Van X","Sdt":"0912345678","GioiTinh":"Nam","ChucVu":""},{"MaNhanVien":"NV002","TenNhanVien":"Tran Thi Y","Sdt":"0922345678","GioiTinh":"Nữ","ChucVu":""},{"MaNhanVien":"NV003","TenNhanVien":"Pham Van Z","Sdt":"0932345678","GioiTinh":"Nam","ChucVu":""},{"MaNhanVien":"NV004","TenNhanVien":"Le Thi M","Sdt":"0942345678","GioiTinh":"Nữ","ChucVu":""},{"MaNhanVien":"NV005","TenNhanVien":"Hoang Van N","Sdt":"0952345678","GioiTinh":"Nam","ChucVu":""}]}
+[18:58:15, 13/04/2025] INFO: Khóa chính API: MaNhanVien
+[18:58:15, 13/04/2025] INFO: Khóa chính TablePanel: MaNhanVien
+[18:58:15, 13/04/2025] INFO: Tên bảng TablePanel: nhanvien
+[18:58:15, 13/04/2025] INFO: Chú thích bảng TablePanel: nhanvien
+[18:58:16, 13/04/2025] INFO: Tên bảng: phieudatphong, Chú thích: phieudatphong
+[18:58:16, 13/04/2025] INFO: Kiểm tra bảng phieudatphong: tồn tại
+[18:58:16, 13/04/2025] INFO: Truy vấn khóa chính cho phieudatphong: MaPhieuDatPhong
+[18:58:16, 13/04/2025] INFO: Khóa chính Handler: MaPhieuDatPhong
+[18:58:16, 13/04/2025] INFO: Table data status: 200
+[18:58:16, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuDatPhong","columns":[{"name":"MaPhieuDatPhong","comment":""},{"name":"MaPhong","comment":""},{"name":"MaNhanVien","comment":""},{"name":"MaKhachHang","comment":""},{"name":"MaHoaDon","comment":""},{"name":"NgayNhanPhong","comment":""},{"name":"NgayTraPhong","comment":""}],"data":[{"MaPhieuDatPhong":"PDP001","MaPhong":"P101","MaNhanVien":"NV001","MaKhachHang":"KH001","MaHoaDon":"HD001","NgayNhanPhong":"2025-03-01","NgayTraPhong":"2025-03-05"},{"MaPhieuDatPhong":"PDP002","MaPhong":"P102","MaNhanVien":"NV002","MaKhachHang":"KH002","MaHoaDon":"HD002","NgayNhanPhong":"2025-03-02","NgayTraPhong":"2025-03-06"},{"MaPhieuDatPhong":"PDP003","MaPhong":"P103","MaNhanVien":"NV003","MaKhachHang":"KH003","MaHoaDon":"HD003","NgayNhanPhong":"2025-03-03","NgayTraPhong":"2025-03-07"}]}
+[18:58:16, 13/04/2025] INFO: Khóa chính API: MaPhieuDatPhong
+[18:58:16, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuDatPhong
+[18:58:16, 13/04/2025] INFO: Tên bảng TablePanel: phieudatphong
+[18:58:16, 13/04/2025] INFO: Chú thích bảng TablePanel: phieudatphong
+[18:58:16, 13/04/2025] INFO: Tên bảng: phieukiemtraphong, Chú thích: phieukiemtraphong
+[18:58:16, 13/04/2025] INFO: Kiểm tra bảng phieukiemtraphong: tồn tại
+[18:58:16, 13/04/2025] INFO: Truy vấn khóa chính cho phieukiemtraphong: MaPhieuKiemTra
+[18:58:16, 13/04/2025] INFO: Khóa chính Handler: MaPhieuKiemTra
+[18:58:16, 13/04/2025] INFO: Table data status: 200
+[18:58:16, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuKiemTra","columns":[{"name":"MaPhieuKiemTra","comment":""},{"name":"MaPhong","comment":""},{"name":"MaNhanVien","comment":""},{"name":"NgayKiemTra","comment":""},{"name":"GhiChu","comment":""},{"name":"TrangThai","comment":""}],"data":[]}
+[18:58:16, 13/04/2025] INFO: Khóa chính API: MaPhieuKiemTra
+[18:58:16, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuKiemTra
+[18:58:16, 13/04/2025] INFO: Tên bảng TablePanel: phieukiemtraphong
+[18:58:16, 13/04/2025] INFO: Chú thích bảng TablePanel: phieukiemtraphong
+[18:58:18, 13/04/2025] INFO: Tên bảng: phieusddv, Chú thích: phieusddv
+[18:58:18, 13/04/2025] INFO: Kiểm tra bảng phieusddv: tồn tại
+[18:58:18, 13/04/2025] INFO: Truy vấn khóa chính cho phieusddv: MaPhieuSDDV
+[18:58:18, 13/04/2025] INFO: Khóa chính Handler: MaPhieuSDDV
+[18:58:18, 13/04/2025] INFO: Table data status: 200
+[18:58:18, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuSDDV","columns":[{"name":"MaPhieuSDDV","comment":""},{"name":"MaKhachHang","comment":""},{"name":"MaNhanVien","comment":""},{"name":"NgaySDDV","comment":""}],"data":[{"MaPhieuSDDV":"PSDDV001","MaKhachHang":"KH001","MaNhanVien":"NV001","NgaySDDV":"2025-03-01"},{"MaPhieuSDDV":"PSDDV002","MaKhachHang":"KH002","MaNhanVien":"NV002","NgaySDDV":"2025-03-02"},{"MaPhieuSDDV":"PSDDV003","MaKhachHang":"KH003","MaNhanVien":"NV003","NgaySDDV":"2025-03-03"}]}
+[18:58:18, 13/04/2025] INFO: Khóa chính API: MaPhieuSDDV
+[18:58:18, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuSDDV
+[18:58:18, 13/04/2025] INFO: Tên bảng TablePanel: phieusddv
+[18:58:18, 13/04/2025] INFO: Chú thích bảng TablePanel: phieusddv
+[18:58:21, 13/04/2025] INFO: Tên bảng: phieukiemtraphong, Chú thích: phieukiemtraphong
+[18:58:21, 13/04/2025] INFO: Kiểm tra bảng phieukiemtraphong: tồn tại
+[18:58:21, 13/04/2025] INFO: Truy vấn khóa chính cho phieukiemtraphong: MaPhieuKiemTra
+[18:58:21, 13/04/2025] INFO: Khóa chính Handler: MaPhieuKiemTra
+[18:58:21, 13/04/2025] INFO: Table data status: 200
+[18:58:21, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuKiemTra","columns":[{"name":"MaPhieuKiemTra","comment":""},{"name":"MaPhong","comment":""},{"name":"MaNhanVien","comment":""},{"name":"NgayKiemTra","comment":""},{"name":"GhiChu","comment":""},{"name":"TrangThai","comment":""}],"data":[]}
+[18:58:21, 13/04/2025] INFO: Khóa chính API: MaPhieuKiemTra
+[18:58:21, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuKiemTra
+[18:58:21, 13/04/2025] INFO: Tên bảng TablePanel: phieukiemtraphong
+[18:58:21, 13/04/2025] INFO: Chú thích bảng TablePanel: phieukiemtraphong
+[18:58:22, 13/04/2025] INFO: Tên bảng: phieudatphong, Chú thích: phieudatphong
+[18:58:22, 13/04/2025] INFO: Kiểm tra bảng phieudatphong: tồn tại
+[18:58:22, 13/04/2025] INFO: Truy vấn khóa chính cho phieudatphong: MaPhieuDatPhong
+[18:58:22, 13/04/2025] INFO: Khóa chính Handler: MaPhieuDatPhong
+[18:58:22, 13/04/2025] INFO: Table data status: 200
+[18:58:22, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuDatPhong","columns":[{"name":"MaPhieuDatPhong","comment":""},{"name":"MaPhong","comment":""},{"name":"MaNhanVien","comment":""},{"name":"MaKhachHang","comment":""},{"name":"MaHoaDon","comment":""},{"name":"NgayNhanPhong","comment":""},{"name":"NgayTraPhong","comment":""}],"data":[{"MaPhieuDatPhong":"PDP001","MaPhong":"P101","MaNhanVien":"NV001","MaKhachHang":"KH001","MaHoaDon":"HD001","NgayNhanPhong":"2025-03-01","NgayTraPhong":"2025-03-05"},{"MaPhieuDatPhong":"PDP002","MaPhong":"P102","MaNhanVien":"NV002","MaKhachHang":"KH002","MaHoaDon":"HD002","NgayNhanPhong":"2025-03-02","NgayTraPhong":"2025-03-06"},{"MaPhieuDatPhong":"PDP003","MaPhong":"P103","MaNhanVien":"NV003","MaKhachHang":"KH003","MaHoaDon":"HD003","NgayNhanPhong":"2025-03-03","NgayTraPhong":"2025-03-07"}]}
+[18:58:22, 13/04/2025] INFO: Khóa chính API: MaPhieuDatPhong
+[18:58:22, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuDatPhong
+[18:58:22, 13/04/2025] INFO: Tên bảng TablePanel: phieudatphong
+[18:58:22, 13/04/2025] INFO: Chú thích bảng TablePanel: phieudatphong
+[18:58:22, 13/04/2025] INFO: Tên bảng: hoadon, Chú thích: hoadon
+[18:58:22, 13/04/2025] INFO: Kiểm tra bảng hoadon: tồn tại
+[18:58:22, 13/04/2025] INFO: Truy vấn khóa chính cho hoadon: MaHoaDon
+[18:58:22, 13/04/2025] INFO: Khóa chính Handler: MaHoaDon
+[18:58:22, 13/04/2025] INFO: Table data status: 200
+[18:58:22, 13/04/2025] INFO: Table data body: {"keyColumn":"MaHoaDon","columns":[{"name":"MaHoaDon","comment":""},{"name":"MaNhanVien","comment":""},{"name":"MaKhachHang","comment":""},{"name":"Ngay","comment":""}],"data":[{"MaHoaDon":"HD001","MaNhanVien":"NV001","MaKhachHang":"KH001","Ngay":"2025-03-01"},{"MaHoaDon":"HD002","MaNhanVien":"NV002","MaKhachHang":"KH002","Ngay":"2025-03-02"},{"MaHoaDon":"HD003","MaNhanVien":"NV003","MaKhachHang":"KH003","Ngay":"2025-03-03"}]}
+[18:58:22, 13/04/2025] INFO: Khóa chính API: MaHoaDon
+[18:58:22, 13/04/2025] INFO: Khóa chính TablePanel: MaHoaDon
+[18:58:22, 13/04/2025] INFO: Tên bảng TablePanel: hoadon
+[18:58:22, 13/04/2025] INFO: Chú thích bảng TablePanel: hoadon
+[18:58:22, 13/04/2025] INFO: Tên bảng: chitietphieusddv, Chú thích: chitietphieusddv
+[18:58:22, 13/04/2025] INFO: Kiểm tra bảng chitietphieusddv: tồn tại
+[18:58:22, 13/04/2025] INFO: Truy vấn khóa chính cho chitietphieusddv: MaPhieuSDDV
+[18:58:22, 13/04/2025] INFO: Khóa chính Handler: MaPhieuSDDV
+[18:58:22, 13/04/2025] INFO: Table data status: 200
+[18:58:22, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuSDDV","columns":[{"name":"MaPhieuSDDV","comment":""},{"name":"MaDichVu","comment":""},{"name":"SoLuongDichVu","comment":""}],"data":[{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV001","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV002","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV003","SoLuongDichVu":"3"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV004","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV005","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV006","SoLuongDichVu":"2"}]}
+[18:58:22, 13/04/2025] INFO: Khóa chính API: MaPhieuSDDV
+[18:58:22, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuSDDV
+[18:58:22, 13/04/2025] INFO: Tên bảng TablePanel: chitietphieusddv
+[18:58:22, 13/04/2025] INFO: Chú thích bảng TablePanel: chitietphieusddv
+[18:58:23, 13/04/2025] INFO: Tên bảng: dichvu, Chú thích: dichvu
+[18:58:23, 13/04/2025] INFO: Kiểm tra bảng dichvu: tồn tại
+[18:58:23, 13/04/2025] INFO: Truy vấn khóa chính cho dichvu: MaDichVu
+[18:58:23, 13/04/2025] INFO: Khóa chính Handler: MaDichVu
+[18:58:23, 13/04/2025] INFO: Table data status: 200
+[18:58:23, 13/04/2025] INFO: Table data body: {"keyColumn":"MaDichVu","columns":[{"name":"MaDichVu","comment":""},{"name":"LoaiDichVu","comment":""},{"name":"GiaDichVu","comment":""}],"data":[{"MaDichVu":"DV001","LoaiDichVu":"Ăn uống","GiaDichVu":"500000.00"},{"MaDichVu":"DV002","LoaiDichVu":"Giặt ủi","GiaDichVu":"200000.00"},{"MaDichVu":"DV003","LoaiDichVu":"Spa","GiaDichVu":"1000000.00"},{"MaDichVu":"DV004","LoaiDichVu":"Thuê xe","GiaDichVu":"300000.00"},{"MaDichVu":"DV005","LoaiDichVu":"Công viên","GiaDichVu":"150000.00"},{"MaDichVu":"DV006","LoaiDichVu":"Massage","GiaDichVu":"800000.00"},{"MaDichVu":"DV007","LoaiDichVu":"Bể bơi","GiaDichVu":"250000.00"}]}
+[18:58:23, 13/04/2025] INFO: Khóa chính API: MaDichVu
+[18:58:23, 13/04/2025] INFO: Khóa chính TablePanel: MaDichVu
+[18:58:23, 13/04/2025] INFO: Tên bảng TablePanel: dichvu
+[18:58:23, 13/04/2025] INFO: Chú thích bảng TablePanel: dichvu
+[18:58:23, 13/04/2025] INFO: Tên bảng: dichvu, Chú thích: dichvu
+[18:58:23, 13/04/2025] INFO: Kiểm tra bảng dichvu: tồn tại
+[18:58:23, 13/04/2025] INFO: Truy vấn khóa chính cho dichvu: MaDichVu
+[18:58:23, 13/04/2025] INFO: Khóa chính Handler: MaDichVu
+[18:58:23, 13/04/2025] INFO: Table data status: 200
+[18:58:23, 13/04/2025] INFO: Table data body: {"keyColumn":"MaDichVu","columns":[{"name":"MaDichVu","comment":""},{"name":"LoaiDichVu","comment":""},{"name":"GiaDichVu","comment":""}],"data":[{"MaDichVu":"DV001","LoaiDichVu":"Ăn uống","GiaDichVu":"500000.00"},{"MaDichVu":"DV002","LoaiDichVu":"Giặt ủi","GiaDichVu":"200000.00"},{"MaDichVu":"DV003","LoaiDichVu":"Spa","GiaDichVu":"1000000.00"},{"MaDichVu":"DV004","LoaiDichVu":"Thuê xe","GiaDichVu":"300000.00"},{"MaDichVu":"DV005","LoaiDichVu":"Công viên","GiaDichVu":"150000.00"},{"MaDichVu":"DV006","LoaiDichVu":"Massage","GiaDichVu":"800000.00"},{"MaDichVu":"DV007","LoaiDichVu":"Bể bơi","GiaDichVu":"250000.00"}]}
+[18:58:23, 13/04/2025] INFO: Khóa chính API: MaDichVu
+[18:58:23, 13/04/2025] INFO: Khóa chính TablePanel: MaDichVu
+[18:58:23, 13/04/2025] INFO: Tên bảng TablePanel: dichvu
+[18:58:23, 13/04/2025] INFO: Chú thích bảng TablePanel: dichvu
+[18:58:23, 13/04/2025] INFO: Tên bảng: hoadon, Chú thích: hoadon
+[18:58:23, 13/04/2025] INFO: Kiểm tra bảng hoadon: tồn tại
+[18:58:23, 13/04/2025] INFO: Truy vấn khóa chính cho hoadon: MaHoaDon
+[18:58:23, 13/04/2025] INFO: Khóa chính Handler: MaHoaDon
+[18:58:23, 13/04/2025] INFO: Table data status: 200
+[18:58:23, 13/04/2025] INFO: Table data body: {"keyColumn":"MaHoaDon","columns":[{"name":"MaHoaDon","comment":""},{"name":"MaNhanVien","comment":""},{"name":"MaKhachHang","comment":""},{"name":"Ngay","comment":""}],"data":[{"MaHoaDon":"HD001","MaNhanVien":"NV001","MaKhachHang":"KH001","Ngay":"2025-03-01"},{"MaHoaDon":"HD002","MaNhanVien":"NV002","MaKhachHang":"KH002","Ngay":"2025-03-02"},{"MaHoaDon":"HD003","MaNhanVien":"NV003","MaKhachHang":"KH003","Ngay":"2025-03-03"}]}
+[18:58:23, 13/04/2025] INFO: Khóa chính API: MaHoaDon
+[18:58:23, 13/04/2025] INFO: Khóa chính TablePanel: MaHoaDon
+[18:58:23, 13/04/2025] INFO: Tên bảng TablePanel: hoadon
+[18:58:23, 13/04/2025] INFO: Chú thích bảng TablePanel: hoadon
+[18:58:24, 13/04/2025] INFO: Tên bảng: loaiphong, Chú thích: loaiphong
+[18:58:24, 13/04/2025] INFO: Kiểm tra bảng loaiphong: tồn tại
+[18:58:24, 13/04/2025] INFO: Truy vấn khóa chính cho loaiphong: Maloai
+[18:58:24, 13/04/2025] INFO: Khóa chính Handler: Maloai
+[18:58:24, 13/04/2025] INFO: Table data status: 200
+[18:58:24, 13/04/2025] INFO: Table data body: {"keyColumn":"Maloai","columns":[{"name":"Maloai","comment":""},{"name":"TenLoaiPhong","comment":""},{"name":"GiaLoai","comment":""}],"data":[{"Maloai":"LP001","TenLoaiPhong":"VIP","GiaLoai":"2000000.00"},{"Maloai":"LP002","TenLoaiPhong":"Đơn","GiaLoai":"800000.00"},{"Maloai":"LP003","TenLoaiPhong":"Đôi","GiaLoai":"1200000.00"}]}
+[18:58:24, 13/04/2025] INFO: Khóa chính API: Maloai
+[18:58:24, 13/04/2025] INFO: Khóa chính TablePanel: Maloai
+[18:58:24, 13/04/2025] INFO: Tên bảng TablePanel: loaiphong
+[18:58:24, 13/04/2025] INFO: Chú thích bảng TablePanel: loaiphong

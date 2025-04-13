@@ -1,6 +1,5 @@
-import javax.swing.SwingUtilities;
-
 import controller.LogHandler;
+import javax.swing.SwingUtilities;
 import view.MainUI;
 
 public class Run {
