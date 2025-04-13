@@ -4,7 +4,9 @@ import java.awt.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import java.awt.geom.Ellipse2D;
 
 public class Style {
     // Color
@@ -29,6 +31,7 @@ public class Style {
     public static final Font MONS_20 = new Font("Montserrat", Font.BOLD, 20);
     public static final Font MONS_24 = new Font("Montserrat", Font.BOLD, 24);
     public static final Font MONS_28 = new Font("Montserrat", Font.BOLD, 28);
+    public static final Font MONS_32 = new Font("Montserrat", Font.BOLD, 32);
     public static final Font ROB_B14 = new Font("Roboto", Font.BOLD, 14);
     public static final Font ROB_14 = new Font("Roboto", Font.PLAIN, 14);
     public static final Font ROB_16 = new Font("Roboto", Font.BOLD, 16);
@@ -114,6 +117,38 @@ public class Style {
         @Override
         public boolean isBorderOpaque() {
             return false;
+        }
+    }
+
+    public static class CircleButton extends RoundedButton {
+        public CircleButton(String text) {
+            super(text, 150, 150);
+            setPreferredSize(new Dimension(150, 150));
+            setMinimumSize(new Dimension(150, 150));
+            setMaximumSize(new Dimension(150, 150));
+            setFont(Style.MONS_12);
+            setBackground(Style.MAIN_CL);
+            setForeground(Color.WHITE);
+            setHorizontalTextPosition(SwingConstants.CENTER);
+            setVerticalTextPosition(SwingConstants.CENTER);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.setColor(getBackground());
+            g2.fillOval(0, 0, getWidth(), getHeight());
+
+            g2.dispose();
+            super.paintComponent(g);
+        }
+
+        @Override
+        public boolean contains(int x, int y) {
+            Ellipse2D circle = new Ellipse2D.Float(0, 0, getWidth(), getHeight());
+            return circle.contains(x, y);
         }
     }
 }   

@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class FooterPanel extends JPanel {
     public FooterPanel() {
-        setPreferredSize(new Dimension(Style.WIN_WIDTH, 45));
+        setPreferredSize(new Dimension(Style.WIN_WIDTH, 40));
         setBackground(new Color(0x43327C));
     }
 }

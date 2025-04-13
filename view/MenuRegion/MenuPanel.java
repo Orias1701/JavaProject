@@ -17,6 +17,7 @@ public class MenuPanel extends JPanel {
     private Rectangle highlightRect = new Rectangle(0, 0, 240, 60);
     private final Timer animationTimer;
     private TableSelectionListener tableSelectionListener;
+    private Runnable homeSelectionListener; // Thêm callback cho nút TRANG CHỦ
 
     public interface TableSelectionListener {
         void onTableSelected(String tableName, String tableComment);
@@ -24,6 +25,10 @@ public class MenuPanel extends JPanel {
 
     public void setTableSelectionListener(TableSelectionListener listener) {
         this.tableSelectionListener = listener;
+    }
+
+    public void setHomeSelectionListener(Runnable listener) {
+        this.homeSelectionListener = listener;
     }
 
     public String getCurrentTableName() {
@@ -128,7 +133,11 @@ public class MenuPanel extends JPanel {
         String currentTableComment = activeButton.getText();
         LogHandler.logInfo("Tên bảng: " + currentTableName + ", Chú thích: " + currentTableComment);
 
-        if (tableSelectionListener != null && !"HOME".equals(currentTableName)) {
+        if ("HOME".equals(currentTableName)) {
+            if (homeSelectionListener != null) {
+                homeSelectionListener.run();
+            }
+        } else if (tableSelectionListener != null) {
             tableSelectionListener.onTableSelected(currentTableName, currentTableComment);
         }
 
