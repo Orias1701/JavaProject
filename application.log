@@ -1,24 +1,24 @@
-[07:00:52, 13/04/2025] INFO: Start
-[07:00:52, 13/04/2025] INFO: MainUI constructor
-[07:00:52, 13/04/2025] INFO: LoginPanel initialized
-[07:00:52, 13/04/2025] INFO: Server started on port 8080
-[07:00:56, 13/04/2025] INFO: Thử đăng nhập - Tên người dùng: 1
-[07:00:56, 13/04/2025] INFO: Login response status: 200
-[07:00:56, 13/04/2025] INFO: Login response body: Login successful
-[07:00:56, 13/04/2025] INFO: Đăng nhập thành công cho người dùng: 1
-[07:00:56, 13/04/2025] INFO: TableDataOperationsClient được khởi tạo với authHeader
-[07:00:56, 13/04/2025] INFO: Show main interface
-[07:00:56, 13/04/2025] INFO: MenuPanel initialized
-[07:00:56, 13/04/2025] INFO: Executing query: com.mysql.cj.jdbc.ClientPreparedStatement: SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'ql_khachsan' AND TABLE_TYPE = 'BASE TABLE'
-[07:00:56, 13/04/2025] INFO: Table info status: 200
-[07:00:56, 13/04/2025] INFO: Table info body: [{"name":"chitietphieusddv","comment":"CHI TIẾT"},{"name":"dichvu","comment":"DỊCH VỤ"},{"name":"hoadon","comment":"HÓA ĐƠN"},{"name":"khachhang","comment":"KHÁCH HÀNG"},{"name":"loaiphong","comment":"LOẠI PHÒNG"},{"name":"nhanvien","comment":"NHÂN VIÊN"},{"name":"phieudatphong","comment":"PHIẾU ĐẶT PHÒNG"},{"name":"phieusddv","comment":"PHIẾU DỊCH VỤ"},{"name":"phong","comment":"QUẢN LÝ PHÒNG"}]
-[07:00:57, 13/04/2025] INFO: Tên bảng: chitietphieusddv, Chú thích: CHI TIẾT
-[07:00:57, 13/04/2025] INFO: Kiểm tra bảng chitietphieusddv: tồn tại
-[07:00:57, 13/04/2025] INFO: Truy vấn khóa chính cho chitietphieusddv: MaPhieuSDDV
-[07:00:57, 13/04/2025] INFO: Khóa chính Handler: MaPhieuSDDV
-[07:00:57, 13/04/2025] INFO: Table data status: 200
-[07:00:57, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuSDDV","columns":[{"name":"MaPhieuSDDV","comment":"Mã phiếu"},{"name":"MaDichVu","comment":"Mã dịch vụ"},{"name":"SoLuongDichVu","comment":"Số lượng"}],"data":[{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV001","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV002","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV003","SoLuongDichVu":"3"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV004","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV005","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV006","SoLuongDichVu":"2"}]}
-[07:00:57, 13/04/2025] INFO: Khóa chính API: MaPhieuSDDV
-[07:00:57, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuSDDV
-[07:00:57, 13/04/2025] INFO: Tên bảng TablePanel: chitietphieusddv
-[07:00:57, 13/04/2025] INFO: Chú thích bảng TablePanel: CHI TIẾT
+[07:04:06, 13/04/2025] INFO: Start
+[07:04:06, 13/04/2025] INFO: MainUI constructor
+[07:04:06, 13/04/2025] INFO: LoginPanel initialized
+[07:04:06, 13/04/2025] INFO: Server started on port 8080
+[07:04:16, 13/04/2025] INFO: Thử đăng nhập - Tên người dùng: 1
+[07:04:16, 13/04/2025] INFO: Login response status: 200
+[07:04:16, 13/04/2025] INFO: Login response body: Login successful
+[07:04:16, 13/04/2025] INFO: Đăng nhập thành công cho người dùng: 1
+[07:04:16, 13/04/2025] INFO: TableDataOperationsClient được khởi tạo với authHeader
+[07:04:16, 13/04/2025] INFO: Show main interface
+[07:04:16, 13/04/2025] INFO: MenuPanel initialized
+[07:04:16, 13/04/2025] INFO: Executing query: com.mysql.cj.jdbc.ClientPreparedStatement: SELECT TABLE_NAME, TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'ql_khachsan' AND TABLE_TYPE = 'BASE TABLE'
+[07:04:16, 13/04/2025] INFO: Table info status: 200
+[07:04:16, 13/04/2025] INFO: Table info body: [{"name":"chitietphieusddv","comment":"CHI TIẾT"},{"name":"dichvu","comment":"DỊCH VỤ"},{"name":"hoadon","comment":"HÓA ĐƠN"},{"name":"khachhang","comment":"KHÁCH HÀNG"},{"name":"loaiphong","comment":"LOẠI PHÒNG"},{"name":"nhanvien","comment":"NHÂN VIÊN"},{"name":"phieudatphong","comment":"PHIẾU ĐẶT PHÒNG"},{"name":"phieusddv","comment":"PHIẾU DỊCH VỤ"},{"name":"phong","comment":"QUẢN LÝ PHÒNG"}]
+[07:04:18, 13/04/2025] INFO: Tên bảng: chitietphieusddv, Chú thích: CHI TIẾT
+[07:04:18, 13/04/2025] INFO: Kiểm tra bảng chitietphieusddv: tồn tại
+[07:04:18, 13/04/2025] INFO: Truy vấn khóa chính cho chitietphieusddv: MaPhieuSDDV
+[07:04:18, 13/04/2025] INFO: Khóa chính Handler: MaPhieuSDDV
+[07:04:18, 13/04/2025] INFO: Table data status: 200
+[07:04:18, 13/04/2025] INFO: Table data body: {"keyColumn":"MaPhieuSDDV","columns":[{"name":"MaPhieuSDDV","comment":"Mã phiếu"},{"name":"MaDichVu","comment":"Mã dịch vụ"},{"name":"SoLuongDichVu","comment":"Số lượng"}],"data":[{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV001","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV001","MaDichVu":"DV002","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV003","SoLuongDichVu":"3"},{"MaPhieuSDDV":"PSDDV002","MaDichVu":"DV004","SoLuongDichVu":"2"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV005","SoLuongDichVu":"1"},{"MaPhieuSDDV":"PSDDV003","MaDichVu":"DV006","SoLuongDichVu":"2"}]}
+[07:04:18, 13/04/2025] INFO: Khóa chính API: MaPhieuSDDV
+[07:04:18, 13/04/2025] INFO: Khóa chính TablePanel: MaPhieuSDDV
+[07:04:18, 13/04/2025] INFO: Tên bảng TablePanel: chitietphieusddv
+[07:04:18, 13/04/2025] INFO: Chú thích bảng TablePanel: CHI TIẾT
