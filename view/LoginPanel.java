@@ -1,5 +1,7 @@
 package view;
 
+import controller.LogHandler;
+import controller.MainCtrl;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -15,9 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-
-import controller.LogHandler;
-import controller.MainCtrl;
 import model.ApiClient;
 
 public class LoginPanel extends JPanel {
