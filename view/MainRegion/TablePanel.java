@@ -20,7 +20,8 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     private String tableName;
     private String tableComment;
     private List<String> columnNames;
-    private final FormDialogHandler formDialogHandler;
+    private List<String> columnComments; // Lưu danh sách chú thích theo thứ tự
+    private FormDialogHandler formDialogHandler; // Khai báo biến
 
     public TablePanel(ContentPanel parent) {
         this.parent = parent;
@@ -80,7 +81,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         add(scrollPane, BorderLayout.CENTER);
 
-        formDialogHandler = new FormDialogPanel(this);
+        formDialogHandler = new FormDialogPanel(this); // Khởi tạo
     }
 
     public void showAddFormDialog() {
@@ -92,7 +93,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     }
 
     @Override
-    public void updateTableData(List<Map<String, String>> data, Map<String, String> columnComments, String keyColumn, String tableName, String tableComment) {
+    public void updateTableData(List<Map<String, String>> data, Map<String, String> columnCommentsMap, String keyColumn, String tableName, String tableComment) {
         this.keyColumn = keyColumn;
         this.tableName = tableName;
         this.tableComment = tableComment;
@@ -105,6 +106,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
 
         if (data == null || data.isEmpty()) {
             columnNames = null;
+            columnComments = null;
             table.revalidate();
             table.repaint();
             return;
@@ -112,12 +114,15 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
 
         Map<String, String> firstRow = data.get(0);
         this.columnNames = new ArrayList<>(firstRow.keySet());
+        this.columnComments = new ArrayList<>();
 
-        List<String> displayNames = new ArrayList<>();
+        // Khởi tạo columnComments theo thứ tự của columnNames
         for (String columnName : columnNames) {
-            String displayName = columnComments != null ? columnComments.getOrDefault(columnName, columnName) : columnName;
-            displayNames.add(displayName);
+            String comment = columnCommentsMap != null ? columnCommentsMap.getOrDefault(columnName, columnName) : columnName;
+            this.columnComments.add(comment);
         }
+
+        List<String> displayNames = new ArrayList<>(this.columnComments);
         displayNames.add("");
         displayNames.add("");
 
@@ -203,6 +208,10 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     @Override
     public List<String> getColumnNames() {
         return columnNames;
+    }
+
+    public List<String> getColumnComments() {
+        return columnComments;
     }
 
     public JTable getTable() {

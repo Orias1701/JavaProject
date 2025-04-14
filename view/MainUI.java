@@ -17,11 +17,13 @@ import view.MenuRegion.MenuPanel;
 
 public class MainUI extends JFrame {
 
+    private ContentPanel contentPanel;
+
     public MainUI() {
         setTitle("Hotel Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(Style.WIN_WIDTH, 810);
-        setMinimumSize(new Dimension(900, 700));
+        setMinimumSize(new Dimension(1280, 720));
         setLayout(new BorderLayout());
 
         getContentPane().setBackground(Color.decode("#FFFFFF"));
@@ -42,15 +44,12 @@ public class MainUI extends JFrame {
         HeaderPanel headerPanel = new HeaderPanel();
         FooterPanel footerPanel = new FooterPanel();
         MenuPanel menuPanel = new MenuPanel();
-        ContentPanel contentPanel = new ContentPanel();
+        contentPanel = new ContentPanel();
 
-        // Thiết lập TableSelectionListener cho MenuPanel
         menuPanel.setTableSelectionListener((tableName, tableComment) -> {
             try {
-                // Gọi API để lấy dữ liệu bảng
                 TableDataResult result = ApiClient.getTableData(tableName);
                 if (result.data != null && !result.data.isEmpty()) {
-                    // Cập nhật ContentPanel với dữ liệu bảng và tableComment
                     contentPanel.updateTableData(
                         result.data,
                         result.columnComments,
@@ -59,14 +58,12 @@ public class MainUI extends JFrame {
                         tableComment
                     );
                 } else {
-                    // Xử lý trường hợp không có dữ liệu
                     JOptionPane.showMessageDialog(
                         this,
                         "Không có dữ liệu cho bảng " + tableComment,
                         "Cảnh báo",
                         JOptionPane.WARNING_MESSAGE
                     );
-                    // Xóa nội dung bảng trong ContentPanel
                     contentPanel.updateTableData(null, null, null, tableName, tableComment);
                 }
             } catch (Exception ex) {
@@ -80,6 +77,12 @@ public class MainUI extends JFrame {
             }
         });
 
+        // Thiết lập HomeSelectionListener
+        menuPanel.setHomeSelectionListener(() -> {
+            contentPanel.showHomePanel();
+            LogHandler.logInfo("Hiển thị HomePanel trong ContentPanel");
+        });
+
         add(headerPanel, BorderLayout.NORTH);
         add(footerPanel, BorderLayout.SOUTH);
         add(menuPanel, BorderLayout.WEST);
@@ -89,6 +92,9 @@ public class MainUI extends JFrame {
 
         // Làm mới danh sách bảng
         menuPanel.refreshTableList();
+
+        // Hiển thị HomePanel mặc định khi khởi động
+        contentPanel.showHomePanel();
 
         revalidate();
         repaint();
