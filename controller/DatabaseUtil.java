@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DatabaseUtil {
-    private static final String SCHEMA = "ql_khachsan";
+    private static final String SCHEMA = BaseHandler.DATA_DB_URL.substring(BaseHandler.DATA_DB_URL.lastIndexOf("/") + 1);
 
     public static Connection getConnection() throws Exception {
         return DriverManager.getConnection(BaseHandler.DATA_DB_URL, BaseHandler.DB_USERNAME, BaseHandler.DB_PASSWORD);
