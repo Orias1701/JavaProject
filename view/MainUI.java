@@ -1,13 +1,13 @@
 package view;
 
+import controller.LogHandler;
+import controller.MainCtrl;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
-import controller.LogHandler;
-import controller.MainCtrl;
+import javax.swing.JScrollPane;
 import model.ApiClient;
 import model.ApiClient.TableDataResult;
 import view.FooterRegion.FooterPanel;
@@ -77,23 +77,27 @@ public class MainUI extends JFrame {
             }
         });
 
-        // Thiết lập HomeSelectionListener
         menuPanel.setHomeSelectionListener(() -> {
             contentPanel.showHomePanel();
             LogHandler.logInfo("Hiển thị HomePanel trong ContentPanel");
         });
 
+        JScrollPane scrollPane = new JScrollPane(menuPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(null);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setOpaque(false);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+
         add(headerPanel, BorderLayout.NORTH);
         add(footerPanel, BorderLayout.SOUTH);
-        add(menuPanel, BorderLayout.WEST);
+        add(scrollPane, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 
         new MainCtrl(contentPanel, menuPanel);
 
-        // Làm mới danh sách bảng
         menuPanel.refreshTableList();
-
-        // Hiển thị HomePanel mặc định khi khởi động
         contentPanel.showHomePanel();
 
         revalidate();

@@ -1,12 +1,11 @@
 package view.MenuRegion;
 
+import controller.LogHandler;
 import java.awt.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
-
-import controller.LogHandler;
 import model.ApiClient;
 import view.Style;
 
@@ -17,7 +16,7 @@ public class MenuPanel extends JPanel {
     private Rectangle highlightRect = new Rectangle(0, 0, 240, 60);
     private final Timer animationTimer;
     private TableSelectionListener tableSelectionListener;
-    private Runnable homeSelectionListener; // Thêm callback cho nút TRANG CHỦ
+    private Runnable homeSelectionListener;
 
     public interface TableSelectionListener {
         void onTableSelected(String tableName, String tableComment);
@@ -38,7 +37,6 @@ public class MenuPanel extends JPanel {
     public MenuPanel() {
         setLayout(null);
         setOpaque(false);
-        setPreferredSize(new Dimension(240, 720));
         animationTimer = new Timer(0, e -> animateHighlight());
         int y = 20;
 
@@ -85,6 +83,7 @@ public class MenuPanel extends JPanel {
             y += 60;
         }
 
+        revalidate(); // cập nhật lại layout
         repaint();
     }
 
@@ -157,6 +156,12 @@ public class MenuPanel extends JPanel {
             highlightRect.y += step;
         }
         repaint();
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        int height = 80 + (menuButtons.size() - 1) * 60 + 20;
+        return new Dimension(240, Math.max(height, 720));
     }
 
     @Override
