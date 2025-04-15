@@ -90,14 +90,14 @@ public class MenuPanel extends JPanel {
     private MenuButton createMenuButton(String text, int y) {
         MenuButton button = new MenuButton(text);
         button.setBounds(0, y, 240, 60);
-        button.setFont(Style.MONS_16);
+        button.setFont(Style.MONS_12);  // Sử dụng cỡ chữ nhỏ hơn
         button.setForeground(Style.GRAY_CL);
         button.setBackground(Style.NO_CL);
         button.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
         button.setHorizontalAlignment(SwingConstants.LEFT);
-
+    
         button.addActionListener(e -> moveHighlightTo(button));
-
+    
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
@@ -107,7 +107,7 @@ public class MenuPanel extends JPanel {
                     button.repaint();
                 }
             }
-
+    
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 if (!button.isActive()) {
@@ -117,21 +117,24 @@ public class MenuPanel extends JPanel {
                 }
             }
         });
-
+    
         return button;
     }
+    
 
     private void moveHighlightTo(MenuButton targetButton) {
         if (activeButton != null) {
             activeButton.setActive(false);
+            activeButton.setFont(Style.MONS_12);  // Chỉnh lại cỡ chữ khi không còn chọn
         }
-
+    
         activeButton = targetButton;
         activeButton.setActive(true);
+        activeButton.setFont(Style.MONS_16);  // Chỉnh cỡ chữ lớn khi nút được chọn
         currentTableName = (String) activeButton.getClientProperty("tableName");
         String currentTableComment = activeButton.getText();
         LogHandler.logInfo("Tên bảng: " + currentTableName + ", Chú thích: " + currentTableComment);
-
+    
         if ("HOME".equals(currentTableName)) {
             if (homeSelectionListener != null) {
                 homeSelectionListener.run();
@@ -139,9 +142,10 @@ public class MenuPanel extends JPanel {
         } else if (tableSelectionListener != null) {
             tableSelectionListener.onTableSelected(currentTableName, currentTableComment);
         }
-
+    
         animationTimer.start();
     }
+    
 
     private void animateHighlight() {
         if (activeButton == null) return;
