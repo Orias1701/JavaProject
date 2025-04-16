@@ -170,15 +170,50 @@ public class FormDialogPanel implements FormDialogHandler {
             }
         });
 
+        // Thêm nút xóa cho dialog sửa
+        Style.RoundedButton deleteButton = null;
+        if (actionType.equals("edit")) {
+            deleteButton = new Style.RoundedButton("Xóa");
+            deleteButton.setFont(Style.MONS_14);
+            deleteButton.setBackground(Style.RED);
+            deleteButton.setForeground(Color.WHITE);
+            deleteButton.setPreferredSize(new Dimension(100, 40));
+            deleteButton.addActionListener(e -> {
+                String keyValue = inputFields.get(tablePanel.getKeyColumn()).getText();
+                int confirm = JOptionPane.showConfirmDialog(dialog,
+                        "Bạn có chắc chắn muốn xóa " + tablePanel.getKeyColumn() + ": " + keyValue + "?",
+                        "Xác nhận", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    try {
+                        ApiResponse response = MainCtrl.deleteRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue);
+                        if (response.success) {
+                            JOptionPane.showMessageDialog(dialog, "Xóa dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                            tablePanel.refreshTable();
+                            dialog.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(dialog, response.message, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (Exception ex) {
+                        LogHandler.logError("Lỗi kết nối: " + ex.getMessage(), ex);
+                        JOptionPane.showMessageDialog(dialog, "Lỗi kết nối: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+        }
+
         // Sử dụng RoundedButton cho nút Hủy
         Style.RoundedButton cancelButton = new Style.RoundedButton("Hủy");
         cancelButton.setFont(Style.MONS_14);
-        cancelButton.setBackground(Style.RED);
+        cancelButton.setBackground(Style.DARK_CL);
         cancelButton.setForeground(Color.WHITE);
         cancelButton.setPreferredSize(new Dimension(100, 40));
         cancelButton.addActionListener(e -> dialog.dispose());
 
+        // Thêm các nút vào buttonPanel
         buttonPanel.add(cancelButton);
+        if (deleteButton != null) {
+            buttonPanel.add(deleteButton);
+        }
         buttonPanel.add(confirmButton);
 
         // Thêm các thành phần vào dialog
