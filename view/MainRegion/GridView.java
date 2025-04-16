@@ -81,7 +81,7 @@ public class GridView {
         for (int rowIndex = 0; rowIndex < data.size(); rowIndex++) {
             Map<String, String> row = data.get(rowIndex);
             StringBuilder buttonText = new StringBuilder("<html><body style='width:100%'>");
-            for (int i = 0; i < Math.min(4, columnNames.size()); i++) {
+            for (int i = 0; i < Math.min(5, columnNames.size()); i++) {
                 String columnName = columnNames.get(i);
                 String comment = columnComments.size() > i ? columnComments.get(i) : columnName;
                 String value = row.get(columnName);

@@ -1,13 +1,11 @@
 package view.MenuRegion;
 
+import controller.LogHandler;
 import java.awt.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import javax.swing.*;
-// import javax.swing.plaf.basic.BasicScrollBarUI;
-
-import controller.LogHandler;
 import model.ApiClient;
 import view.Style;
 
@@ -20,22 +18,27 @@ public class MenuPanel extends JPanel {
     private TableSelectionListener tableSelectionListener;
     private Runnable homeSelectionListener;
 
+    // Interface để lắng nghe sự kiện chọn bảng
     public interface TableSelectionListener {
         void onTableSelected(String tableName, String tableComment);
     }
 
+    // Phương thức thiết lập TableSelectionListener
     public void setTableSelectionListener(TableSelectionListener listener) {
         this.tableSelectionListener = listener;
     }
 
+    // Phương thức thiết lập homeSelectionListener
     public void setHomeSelectionListener(Runnable listener) {
         this.homeSelectionListener = listener;
     }
 
+    // Phương thức trả về tên bảng hiện tại
     public String getCurrentTableName() {
         return currentTableName;
     }
 
+    // Constructor của MenuPanel, tạo giao diện ban đầu
     public MenuPanel() {
         setLayout(null);
         setOpaque(false);
@@ -43,7 +46,7 @@ public class MenuPanel extends JPanel {
         animationTimer = new Timer(0, e -> animateHighlight());
         int y = 20;
         
-        // Create a JScrollPane to contain the menu
+        // Tạo JScrollPane để chứa menu
         JScrollPane MenuScroll = new JScrollPane(this);
         MenuScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         MenuScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -53,7 +56,7 @@ public class MenuPanel extends JPanel {
         MenuScroll.getVerticalScrollBar().setUnitIncrement(20);
         MenuScroll.getHorizontalScrollBar().setEnabled(false);
 
-        // Home button
+        // Nút Home
         MenuButton homeButton = createMenuButton("TRANG CHỦ", y);
         homeButton.setFont(Style.MONS_16);
         homeButton.setForeground(Style.LIGHT_CL);
@@ -70,6 +73,7 @@ public class MenuPanel extends JPanel {
         LogHandler.logInfo("MenuPanel initialized");
     }
 
+    // Phương thức làm mới danh sách bảng
     public void refreshTableList() {
         int y = 80;
         for (int i = menuButtons.size() - 1; i >= 0; i--) {
@@ -86,10 +90,10 @@ public class MenuPanel extends JPanel {
             return;
         }
 
+        // Thêm các nút menu cho các bảng mới
         for (Map.Entry<String, String> entry : tableInfo.entrySet()) {
             String tableName = entry.getKey();
             String tableComment = entry.getValue();
-            // MenuButton button = createMenuButton(tableComment.toUpperCase(), y);
             MenuButton button = createMenuButton(tableComment, y);
             button.putClientProperty("tableName", tableName);
             add(button);
@@ -101,6 +105,7 @@ public class MenuPanel extends JPanel {
         repaint();
     }
 
+    // Phương thức tạo một nút menu
     private MenuButton createMenuButton(String text, int y) {
         MenuButton button = new MenuButton(text);
         button.setBounds(0, y, 240, button.isActive() ? 60 : 40);
@@ -135,6 +140,7 @@ public class MenuPanel extends JPanel {
         return button;
     }
     
+    // Phương thức di chuyển điểm highlight đến nút được chọn
     private void moveHighlightTo(MenuButton targetButton) {
         if (activeButton != null) {
             activeButton.setActive(false);
@@ -150,6 +156,7 @@ public class MenuPanel extends JPanel {
 
         updateButtonPositions();
 
+        // Gọi home selection listener hoặc table selection listener tùy theo bảng được chọn
         if ("HOME".equals(currentTableName)) {
             if (homeSelectionListener != null) {
                 homeSelectionListener.run();
@@ -161,6 +168,7 @@ public class MenuPanel extends JPanel {
         animationTimer.start();
     }
 
+    // Phương thức cập nhật vị trí các nút trong menu
     private void updateButtonPositions() {
         int y = 80;
         for (MenuButton button : menuButtons) {
@@ -172,6 +180,7 @@ public class MenuPanel extends JPanel {
         revalidate();
     }
 
+    // Phương thức để tạo hiệu ứng chuyển động cho highlight
     private void animateHighlight() {
         if (activeButton == null) return;
         int targetY = activeButton.getY();
@@ -194,6 +203,7 @@ public class MenuPanel extends JPanel {
         repaint();
     }
 
+    // Phương thức vẽ lại giao diện
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
