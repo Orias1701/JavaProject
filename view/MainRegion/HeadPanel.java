@@ -53,7 +53,6 @@ public class HeadPanel extends JPanel {
         });
         buttonPanel.add(changeLayoutButton);
 
-        // Thêm buttonPanel vào EAST
         add(buttonPanel, BorderLayout.EAST);
     }
 
