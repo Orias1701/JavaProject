@@ -58,7 +58,7 @@ public class MenuPanel extends JPanel {
 
         // Nút Home
         MenuButton homeButton = createMenuButton("TRANG CHỦ", y);
-        homeButton.setFont(Style.MONS_16);
+        homeButton.setFont(Style.MONS_15);
         homeButton.setForeground(Style.LIGHT_CL);
         homeButton.putClientProperty("tableName", "HOME");
         homeButton.setBounds(0, y, 240, 60);
@@ -93,7 +93,7 @@ public class MenuPanel extends JPanel {
         // Thêm các nút menu cho các bảng mới
         for (Map.Entry<String, String> entry : tableInfo.entrySet()) {
             String tableName = entry.getKey();
-            String tableComment = entry.getValue();
+            String tableComment = entry.getValue().toUpperCase();
             MenuButton button = createMenuButton(tableComment, y);
             button.putClientProperty("tableName", tableName);
             add(button);
@@ -109,7 +109,7 @@ public class MenuPanel extends JPanel {
     private MenuButton createMenuButton(String text, int y) {
         MenuButton button = new MenuButton(text);
         button.setBounds(0, y, 240, button.isActive() ? 60 : 40);
-        button.setFont(Style.MONS_16);
+        button.setFont(Style.MONS_15);
         button.setForeground(Style.GRAY_CL);
         button.setBackground(Style.NO_CL);
         button.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
