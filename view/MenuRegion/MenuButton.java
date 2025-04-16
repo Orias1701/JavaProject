@@ -32,6 +32,6 @@ public class MenuButton extends Style.RoundedButton {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(240, 60);
+        return new Dimension(240, isActive ? 60 : 40);
     }
 }

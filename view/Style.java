@@ -4,8 +4,11 @@ import java.awt.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.plaf.basic.BasicScrollBarUI;
+
 import java.awt.geom.Ellipse2D;
 
 public class Style {
@@ -97,6 +100,7 @@ public class Style {
             super.paintComponent(g);
         }
     }
+
     public static class RoundBorder implements Border {
         private final int radius;
         private final Color color;
@@ -155,6 +159,54 @@ public class Style {
         public boolean contains(int x, int y) {
             Ellipse2D circle = new Ellipse2D.Float(0, 0, getWidth(), getHeight());
             return circle.contains(x, y);
+        }
+    }
+
+    public static class CustomScrollBarUI extends BasicScrollBarUI {
+        private final Color THUMB_COLOR = Style.ACT_CL;
+        private final Color TRACK_COLOR = Style.LIGHT_CL;
+
+        @Override
+        protected void configureScrollBarColors() {
+            thumbColor = THUMB_COLOR;
+            trackColor = TRACK_COLOR;
+        }
+
+        @Override
+        protected JButton createDecreaseButton(int orientation) {
+            return createEmptyButton();
+        }
+
+        @Override
+        protected JButton createIncreaseButton(int orientation) {
+            return createEmptyButton();
+        }
+
+        private JButton createEmptyButton() {
+            JButton button = new JButton();
+            button.setPreferredSize(new Dimension(0, 0));
+            button.setMinimumSize(new Dimension(0, 0));
+            button.setMaximumSize(new Dimension(0, 0));
+            return button;
+        }
+
+        @Override
+        protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+            g.setColor(TRACK_COLOR);
+            g.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+        }
+
+        @Override
+        protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+            if (thumbBounds.isEmpty() || !scrollbar.isEnabled()) {
+                return;
+            }
+
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(THUMB_COLOR);
+            g2.fillRoundRect(thumbBounds.x, thumbBounds.y, thumbBounds.width - 2, thumbBounds.height - 2, 10, 10);
+            g2.dispose();
         }
     }
 }   

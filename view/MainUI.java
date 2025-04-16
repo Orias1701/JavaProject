@@ -5,9 +5,12 @@ import controller.MainCtrl;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+
 import model.ApiClient;
 import model.ApiClient.TableDataResult;
 import view.FooterRegion.FooterPanel;
@@ -82,17 +85,22 @@ public class MainUI extends JFrame {
             LogHandler.logInfo("Hiển thị HomePanel trong ContentPanel");
         });
 
-        JScrollPane scrollPane = new JScrollPane(menuPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setBorder(null);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setOpaque(false);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        JScrollPane menuScroll = new JScrollPane(menuPanel);
+        menuScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        menuScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        menuScroll.setBorder(null);
+        menuScroll.getViewport().setOpaque(false);
+        menuScroll.setOpaque(false);
+        
+        JScrollBar verticalScrollBar = menuScroll.getVerticalScrollBar();
+        verticalScrollBar.setUI(new Style.CustomScrollBarUI());
+        verticalScrollBar.setPreferredSize(new Dimension(8, Integer.MAX_VALUE));
+        verticalScrollBar.setUnitIncrement(20);
+        verticalScrollBar.setBorder(null);
 
         add(headerPanel, BorderLayout.NORTH);
         add(footerPanel, BorderLayout.SOUTH);
-        add(scrollPane, BorderLayout.WEST);
+        add(menuScroll, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 
         new MainCtrl(contentPanel, menuPanel);

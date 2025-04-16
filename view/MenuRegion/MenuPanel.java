@@ -1,11 +1,13 @@
 package view.MenuRegion;
 
-import controller.LogHandler;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import javax.swing.*;
+// import javax.swing.plaf.basic.BasicScrollBarUI;
+
+import controller.LogHandler;
 import model.ApiClient;
 import view.Style;
 
@@ -37,8 +39,19 @@ public class MenuPanel extends JPanel {
     public MenuPanel() {
         setLayout(null);
         setOpaque(false);
+        setPreferredSize(new Dimension(240, 660));
         animationTimer = new Timer(0, e -> animateHighlight());
         int y = 20;
+        
+        // Create a JScrollPane to contain the menu
+        JScrollPane MenuScroll = new JScrollPane(this);
+        MenuScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        MenuScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        MenuScroll.setBorder(null);
+        MenuScroll.getViewport().setOpaque(false);
+        MenuScroll.setOpaque(false);
+        MenuScroll.getVerticalScrollBar().setUnitIncrement(20);
+        MenuScroll.getHorizontalScrollBar().setEnabled(false);
 
         // Home button
         MenuButton homeButton = createMenuButton("TRANG CHỦ", y);
@@ -76,28 +89,29 @@ public class MenuPanel extends JPanel {
         for (Map.Entry<String, String> entry : tableInfo.entrySet()) {
             String tableName = entry.getKey();
             String tableComment = entry.getValue();
+            // MenuButton button = createMenuButton(tableComment.toUpperCase(), y);
             MenuButton button = createMenuButton(tableComment, y);
             button.putClientProperty("tableName", tableName);
             add(button);
             menuButtons.add(button);
-            y += 60;
+            y += 40;
         }
 
-        revalidate(); // cập nhật lại layout
+        revalidate();
         repaint();
     }
 
     private MenuButton createMenuButton(String text, int y) {
         MenuButton button = new MenuButton(text);
-        button.setBounds(0, y, 240, 60);
-        button.setFont(Style.MONS_12);  // Sử dụng cỡ chữ nhỏ hơn
+        button.setBounds(0, y, 240, button.isActive() ? 60 : 40);
+        button.setFont(Style.MONS_16);
         button.setForeground(Style.GRAY_CL);
         button.setBackground(Style.NO_CL);
         button.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
         button.setHorizontalAlignment(SwingConstants.LEFT);
-    
+
         button.addActionListener(e -> moveHighlightTo(button));
-    
+
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
@@ -107,7 +121,7 @@ public class MenuPanel extends JPanel {
                     button.repaint();
                 }
             }
-    
+
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 if (!button.isActive()) {
@@ -117,24 +131,25 @@ public class MenuPanel extends JPanel {
                 }
             }
         });
-    
+
         return button;
     }
     
-
     private void moveHighlightTo(MenuButton targetButton) {
         if (activeButton != null) {
             activeButton.setActive(false);
-            activeButton.setFont(Style.MONS_12);  // Chỉnh lại cỡ chữ khi không còn chọn
+            activeButton.setBounds(activeButton.getX(), activeButton.getY(), 240, 40);
         }
-    
+
         activeButton = targetButton;
         activeButton.setActive(true);
-        activeButton.setFont(Style.MONS_16);  // Chỉnh cỡ chữ lớn khi nút được chọn
+        activeButton.setBounds(activeButton.getX(), activeButton.getY(), 240, 60);
         currentTableName = (String) activeButton.getClientProperty("tableName");
         String currentTableComment = activeButton.getText();
         LogHandler.logInfo("Tên bảng: " + currentTableName + ", Chú thích: " + currentTableComment);
-    
+
+        updateButtonPositions();
+
         if ("HOME".equals(currentTableName)) {
             if (homeSelectionListener != null) {
                 homeSelectionListener.run();
@@ -142,30 +157,41 @@ public class MenuPanel extends JPanel {
         } else if (tableSelectionListener != null) {
             tableSelectionListener.onTableSelected(currentTableName, currentTableComment);
         }
-    
+
         animationTimer.start();
     }
-    
+
+    private void updateButtonPositions() {
+        int y = 80;
+        for (MenuButton button : menuButtons) {
+            if (!"HOME".equals(button.getClientProperty("tableName"))) {
+                button.setBounds(0, y, 240, button.isActive() ? 60 : 40);
+                y += button.isActive() ? 60 : 40;
+            }
+        }
+        revalidate();
+    }
 
     private void animateHighlight() {
         if (activeButton == null) return;
         int targetY = activeButton.getY();
+        int targetHeight = activeButton.getHeight();
         int dy = targetY - highlightRect.y;
-        if (Math.abs(dy) <= 1) {
+        int dh = targetHeight - highlightRect.height;
+
+        if (Math.abs(dy) <= 1 && Math.abs(dh) <= 1) {
             highlightRect.y = targetY;
+            highlightRect.height = targetHeight;
             animationTimer.stop();
         } else {
-            int step = (int)(dy * 0.16);
-            if (step == 0) step = (dy > 0) ? 1 : -1;
-            highlightRect.y += step;
+            int stepY = (int)(dy * 0.16);
+            int stepH = (int)(dh * 0.16);
+            if (stepY == 0) stepY = (dy > 0) ? 1 : -1;
+            if (stepH == 0) stepH = (dh > 0) ? 1 : -1;
+            highlightRect.y += stepY;
+            highlightRect.height += stepH;
         }
         repaint();
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        int height = 80 + (menuButtons.size() - 1) * 60 + 20;
-        return new Dimension(240, Math.max(height, 720));
     }
 
     @Override

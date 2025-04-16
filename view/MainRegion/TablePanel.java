@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
 import model.ApiClient;
 import model.ApiClient.TableDataResult;
@@ -14,19 +15,22 @@ import view.Style;
 public class TablePanel extends JPanel implements TableViewDataHandler {
     private final JTable table;
     private final DefaultTableModel tableModel;
+    private final JPanel buttonPanel;
     private final JScrollPane scrollPane;
     private final ContentPanel parent;
+    private boolean isButtonView = false; // Mặc định là JTable
     private String keyColumn;
     private String tableName;
     private String tableComment;
     private List<String> columnNames;
-    private List<String> columnComments; // Lưu danh sách chú thích theo thứ tự
-    private FormDialogHandler formDialogHandler; // Khai báo biến
+    private List<String> columnComments;
+    private FormDialogHandler formDialogHandler;
 
     public TablePanel(ContentPanel parent) {
         this.parent = parent;
         setLayout(new BorderLayout());
 
+        // Khởi tạo JTable
         tableModel = new DefaultTableModel();
         table = new JTable(tableModel);
         table.setFillsViewportHeight(true);
@@ -77,11 +81,39 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
             }
         });
 
+        // Khởi tạo buttonPanel
+        buttonPanel = new JPanel(new GridLayout(0, 6, 10, 10));
+        buttonPanel.setOpaque(true);
+        buttonPanel.setBackground(Style.LIGHT_CL);
+
+        // Khởi tạo JScrollPane
         scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setOpaque(false);
+
+        // Tùy chỉnh thanh cuộn
+        JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
+        verticalScrollBar.setUI(new Style.CustomScrollBarUI());
+        verticalScrollBar.setPreferredSize(new Dimension(13, Integer.MAX_VALUE));
+        verticalScrollBar.setUnitIncrement(20);
+        verticalScrollBar.setOpaque(true);
+        verticalScrollBar.setBackground(Style.LIGHT_CL);
+        verticalScrollBar.setBorder(new EmptyBorder(0, 5, 0, 0));
+
         add(scrollPane, BorderLayout.CENTER);
 
-        formDialogHandler = new FormDialogPanel(this); // Khởi tạo
+        formDialogHandler = new FormDialogPanel(this);
+    }
+
+    public void setButtonView(boolean isButtonView) {
+        if (this.isButtonView != isButtonView) {
+            this.isButtonView = isButtonView;
+            scrollPane.setViewportView(isButtonView ? buttonPanel : table);
+            scrollPane.revalidate();
+            scrollPane.repaint();
+            refreshTable(); // Làm mới dữ liệu
+        }
     }
 
     public void showAddFormDialog() {
@@ -101,74 +133,113 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         LogHandler.logInfo("Tên bảng TablePanel: " + tableName);
         LogHandler.logInfo("Chú thích bảng TablePanel: " + tableComment);
 
+        // Xóa nội dung cũ
         tableModel.setRowCount(0);
         tableModel.setColumnCount(0);
+        buttonPanel.removeAll();
 
         if (data == null || data.isEmpty()) {
             columnNames = null;
             columnComments = null;
+            buttonPanel.revalidate();
+            buttonPanel.repaint();
             table.revalidate();
             table.repaint();
             return;
         }
 
+        // Lấy danh sách cột
         Map<String, String> firstRow = data.get(0);
         this.columnNames = new ArrayList<>(firstRow.keySet());
         this.columnComments = new ArrayList<>();
 
-        // Khởi tạo columnComments theo thứ tự của columnNames
+        // Khởi tạo columnComments
         for (String columnName : columnNames) {
             String comment = columnCommentsMap != null ? columnCommentsMap.getOrDefault(columnName, columnName) : columnName;
             this.columnComments.add(comment);
         }
 
-        List<String> displayNames = new ArrayList<>(this.columnComments);
-        displayNames.add("");
-        displayNames.add("");
+        if (isButtonView) {
+            // Chế độ lưới button
+            for (int rowIndex = 0; rowIndex < data.size(); rowIndex++) {
+                Map<String, String> row = data.get(rowIndex);
+                StringBuilder buttonText = new StringBuilder("<html>");
+                for (int i = 0; i < Math.min(4, columnNames.size()); i++) {
+                    String columnName = columnNames.get(i);
+                    String value = row.get(columnName);
+                    buttonText.append(value != null ? value : "").append("<br>");
+                }
+                buttonText.append("</html>");
 
-        tableModel.setColumnIdentifiers(displayNames.toArray());
+                JButton editButton = new JButton(buttonText.toString());
+                editButton.setFont(Style.ROB_14);
+                editButton.setForeground(Style.DARK_CL);
+                editButton.setBackground(Style.LIGHT_CL);
+                editButton.setHorizontalAlignment(SwingConstants.LEFT);
+                editButton.setBorder(BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 1, 0, Style.ACT_CL),
+                        BorderFactory.createEmptyBorder(10, 10, 10, 10)
+                ));
+                editButton.setFocusPainted(false);
 
-        for (Map<String, String> row : data) {
-            Object[] rowData = new Object[columnNames.size() + 2];
-            for (int i = 0; i < columnNames.size(); i++) {
-                rowData[i] = row.get(columnNames.get(i));
+                final int finalRowIndex = rowIndex;
+                editButton.addActionListener(e -> formDialogHandler.showFormDialog("edit", finalRowIndex));
+                buttonPanel.add(editButton);
             }
-            rowData[columnNames.size()] = "Sửa";
-            rowData[columnNames.size() + 1] = "Xóa";
-            tableModel.addRow(rowData);
+        } else {
+            // Chế độ JTable
+            List<String> displayNames = new ArrayList<>(this.columnComments);
+            displayNames.add("");
+            displayNames.add("");
+            tableModel.setColumnIdentifiers(displayNames.toArray());
+
+            for (Map<String, String> row : data) {
+                Object[] rowData = new Object[columnNames.size() + 2];
+                for (int i = 0; i < columnNames.size(); i++) {
+                    rowData[i] = row.get(columnNames.get(i));
+                }
+                rowData[columnNames.size()] = "Sửa";
+                rowData[columnNames.size() + 1] = "Xóa";
+                tableModel.addRow(rowData);
+            }
+
+            int editColumnIndex = table.getColumnCount() - 2;
+            int deleteColumnIndex = table.getColumnCount() - 1;
+
+            TableColumn editButton = table.getColumnModel().getColumn(editColumnIndex);
+            TableColumn deleteButton = table.getColumnModel().getColumn(deleteColumnIndex);
+
+            editButton.setCellRenderer(new ButtonRenderer());
+                editButton.setCellEditor(new ButtonEditor(new JCheckBox(), "edit", formDialogHandler));
+                editButton.setPreferredWidth(70);
+                editButton.setMaxWidth(70);
+                editButton.setMinWidth(70);
+                editButton.setResizable(false);
+
+                deleteButton.setCellRenderer(new ButtonRenderer() {
+                    @Override
+                    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                        Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                        if (c instanceof JButton button) {
+                            button.setForeground(Color.RED);
+                        }
+                        return c;
+                    }
+                });
+                deleteButton.setCellEditor(new ButtonEditor(new JCheckBox(), "delete", formDialogHandler));
+                deleteButton.setPreferredWidth(70);
+                deleteButton.setMaxWidth(70);
+                deleteButton.setMinWidth(70);
+                deleteButton.setResizable(false);
         }
 
-        int editColumnIndex = table.getColumnCount() - 2;
-        int deleteColumnIndex = table.getColumnCount() - 1;
-
-        TableColumn editButton = table.getColumnModel().getColumn(editColumnIndex);
-        TableColumn deleteButton = table.getColumnModel().getColumn(deleteColumnIndex);
-
-        editButton.setCellRenderer(new ButtonRenderer());
-        editButton.setCellEditor(new ButtonEditor(new JCheckBox(), "edit", formDialogHandler));
-        editButton.setPreferredWidth(70);
-        editButton.setMaxWidth(70);
-        editButton.setMinWidth(70);
-        editButton.setResizable(false);
-
-        deleteButton.setCellRenderer(new ButtonRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (c instanceof JButton button) {
-                    button.setForeground(Color.RED);
-                }
-                return c;
-            }
-        });
-        deleteButton.setCellEditor(new ButtonEditor(new JCheckBox(), "delete", formDialogHandler));
-        deleteButton.setPreferredWidth(70);
-        deleteButton.setMaxWidth(70);
-        deleteButton.setMinWidth(70);
-        deleteButton.setResizable(false);
-
+        // Cập nhật giao diện
+        buttonPanel.revalidate();
+        buttonPanel.repaint();
         table.revalidate();
         table.repaint();
+        scrollPane.revalidate();
+        scrollPane.repaint();
     }
 
     @Override
@@ -176,6 +247,11 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         if (tableName == null || tableName.isEmpty()) {
             tableModel.setRowCount(0);
             tableModel.setColumnCount(0);
+            buttonPanel.removeAll();
+            buttonPanel.revalidate();
+            buttonPanel.repaint();
+            table.revalidate();
+            table.repaint();
             return;
         }
         try {
@@ -185,14 +261,15 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
             } else {
                 tableModel.setRowCount(0);
                 tableModel.setColumnCount(0);
+                buttonPanel.removeAll();
+                buttonPanel.revalidate();
+                buttonPanel.repaint();
                 JOptionPane.showMessageDialog(parent, "Không có dữ liệu để hiển thị sau khi làm mới", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             }
         } catch (Exception ex) {
             LogHandler.logError("Lỗi khi làm mới dữ liệu: " + ex.getMessage(), ex);
             JOptionPane.showMessageDialog(parent, "Lỗi khi làm mới dữ liệu: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-        table.revalidate();
-        table.repaint();
     }
 
     @Override
