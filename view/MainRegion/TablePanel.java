@@ -9,6 +9,7 @@ import model.ApiClient.TableDataResult;
 import view.Style;
 
 public class TablePanel extends JPanel implements TableViewDataHandler {
+    
     private final JScrollPane scrollPane;
     private final ContentPanel parent;
     private boolean isButtonView = false;

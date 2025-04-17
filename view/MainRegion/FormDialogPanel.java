@@ -136,7 +136,7 @@ public class FormDialogPanel implements FormDialogHandler {
                         rowData.put(col, inputFields.get(col).getText());
                     }
                     ApiResponse response = MainCtrl.addRow(tablePanel.getTableName(), rowData);
-                    if (response.success) {
+                    if (response.isSuccess()) {
                         JOptionPane.showMessageDialog(dialog, "Thêm dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                         tablePanel.refreshTable();
                         dialog.dispose();
@@ -151,7 +151,7 @@ public class FormDialogPanel implements FormDialogHandler {
                         rowData.put(col, inputFields.get(col).getText());
                     }
                     ApiResponse response = MainCtrl.updateRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue, rowData);
-                    if (response.success) {
+                    if (response.isSuccess()) {
                         JOptionPane.showMessageDialog(dialog, "Cập nhật dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                         tablePanel.refreshTable();
                         dialog.dispose();
@@ -166,12 +166,12 @@ public class FormDialogPanel implements FormDialogHandler {
                             "Xác nhận", JOptionPane.YES_NO_OPTION);
                     if (confirm == JOptionPane.YES_OPTION) {
                         ApiResponse response = MainCtrl.deleteRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue);
-                        if (response.success) {
+                        if (response.isSuccess()) {
                             JOptionPane.showMessageDialog(dialog, "Xóa dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                             tablePanel.refreshTable();
                             dialog.dispose();
                         } else {
-                            JOptionPane.showMessageDialog(dialog, response.message, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(dialog, response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
                     }
@@ -199,12 +199,12 @@ public class FormDialogPanel implements FormDialogHandler {
                 if (confirm == JOptionPane.YES_OPTION) {
                     try {
                         ApiResponse response = MainCtrl.deleteRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue);
-                        if (response.success) {
+                        if (response.isSuccess()) {
                             JOptionPane.showMessageDialog(dialog, "Xóa dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                             tablePanel.refreshTable();
                             dialog.dispose();
                         } else {
-                            JOptionPane.showMessageDialog(dialog, response.message, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(dialog, response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                         }
                     } catch (Exception ex) {
                         LogHandler.logError("Lỗi kết nối: " + ex.getMessage(), ex);
