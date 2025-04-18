@@ -1,11 +1,15 @@
 package view.MainRegion;
 
+import controller.CheckBooking;
 import controller.CheckDetail;
 import java.awt.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import view.HomePanel;
+
 public class ContentPanel extends JPanel {
     private HeadPanel headPanel;  // Panel hiển thị phần đầu trang (header)
     private TablePanel tablePanel;  // Panel hiển thị bảng dữ liệu
@@ -29,9 +33,12 @@ public class ContentPanel extends JPanel {
             System.out.println("Changed");
             tablePanel.setButtonView(isButtonView);  // Cập nhật trạng thái hiển thị của tablePanel
         });
-        // Gọi ở sự kiện nào đó, ví dụ:
+        //Xử lý kiểm tra chi tiết phòng
         CheckDetail checker = new CheckDetail("Bearer your-auth-token", this);
         checker.autoProcessCheckDetail("b0_kiemtrachitiet", "MaThietBi", "");
+        //Xử lý kiểm tra đặt phòng
+        CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this);
+        checkBooking.autoProcessBooking("a6_datphong", "MaDatPhong", "");
 
         // Thêm headPanel và tablePanel vào ContentPanel
         add(headPanel, BorderLayout.NORTH);  // Thêm headPanel vào vị trí đầu (NORTH)
@@ -46,7 +53,6 @@ public class ContentPanel extends JPanel {
 
     // Hàm cập nhật dữ liệu cho bảng
     public void updateTableData(List<Map<String, String>> data, Map<String, String> columnComments, String keyColumn, String tableName, String tableComment) {
-
         // Nếu đang hiển thị trang chủ, cần xóa nó và cập nhật lại các panel
         if (isHomeDisplayed) {
             remove(homePanel);  // Xóa homePanel khỏi ContentPanel
@@ -61,11 +67,31 @@ public class ContentPanel extends JPanel {
             add(tablePanel, BorderLayout.CENTER);  // Thêm lại tablePanel vào ContentPanel
             isHomeDisplayed = false;  // Đánh dấu không còn hiển thị trang chủ
         }
+    
+        // Định dạng ngày giờ theo yêu cầu
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+        for (Map<String, String> row : data) {
+            for (String column : row.keySet()) {
+                String value = row.get(column);
+                try {
+                    if (value != null && value.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}(:\\d{2})?")) {
+                        if (value.length() == 16) value += ":00"; // nếu thiếu giây
+                        LocalDateTime dateTime = LocalDateTime.parse(value, formatter);
+                        row.put(column, dateTime.format(formatter));
+                        System.out.println("Formatted value: " + row.get(column));
+                    }
+                } catch (Exception e) {
+                    System.out.println("Parse error for value: " + value + " → " + e.getMessage());
+                }
+            }
+        }
+
+    
         // Cập nhật dữ liệu cho bảng và tiêu đề
         tablePanel.updateTableData(data, columnComments, keyColumn, tableName, tableComment);
         headPanel.updateTableNameLabel(tableComment != null && !tableComment.isEmpty() ? tableComment : tableName);
-
+    
         // Cập nhật lại giao diện sau khi thay đổi
         revalidate();  // Cập nhật lại layout
         repaint();  // Vẽ lại giao diện
