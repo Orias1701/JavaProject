@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import view.HomePanel;
-
 public class ContentPanel extends JPanel {
     private HeadPanel headPanel;  // Panel hiển thị phần đầu trang (header)
     private TablePanel tablePanel;  // Panel hiển thị bảng dữ liệu
     private HomePanel homePanel;  // Panel hiển thị trang chủ
     private boolean isHomeDisplayed;  // Biến kiểm tra xem trang chủ có đang hiển thị hay không
-
     // Constructor ContentPanel
     public ContentPanel() {
         setLayout(new BorderLayout());  // Sử dụng BorderLayout để sắp xếp các panel
@@ -23,20 +21,22 @@ public class ContentPanel extends JPanel {
         headPanel = new HeadPanel(this::onAddButtonClicked);  // Tạo HeadPanel với callback cho nút thêm
         tablePanel = new TablePanel(this);  // Tạo TablePanel với tham chiếu ContentPanel
         homePanel = new HomePanel();  // Tạo HomePanel cho trang chủ
-        isHomeDisplayed = false;  // Đánh dấu không hiển thị trang chủ ban đầu
+        isHomeDisplayed = false;  // Đánh dấu không hiển thị trang chủ ban 
+        // Gọi phương thức autoProcessCheckDetail để xử lý tự động
 
         // Thiết lập callback để thay đổi layout cho tablePanel
         headPanel.setChangeLayoutCallback(isButtonView -> {
             System.out.println("Changed");
             tablePanel.setButtonView(isButtonView);  // Cập nhật trạng thái hiển thị của tablePanel
         });
+        // Gọi ở sự kiện nào đó, ví dụ:
+        CheckDetail checker = new CheckDetail("Bearer your-auth-token", this);
+        checker.autoProcessCheckDetail("b0_kiemtrachitiet", "MaThietBi", "");
 
         // Thêm headPanel và tablePanel vào ContentPanel
         add(headPanel, BorderLayout.NORTH);  // Thêm headPanel vào vị trí đầu (NORTH)
         add(tablePanel, BorderLayout.CENTER);  // Thêm tablePanel vào vị trí giữa (CENTER)
 
-        // Gọi phương thức autoProcessCheckDetail để xử lý tự động
-        autoProcessCheckDetail();
     }
 
     // Callback khi nút thêm được nhấn
@@ -82,26 +82,6 @@ public class ContentPanel extends JPanel {
             isHomeDisplayed = true;  // Đánh dấu đang hiển thị trang chủ
             revalidate();  // Cập nhật lại giao diện
             repaint();  // Vẽ lại giao diện
-        }
-    }
-    private void autoProcessCheckDetail() {
-        String authToken = "Bearer your-auth-token";  // Token lấy từ nơi phù hợp
-        String tableName = "b0_kiemtrachitiet"; // Tên bảng
-        String keyColumn = "TinhTrang"; // Cột khóa
-        String keyValue = "Tot"; // Giá trị khóa
-
-        // Tạo đối tượng CheckDetail và gọi phương thức xử lý tự động
-        try {
-            CheckDetail checkDetail = new CheckDetail(authToken);
-            checkDetail.processCheckDetail(tableName, keyColumn, keyValue);
-
-            // Sau khi xử lý xong, cập nhật lại dữ liệu bảng hoặc giao diện
-            updateTableData(null, null, null, tableName, "Dữ liệu sau khi xử lý");
-            System.out.println("Done check detail");
-            // Thông báo thành công
-            JOptionPane.showMessageDialog(this, "Đã cập nhật đền bù thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Lỗi khi xử lý: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

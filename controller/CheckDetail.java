@@ -2,33 +2,48 @@ package controller;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import javax.swing.JOptionPane;
+import model.ApiClient;
 import model.ApiClient.ApiResponse;
 import model.TableDataOperationsClient;
+import view.MainRegion.ContentPanel;
 
 public class CheckDetail {
 
     private final TableDataOperationsClient client;
-
+    private ContentPanel contentPanel; // Tham chiếu đến ContentPanel để cập nhật dữ liệu
     // Constructor để khởi tạo với authToken
-    public CheckDetail(String authToken) {
+    // CheckDetail.java
+    public CheckDetail(String authToken, ContentPanel contentPanel) {
         this.client = new TableDataOperationsClient(authToken);
+        this.contentPanel = contentPanel; 
     }
+
 
     // Hàm chính xử lý logic kiểm tra và cập nhật đền bù
     public ApiResponse processCheckDetail(String tableName, String keyColumn, String keyValue) {
-        ApiResponse res = client.getRow(tableName, keyColumn, keyValue);
-
+        ApiResponse res;
+        
+        if (keyValue == null || keyValue.trim().isEmpty()) {
+            // Nếu không có keyValue, lấy tất cả dữ liệu
+            res = client.getRow(tableName, keyColumn, keyValue); // Giả sử phương thức này lấy tất cả dòng trong bảng
+        } else {
+            // Nếu có keyValue, truy vấn theo key
+            res = client.getRow(tableName, keyColumn, keyValue);
+        }
+    
         if (res.isSuccess()) {
             System.out.println("✅ Dữ liệu dòng:");
             System.out.println(res.getMessage());
-
+    
             updateDenBuTheoTinhTrang(); // Cập nhật đền bù theo tình trạng thiết bị
         } else {
             System.err.println("❌ Lỗi: " + res.getMessage());
         }
-
+    
         return res;
     }
+    
 
     // Hàm cập nhật cột Đền Bù theo tình trạng thiết bị
     private void updateDenBuTheoTinhTrang() {
@@ -51,24 +66,30 @@ public class CheckDetail {
                 int rows = pstmt.executeUpdate();
                 System.out.println("✔ Đã cập nhật " + rows + " dòng có Tình Trạng = 'Hỏng' (Lấy Đền Bù từ bảng thiết bị)");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // Phương thức chính để gọi logic kiểm tra và cập nhật
-    // public static void main(String[] args) {
-    //     String authToken = "Bearer your-auth-token";  // Token lấy từ nơi phù hợp
-    //     CheckDetail checkDetail = new CheckDetail(authToken);
-        
-    //     // Thực hiện kiểm tra và cập nhật đền bù
-    //     ApiResponse response = checkDetail.processCheckDetail("b0_kiemtrachitiet", "TinhTrang", "Tot");
-        
-    //     if (response.isSuccess()) {
-    //         System.out.println("✅ Đã xử lý xong!");
-    //     } else {
-    //         System.err.println("❌ Có lỗi xảy ra khi xử lý.");
-    //     }
-    // }
+    // Hàm xử lý tự động kiểm tra và cập nhật đền bù
+    public void autoProcessCheckDetail(String tableName, String keyColumn, String keyValue) {
+        try {
+            processCheckDetail(tableName, keyColumn, keyValue);
+            // ✅ Lấy lại dữ liệu sau khi cập nhật
+            ApiClient.TableDataResult result = ApiClient.getTableData(tableName);
+            if (result == null || result.data == null) {
+                JOptionPane.showMessageDialog(null, "Không thể lấy dữ liệu từ server", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // ✅ Lấy lại cột khóa chính
+            updateDenBuTheoTinhTrang();
+            // ✅ Cập nhật bảng hiển thị
+            contentPanel.updateTableData(result.data, result.columnComments, keyColumn, tableName, "Chi tiết kiểm tra");
+    
+            System.out.println("Done check detail");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Lỗi khi xử lý: " + e.getMessage(), "Lỗi check detail", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
 }

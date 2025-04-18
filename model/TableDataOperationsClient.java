@@ -161,7 +161,6 @@ public class TableDataOperationsClient {
     }
     public ApiResponse getRow(String tableName, String keyColumn, Object keyValue) {
         try {
-            // Kiểm tra tên bảng và khóa chính hợp lệ
             if (tableName == null || tableName.isEmpty()) {
                 LogHandler.logError("Error: tableName is null or empty");
                 return new ApiResponse(false, "Tên bảng không hợp lệ");
@@ -171,38 +170,29 @@ public class TableDataOperationsClient {
                 return new ApiResponse(false, "Khóa chính không hợp lệ");
             }
 
-            // Gửi yêu cầu GET đến API
-            LogHandler.logInfo("Gửi yêu cầu GET: tableName=" + tableName + ", keyColumn=" + keyColumn + ", keyValue=" + keyValue);
-            HttpUtil.HttpResponse response = httpUtil.sendRequest(
-                URI.create(BASE_URL + "/table/" + tableName + "/" + keyColumn + "/" + keyValue),
-                "GET",
-                authHeader,
-                ""
-            );
+            // Giả sử API chỉ cần tableName và keyValue, không cần keyColumn trong URL
+            URI uri = URI.create(BASE_URL + "/table/" + tableName + "/" + keyValue);
+            LogHandler.logInfo("Gửi yêu cầu GET: " + uri);
 
-            // Ghi log phản hồi
+            HttpUtil.HttpResponse response = httpUtil.sendRequest(uri, "GET", authHeader, "");
+
             LogHandler.logInfo("Get row response: " + response.statusCode);
-            LogHandler.logInfo("Body: " + response.body);
+            LogHandler.logInfo("Raw JSON body: " + response.body);
 
-            // Phân tích mã phản hồi và nội dung
             if (response.statusCode == 200) {
-                // Phân tích dữ liệu JSON từ response.body thành đối tượng Java (Map hoặc List)
                 ApiClient.TableDataResult result = jsonParser.parseTableDataWithColumns(response.body);
-                
-                // Nếu có dữ liệu (ví dụ lấy dòng đầu tiên trong dữ liệu)
+
                 if (result.data != null && !result.data.isEmpty()) {
-                    Map<String, String> row = result.data.get(0);  // Lấy dòng đầu tiên (có thể tùy chỉnh)
-                    // Trả về ApiResponse với dữ liệu dòng
+                    Map<String, String> row = result.data.get(0);
                     return new ApiResponse(true, "Lấy dòng dữ liệu thành công", new HashMap<>(row));
                 } else {
                     return new ApiResponse(false, "Không tìm thấy dữ liệu");
                 }
             } else {
-                return new ApiResponse(false, response.body);  // Trả lại thông báo lỗi nếu không thành công
+                return new ApiResponse(false, response.body);
             }
-            
+
         } catch (Exception e) {
-            // Ghi log lỗi nếu xảy ra lỗi mạng
             LogHandler.logError("Error getting row: " + e.getMessage(), e);
             return new ApiResponse(false, "Lỗi mạng: " + e.getMessage());
         }

@@ -1,9 +1,9 @@
 package view.MainRegion;
 
-import javax.swing.*;
 import java.awt.*;
-import view.Style;
 import java.util.function.Consumer;
+import javax.swing.*;
+import view.Style;
 
 public class HeadPanel extends JPanel {
     private final JLabel tableNameLabel = new JLabel("");
@@ -66,5 +66,10 @@ public class HeadPanel extends JPanel {
 
     public boolean isButtonViewActive() {
         return isButtonView;
+    }
+
+    public void setCheckDetailCallback(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setCheckDetailCallback'");
     }
 }
