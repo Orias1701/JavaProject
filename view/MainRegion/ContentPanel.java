@@ -1,5 +1,6 @@
 package view.MainRegion;
 
+import controller.CheckDetail;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,9 @@ public class ContentPanel extends JPanel {
         // Thêm headPanel và tablePanel vào ContentPanel
         add(headPanel, BorderLayout.NORTH);  // Thêm headPanel vào vị trí đầu (NORTH)
         add(tablePanel, BorderLayout.CENTER);  // Thêm tablePanel vào vị trí giữa (CENTER)
+
+        // Gọi phương thức autoProcessCheckDetail để xử lý tự động
+        autoProcessCheckDetail();
     }
 
     // Callback khi nút thêm được nhấn
@@ -78,6 +82,26 @@ public class ContentPanel extends JPanel {
             isHomeDisplayed = true;  // Đánh dấu đang hiển thị trang chủ
             revalidate();  // Cập nhật lại giao diện
             repaint();  // Vẽ lại giao diện
+        }
+    }
+    private void autoProcessCheckDetail() {
+        String authToken = "Bearer your-auth-token";  // Token lấy từ nơi phù hợp
+        String tableName = "b0_kiemtrachitiet"; // Tên bảng
+        String keyColumn = "TinhTrang"; // Cột khóa
+        String keyValue = "Tot"; // Giá trị khóa
+
+        // Tạo đối tượng CheckDetail và gọi phương thức xử lý tự động
+        try {
+            CheckDetail checkDetail = new CheckDetail(authToken);
+            checkDetail.processCheckDetail(tableName, keyColumn, keyValue);
+
+            // Sau khi xử lý xong, cập nhật lại dữ liệu bảng hoặc giao diện
+            updateTableData(null, null, null, tableName, "Dữ liệu sau khi xử lý");
+            System.out.println("Done check detail");
+            // Thông báo thành công
+            JOptionPane.showMessageDialog(this, "Đã cập nhật đền bù thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xử lý: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
