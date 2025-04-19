@@ -9,15 +9,17 @@ import model.ApiClient;
 import model.ApiClient.TableDataResult;
 import model.TableDataOperationsClient;
 import view.MainRegion.ContentPanel;
-
+import view.MainRegion.TablePanel;
 public class CheckBooking {
 
     private final TableDataOperationsClient client;
     private final ContentPanel contentPanel;
+    private final TablePanel tablePanel;
 
-    public CheckBooking(String authToken, ContentPanel contentPanel) {
+    public CheckBooking(String authToken, ContentPanel contentPanel, TablePanel tablePanel) {
         this.client = new TableDataOperationsClient(authToken);
         this.contentPanel = contentPanel;
+        this.tablePanel = tablePanel;
     }
 
     public void autoProcessBooking(String tableName, String keyColumn, String keyValue) {
@@ -30,6 +32,7 @@ public class CheckBooking {
             }
             updatePhongTheoTinhTrang();
             contentPanel.updateTableData(result.data, result.columnComments, keyColumn, tableName, "Thông tin đặt phòng");
+            tablePanel.updateTableData(result.data, result.columnComments, keyColumn, tableName, "Thông tin đặt phòng");
             System.out.println("✔ Đã cập nhật trạng thái đặt phòng");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Lỗi xử lý đặt phòng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);

@@ -7,8 +7,8 @@ import java.util.Map;
 import model.ApiClient;
 import model.TableDataOperationsClient;
 import view.MainRegion.ContentPanel;
+import view.MainRegion.TablePanel;
 import view.MenuRegion.MenuPanel;
-
 public class MainCtrl {
     private final ContentPanel contentPanel;
     private final MenuPanel menuPanel;
@@ -32,10 +32,11 @@ public class MainCtrl {
             }
         });
         //Xử lý kiểm tra chi tiết phòng
-        CheckDetail checker = new CheckDetail("Bearer your-auth-token", this.contentPanel);
+        TablePanel tablePanel = new TablePanel(contentPanel);
+        CheckDetail checker = new CheckDetail("Bearer your-auth-token", this.contentPanel, tablePanel);
         checker.autoProcessCheckDetail("b0_kiemtrachitiet", "MaThietBi", "");
         //Xử lý kiểm tra đặt phòng
-        CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this.contentPanel);
+        CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this.contentPanel, tablePanel);
         checkBooking.autoProcessBooking("a6_datphong", "MaDatPhong", "");
 
     }

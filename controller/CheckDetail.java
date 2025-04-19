@@ -7,16 +7,19 @@ import model.ApiClient;
 import model.ApiClient.ApiResponse;
 import model.TableDataOperationsClient;
 import view.MainRegion.ContentPanel;
-
+import view.MainRegion.TablePanel;
 public class CheckDetail {
 
     private final TableDataOperationsClient client;
     private ContentPanel contentPanel; // Tham chiếu đến ContentPanel để cập nhật dữ liệu
     // Constructor để khởi tạo với authToken
     // CheckDetail.java
-    public CheckDetail(String authToken, ContentPanel contentPanel) {
+    private TablePanel tablePanel; // Declare TablePanel instance
+
+    public CheckDetail(String authToken, ContentPanel contentPanel, TablePanel tablePanel) {
         this.client = new TableDataOperationsClient(authToken);
         this.contentPanel = contentPanel; 
+        this.tablePanel = tablePanel; // Initialize TablePanel
     }
 
 
@@ -37,6 +40,7 @@ public class CheckDetail {
             System.out.println(res.getMessage());
     
             updateDenBuTheoTinhTrang(); // Cập nhật đền bù theo tình trạng thiết bị
+            tablePanel.refreshTable();
         } else {
             System.err.println("❌ Lỗi: " + res.getMessage());
         }

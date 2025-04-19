@@ -1,24 +1,32 @@
 #include <stdio.h>
 
-// �aT PHoNG
-
+// Dat phong 
+class loaiphong{
+	string maloai;
+	int gialoai 
+}; 
 class khachhang {
 	string makhachhang, tinhtrangkhach;
 	arr tinhtrangkhach = {'dang o', 'da roi'};
 };
 
 class phong {
-	string maphong;
+	string maphong,maloai; 
 	arr ttphong = {'trong', 'dang su dung', 'da dat'};
 };
 
 class datphong {
 	string maphong, makhachhang;
-	int nhanphong, traphong;
+	int nhanphong, traphong,tienphat;
 	string cachdat;
 	string ttdat; 
 };
-
+void tienphong(int tienphong){
+	if(loaiphong.gialoai=phong.gialoai){
+		tienphong=loaiphong.gialoai; 
+	} 
+	return tienphong; 
+} 
 bool quahan(int thuc, int nhanphong, int traphong, string cachdat) {
 	if (thuc > traphong + 30p) {
 		return true;
@@ -36,13 +44,16 @@ bool dangdoi(string cachdat) {
 	return false;
 }
 int tinhTienPhat(int thuc, int traphong, string ttdat, string ttphong, int tienphong) {
-	int tienphat = 0;
+	int tienphat;
 	if (ttdat == "qua han" && ttphong == "dang su dung") {
 		if (thuc > traphong + 30p) {
 			int thoigianvuot = thuc - (traphong + 30p);
 			tienphat = tienphong * 0.3 * (thoigianvuot / 120);
 		}
 	}
+	else{
+		tienphat=0 
+	} 
 	return tienphat;
 }
 
@@ -58,10 +69,10 @@ int main {
 	//ttdat:Dang su dung,Qua han,Dang doi,Da tra 
 	//ttphong:Trong,Dang su dung,Da dat
 	//cachdat:online,tructiep 
-	int nhanphong, traphong, thuc;
-	string ttdat, ttphong, cachdat, maphong, makhachhang;
-	int tienphong;
-	int tienphat;
+//	int nhanphong, traphong, thuc;
+//	string ttdat, ttphong, cachdat, maphong, makhachhang;
+//	int tienphong;
+//	int tienphat;
 	int ao;
 	ao = nhanphong - 12h;
 	tienphat = tinhTienPhat(thuc, traphong, ttdat, ttphong, tienphong);
