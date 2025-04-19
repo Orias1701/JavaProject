@@ -28,7 +28,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     public TablePanel(ContentPanel parent) {
         this.parent = parent;
         setLayout(new BorderLayout());
-
+        tableView = new TableView();
         // Initialize views
         gridView = new GridView(this);
         currentView = tableView.getView();

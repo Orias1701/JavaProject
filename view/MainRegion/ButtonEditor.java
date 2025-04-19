@@ -6,9 +6,7 @@ import javax.swing.*;
 
 public class ButtonEditor extends DefaultCellEditor {
     private final JButton button;
-    @SuppressWarnings("unused")
     private final String actionType;
-    @SuppressWarnings("unused")
     private final FormDialogHandler formDialogHandler;
     private int row;
 

@@ -95,7 +95,7 @@ public class MenuPanel extends JPanel {
             String tableName = entry.getKey();
             String tableComment = entry.getValue().toUpperCase();
             // Chỉ hiển thị bảng nếu người dùng có quyền xem
-            if (permissions.getOrDefault(tableName, "00").compareTo("00") > -1) {
+            if (permissions.getOrDefault(tableName, "00").compareTo("00") > 0) {
                 MenuButton button = createMenuButton(tableComment, y);
                 button.putClientProperty("tableName", tableName);
                 add(button);
