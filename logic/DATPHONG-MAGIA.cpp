@@ -34,7 +34,7 @@ bool dangdoi(string cachdat) {
 		return true;
 	}
 	return false;
-
+}
 int tinhTienPhat(int thuc, int traphong, string ttdat, string ttphong, int tienphong) {
 	int tienphat = 0;
 	if (ttdat == "qua han" && ttphong == "dang su dung") {

@@ -2,6 +2,8 @@ package controller;
 
 import java.sql.*;
 import java.time.*;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.JOptionPane;
 import model.ApiClient;
 import model.ApiClient.TableDataResult;
@@ -35,90 +37,136 @@ public class CheckBooking {
     }
 
     private void processBooking(String tableName, String keyColumn, String keyValue) {
-        // Placeholder nếu cần xử lý trước khi update (API call...)
+        // Xử lý nếu cần
     }
 
     private void updatePhongTheoTinhTrang() throws Exception {
-        try (Connection conn = DatabaseUtil.getConnection()) {
-            String sql = """
-                SELECT dp.MaDatPhong, dp.MaPhong, dp.NgayNhanPhong, dp.NgayTraPhong, dp.CachDat, dp.TinhTrang, p.TinhTrangPhong AS TTP
-                FROM a6_datphong dp
-                JOIN a5_phong p ON dp.MaPhong = p.MaPhong;
-            """;
+    try (Connection conn = DatabaseUtil.getConnection()) {
+        // 1. Chuẩn bị danh sách mã phòng đã xử lý
+        Set<String> phongDaXuLy = new HashSet<>();
 
-            try (PreparedStatement ps = conn.prepareStatement(sql);
-                 ResultSet rs = ps.executeQuery()) {
+        String sql = """
+            SELECT dp.MaDatPhong, dp.MaPhong, dp.NgayNhanPhong, dp.NgayTraPhong, dp.CachDat, dp.TinhTrang, p.TinhTrangPhong, kh.MaKhachHang
+            FROM a6_datphong dp
+            JOIN a5_phong p ON dp.MaPhong = p.MaPhong
+            JOIN a1_khachhang kh ON dp.MaKhachHang = kh.MaKhachHang;
+        """;
 
-                while (rs.next()) {
-                    String maPhong = rs.getString("MaPhong");
-                    String tinhTrangDat = rs.getString("TinhTrang");
-                    String cachDat = rs.getString("CachDat");
-                    LocalDateTime nhanPhong = rs.getTimestamp("NgayNhanPhong").toLocalDateTime();
-                    LocalDateTime traPhong = rs.getTimestamp("NgayTraPhong").toLocalDateTime();
-                    LocalDateTime now = LocalDateTime.now();
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-                    String newTinhTrangPhong = null;
+            while (rs.next()) {
+                String maPhong = rs.getString("MaPhong");
+                String tinhTrangDat = rs.getString("TinhTrang");
+                String cachDat = rs.getString("CachDat");
+                String maKhachHang = rs.getString("MaKhachHang");
 
-                    // 1. Kiểm tra đặt trực tiếp
-                    if ("Đặt trực tiếp".equalsIgnoreCase(cachDat)) {
-                        if ("Đang sử dụng".equalsIgnoreCase(tinhTrangDat)) {
+                phongDaXuLy.add(maPhong); // Đánh dấu đã xử lý
+
+                LocalDateTime nhanPhong = rs.getTimestamp("NgayNhanPhong").toLocalDateTime();
+                LocalDateTime traPhong = rs.getTimestamp("NgayTraPhong").toLocalDateTime();
+                LocalDateTime now = LocalDateTime.now();
+
+                if (traPhong.isBefore(nhanPhong)) {
+                    JOptionPane.showMessageDialog(null, "❌ Ngày trả phòng phải sau ngày nhận phòng (phòng " + maPhong + ")");
+                    continue;
+                }
+
+                String newTinhTrangPhong = null;
+                String newTinhTrangKhach = null;
+
+                // Đặt trực tiếp
+                if ("Đặt trực tiếp".equalsIgnoreCase(cachDat)) {
+                    if ("Đang sử dụng".equalsIgnoreCase(tinhTrangDat)) {
+                        newTinhTrangPhong = "Đang sử dụng";
+                        newTinhTrangKhach = "Đang ở";
+                    } else if ("Quá hạn".equalsIgnoreCase(tinhTrangDat)) {
+                        if (now.isAfter(traPhong.plusMinutes(30))) {
+                            long minutesLate = Duration.between(traPhong.plusMinutes(30), now).toMinutes();
+                            double tienPhat = 300_000 * 0.3 * (minutesLate / 120.0); // giả định 300k/phòng
+                            System.out.println("Tiền phạt phòng " + maPhong + ": " + tienPhat);
                             newTinhTrangPhong = "Đang sử dụng";
-                        } else if ("Quá hạn".equalsIgnoreCase(tinhTrangDat)) {
-                            if (now.isAfter(traPhong.plusMinutes(30))) {
-                                newTinhTrangPhong = "Đang sử dụng"; // vẫn đang ở trong
-                                // Tiền phạt nếu vượt quá
-                                long minutesLate = Duration.between(traPhong.plusMinutes(30), now).toMinutes();
-                                double tienPhat = 0.5 * (minutesLate / 60.0); // Tính tiền phạt
-                                System.out.println("Tiền phạt phòng " + maPhong + ": " + tienPhat);
-                            } else {
-                                newTinhTrangPhong = "Đang sử dụng";
-                            }
-                        } else if ("Đang đợi".equalsIgnoreCase(tinhTrangDat)) {
-                            // Trực tiếp không được ở trạng thái đang đợi
-                            JOptionPane.showMessageDialog(null, "⚠ Đặt trực tiếp không thể ở trạng thái Đang đợi (phòng " + maPhong + ")");
-                            continue;
+                            newTinhTrangKhach = "Đang ở";
+                        } else {
+                            newTinhTrangPhong = "Đang sử dụng";
+                            newTinhTrangKhach = "Đang ở";
                         }
-                    }
-
-                    // 2. Đặt online
-                    else if ("Đặt online".equalsIgnoreCase(cachDat)) {
-                        if ("Quá hạn".equalsIgnoreCase(tinhTrangDat) && now.isAfter(traPhong.plusMinutes(30))) {
-                            newTinhTrangPhong = "Trống"; // phòng quá hạn sẽ được giải phóng
-                        } else if ("Đang đợi".equalsIgnoreCase(tinhTrangDat)) {
-                            LocalDateTime before12Hours = nhanPhong.minusHours(12);
-                            if (now.isBefore(before12Hours)) {
-                                newTinhTrangPhong = "Trống";
-                            } else {
-                                newTinhTrangPhong = "Đã đặt";
-                            }
-                        }
-                    }
-
-                    // 3. Điều kiện nhận - trả hợp lệ
-                    if (traPhong.isBefore(nhanPhong)) {
-                        JOptionPane.showMessageDialog(null, "❌ Ngày trả phòng phải sau ngày nhận phòng (phòng " + maPhong + ")");
+                    } else if ("Đang đợi".equalsIgnoreCase(tinhTrangDat)) {
+                        JOptionPane.showMessageDialog(null, "⚠ Đặt trực tiếp không thể ở trạng thái Đang đợi (phòng " + maPhong + ")");
                         continue;
                     }
+                }
 
-                    // 4. Cập nhật trạng thái phòng nếu có thay đổi
-                    if (newTinhTrangPhong != null) {
-                        String updatePhong = "UPDATE a5_phong SET TinhTrangPhong = ? WHERE MaPhong = ?";
-                        try (PreparedStatement updateStmt = conn.prepareStatement(updatePhong)) {
-                            updateStmt.setString(1, newTinhTrangPhong);
-                            updateStmt.setString(2, maPhong);
-                            int rows = updateStmt.executeUpdate();
-                            if (rows > 0) {
-                                System.out.println("✔ Cập nhật trạng thái phòng " + maPhong + ": " + newTinhTrangPhong);
-                            }
+                // Đặt online
+                else if ("Đặt online".equalsIgnoreCase(cachDat)) {
+                    if ("Quá hạn".equalsIgnoreCase(tinhTrangDat)) {
+                        if (now.isAfter(traPhong.plusMinutes(30))) {
+                            newTinhTrangPhong = "Trống";
+                            newTinhTrangKhach = "Đã rời";
+                        }
+                    } else if ("Đang đợi".equalsIgnoreCase(tinhTrangDat)) {
+                        LocalDateTime before12h = nhanPhong.minusHours(12);
+                        if (now.isBefore(before12h)) {
+                            newTinhTrangPhong = "Trống";
+                            newTinhTrangKhach = "Đã rời";
+                        } else {
+                            newTinhTrangPhong = "Đã đặt";
+                            newTinhTrangKhach = "Đang ở";
                         }
                     }
                 }
-            }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Lỗi kết nối cơ sở dữ liệu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                // Trạng thái "Đã trả"
+                if ("Đã trả".equalsIgnoreCase(tinhTrangDat)) {
+                    newTinhTrangPhong = "Trống";
+                    newTinhTrangKhach = "Đã rời";
+                }
+
+                // Cập nhật phòng
+                if (newTinhTrangPhong != null) {
+                    try (PreparedStatement updatePhong = conn.prepareStatement("UPDATE a5_phong SET TinhTrangPhong = ? WHERE MaPhong = ?")) {
+                        updatePhong.setString(1, newTinhTrangPhong);
+                        updatePhong.setString(2, maPhong);
+                        updatePhong.executeUpdate();
+                        System.out.println("✔ Cập nhật phòng " + maPhong + ": " + newTinhTrangPhong);
+                    }
+                }
+
+                // Cập nhật khách
+                if (newTinhTrangKhach != null) {
+                    try (PreparedStatement updateKhach = conn.prepareStatement("UPDATE a1_khachhang SET TinhTrangKhach = ? WHERE MaKhachHang = ?")) {
+                        updateKhach.setString(1, newTinhTrangKhach);
+                        updateKhach.setString(2, maKhachHang);
+                        updateKhach.executeUpdate();
+                        System.out.println("✔ Cập nhật khách " + maKhachHang + ": " + newTinhTrangKhach);
+                    }
+                }
+            }
         }
+
+        // ✅ Cập nhật các phòng không có trong đặt phòng → Trống
+        String sqlAllPhong = "SELECT MaPhong FROM a5_phong";
+        try (PreparedStatement psAll = conn.prepareStatement(sqlAllPhong);
+             ResultSet rsAll = psAll.executeQuery()) {
+
+            while (rsAll.next()) {
+                String maPhong = rsAll.getString("MaPhong");
+                if (!phongDaXuLy.contains(maPhong)) {
+                    try (PreparedStatement updatePhong = conn.prepareStatement(
+                            "UPDATE a5_phong SET TinhTrangPhong = 'Trống' WHERE MaPhong = ?")) {
+                        updatePhong.setString(1, maPhong);
+                        updatePhong.executeUpdate();
+                        System.out.println("✔ Phòng " + maPhong + " không có đặt → cập nhật Trống");
+                    }
+                }
+            }
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Lỗi CSDL: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
     }
-    
+}
+
+
 }
