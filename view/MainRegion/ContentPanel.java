@@ -13,34 +13,28 @@ public class ContentPanel extends JPanel {
     private TablePanel tablePanel;  // Panel hiển thị bảng dữ liệu
     private HomePanel homePanel;  // Panel hiển thị trang chủ
     private boolean isHomeDisplayed;  // Biến kiểm tra xem trang chủ có đang hiển thị hay không
-    // Constructor ContentPanel
+    private String currentTableName;  // Lưu trữ tên bảng hiện tại
+
     public ContentPanel() {
         setLayout(new BorderLayout());  // Sử dụng BorderLayout để sắp xếp các panel
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));  // Thiết lập border xung quanh panel
         setOpaque(false);  // Làm cho ContentPanel trong suốt
 
         // Khởi tạo các panel con
-        headPanel = new HeadPanel(this::onAddButtonClicked);  // Tạo HeadPanel với callback cho nút thêm
+        headPanel = new HeadPanel(this::onAddButtonClicked, null);  // Tạo HeadPanel với tableName ban đầu là null
         tablePanel = new TablePanel(this);  // Tạo TablePanel với tham chiếu ContentPanel
         homePanel = new HomePanel();  // Tạo HomePanel cho trang chủ
-        isHomeDisplayed = false;  // Đánh dấu không hiển thị trang chủ ban 
-        // Gọi phương thức autoProcessCheckDetail để xử lý tự động
+        isHomeDisplayed = false;  // Đánh dấu không hiển thị trang chủ ban đầu
 
         // Thiết lập callback để thay đổi layout cho tablePanel
         headPanel.setChangeLayoutCallback(isButtonView -> {
             System.out.println("Changed");
             tablePanel.setButtonView(isButtonView);  // Cập nhật trạng thái hiển thị của tablePanel
         });
+
         // Thêm headPanel và tablePanel vào ContentPanel
         add(headPanel, BorderLayout.NORTH);  // Thêm headPanel vào vị trí đầu (NORTH)
         add(tablePanel, BorderLayout.CENTER);  // Thêm tablePanel vào vị trí giữa (CENTER)
-        // //Xử lý kiểm tra chi tiết phòng
-        // CheckDetail checker = new CheckDetail("Bearer your-auth-token", this);
-        // checker.autoProcessCheckDetail("b0_kiemtrachitiet", "MaThietBi", "");
-        // //Xử lý kiểm tra đặt phòng
-        // CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this);
-        // checkBooking.autoProcessBooking("a6_datphong", "MaDatPhong", "");
-
     }
 
     // Callback khi nút thêm được nhấn
@@ -53,7 +47,7 @@ public class ContentPanel extends JPanel {
         // Nếu đang hiển thị trang chủ, cần xóa nó và cập nhật lại các panel
         if (isHomeDisplayed) {
             remove(homePanel);  // Xóa homePanel khỏi ContentPanel
-            headPanel = new HeadPanel(this::onAddButtonClicked);  // Tạo lại headPanel mới
+            headPanel = new HeadPanel(this::onAddButtonClicked, tableName);  // Tạo lại headPanel với tableName
             tablePanel = new TablePanel(this);  // Tạo lại tablePanel mới
             // Thiết lập lại callback để đảm bảo changeLayoutCallback không bị null
             headPanel.setChangeLayoutCallback(isButtonView -> {
@@ -64,7 +58,10 @@ public class ContentPanel extends JPanel {
             add(tablePanel, BorderLayout.CENTER);  // Thêm lại tablePanel vào ContentPanel
             isHomeDisplayed = false;  // Đánh dấu không còn hiển thị trang chủ
         }
-    
+
+        // Lưu tên bảng hiện tại
+        this.currentTableName = tableName;
+
         // Định dạng ngày giờ theo yêu cầu
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -84,11 +81,10 @@ public class ContentPanel extends JPanel {
             }
         }
 
-    
         // Cập nhật dữ liệu cho bảng và tiêu đề
         tablePanel.updateTableData(data, columnComments, keyColumn, tableName, tableComment);
         headPanel.updateTableNameLabel(tableComment != null && !tableComment.isEmpty() ? tableComment : tableName);
-    
+
         // Cập nhật lại giao diện sau khi thay đổi
         revalidate();  // Cập nhật lại layout
         repaint();  // Vẽ lại giao diện
@@ -96,7 +92,6 @@ public class ContentPanel extends JPanel {
 
     // Hàm hiển thị trang chủ
     public void showHomePanel() {
-
         // Kiểm tra nếu trang chủ chưa được hiển thị
         if (!isHomeDisplayed) {
             remove(headPanel);  // Xóa headPanel khỏi ContentPanel

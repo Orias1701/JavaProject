@@ -3,6 +3,8 @@ package view.MainRegion;
 import java.awt.*;
 import java.util.function.Consumer;
 import javax.swing.*;
+
+import controller.UserSession;
 import view.Style;
 
 public class HeadPanel extends JPanel {
@@ -11,7 +13,7 @@ public class HeadPanel extends JPanel {
     private Consumer<Boolean> changeLayoutCallback;
     private boolean isButtonView = false;
 
-    public HeadPanel(Consumer<Void> addButtonCallback) {
+    public HeadPanel(Consumer<Void> addButtonCallback, String tableName) {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 10));
         setOpaque(false);
@@ -26,6 +28,9 @@ public class HeadPanel extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setOpaque(false);
 
+        // Kiểm tra quyền thêm bản ghi
+        boolean canAdd = UserSession.hasPermission(tableName, "10");
+
         // Nút thêm bản ghi
         Style.RoundedButton addRecordButton = new Style.RoundedButton(" + ");
         addRecordButton.setFont(Style.MONS_24);
@@ -33,7 +38,10 @@ public class HeadPanel extends JPanel {
         addRecordButton.setBackground(Style.GREEN);
         addRecordButton.setFocusPainted(false);
         addRecordButton.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
-        addRecordButton.addActionListener(e -> addButtonCallback.accept(null));
+        addRecordButton.setEnabled(canAdd);
+        if (canAdd) {
+            addRecordButton.addActionListener(e -> addButtonCallback.accept(null));
+        }
         buttonPanel.add(addRecordButton);
 
         // Nút ChangeLayout
@@ -44,10 +52,8 @@ public class HeadPanel extends JPanel {
         changeLayoutButton.setFocusPainted(false);
         changeLayoutButton.setBorder(BorderFactory.createEmptyBorder(9, 9, 9, 9));
         changeLayoutButton.addActionListener(e -> {
-            System.out.println("123");
             isButtonView = !isButtonView;
             if (changeLayoutCallback != null) {
-                System.out.println("321");
                 changeLayoutCallback.accept(isButtonView);
             }
         });
