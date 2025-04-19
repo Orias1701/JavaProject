@@ -1,7 +1,5 @@
 package view.MainRegion;
 
-import controller.CheckBooking;
-import controller.CheckDetail;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,16 +31,15 @@ public class ContentPanel extends JPanel {
             System.out.println("Changed");
             tablePanel.setButtonView(isButtonView);  // Cập nhật trạng thái hiển thị của tablePanel
         });
-        //Xử lý kiểm tra chi tiết phòng
-        CheckDetail checker = new CheckDetail("Bearer your-auth-token", this);
-        checker.autoProcessCheckDetail("b0_kiemtrachitiet", "MaThietBi", "");
-        //Xử lý kiểm tra đặt phòng
-        CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this);
-        checkBooking.autoProcessBooking("a6_datphong", "MaDatPhong", "");
-
         // Thêm headPanel và tablePanel vào ContentPanel
         add(headPanel, BorderLayout.NORTH);  // Thêm headPanel vào vị trí đầu (NORTH)
         add(tablePanel, BorderLayout.CENTER);  // Thêm tablePanel vào vị trí giữa (CENTER)
+        // //Xử lý kiểm tra chi tiết phòng
+        // CheckDetail checker = new CheckDetail("Bearer your-auth-token", this);
+        // checker.autoProcessCheckDetail("b0_kiemtrachitiet", "MaThietBi", "");
+        // //Xử lý kiểm tra đặt phòng
+        // CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this);
+        // checkBooking.autoProcessBooking("a6_datphong", "MaDatPhong", "");
 
     }
 

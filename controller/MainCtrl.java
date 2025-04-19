@@ -1,20 +1,20 @@
 package controller;
 
+import com.sun.net.httpserver.HttpServer;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.Map;
 import model.ApiClient;
 import model.TableDataOperationsClient;
 import view.MainRegion.ContentPanel;
 import view.MenuRegion.MenuPanel;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.Map;
-
-import com.sun.net.httpserver.HttpServer;
-
 public class MainCtrl {
     private final ContentPanel contentPanel;
     private final MenuPanel menuPanel;
     private static TableDataOperationsClient operationsClient;
+    private CheckDetail checkDetail;
+    private CheckBooking checkBooking;
 
     public MainCtrl(ContentPanel contentPanel, MenuPanel menuPanel) {
         if (contentPanel == null || menuPanel == null) {
@@ -31,6 +31,13 @@ public class MainCtrl {
                 LogHandler.logError("Invalid table name received");
             }
         });
+        //Xử lý kiểm tra chi tiết phòng
+        CheckDetail checker = new CheckDetail("Bearer your-auth-token", this.contentPanel);
+        checker.autoProcessCheckDetail("b0_kiemtrachitiet", "MaThietBi", "");
+        //Xử lý kiểm tra đặt phòng
+        CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this.contentPanel);
+        checkBooking.autoProcessBooking("a6_datphong", "MaDatPhong", "");
+
     }
 
     public ContentPanel getContentPanel() {
