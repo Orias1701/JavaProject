@@ -13,6 +13,9 @@ public class GridView {
     private List<String> columnNames; // Lưu tên cột
     private List<String> columnComments; // Lưu chú thích cột
     private FormDialogHandler formDialogHandler; // Lưu handler
+    private boolean canAdd;
+    private boolean canEdit;
+    private boolean canDelete;
 
     public GridView(TablePanel parent) {
         // GridLayout sẽ được thiết lập động trong updateView
@@ -31,7 +34,7 @@ public class GridView {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
                 if (data != null && columnNames != null && columnComments != null && formDialogHandler != null) {
-                    updateView(data, columnNames, columnComments, formDialogHandler);
+                    updateView(data, columnNames, columnComments, formDialogHandler, canAdd, canEdit, canDelete);
                 }
             }
         });
@@ -41,12 +44,15 @@ public class GridView {
         return containerPanel;
     }
 
-    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, FormDialogHandler formDialogHandler) {
+    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
         // Lưu các tham số để sử dụng khi resize
         this.data = data;
         this.columnNames = columnNames;
         this.columnComments = columnComments;
         this.formDialogHandler = formDialogHandler;
+        this.canAdd = canAdd;
+        this.canEdit = canEdit;
+        this.canDelete = canDelete;
 
         buttonPanel.removeAll();
 
@@ -66,14 +72,13 @@ public class GridView {
         // Tính chiều rộng của buttonPanel dựa trên cửa sổ
         int windowWidth = containerPanel.getWidth();
         if (windowWidth == 0) {
-            // Nếu chưa hiển thị, sử dụng chiều rộng mặc định (4 button)
             windowWidth = 4 * (buttonMinWidth + gap) + gap + 240;
         }
-        int panelWidth = windowWidth - 240; // Chiều rộng buttonPanel = chiều rộng cửa sổ - 240
+        int panelWidth = windowWidth - 240;
 
         // Tính số cột
-        int columns = panelWidth / (buttonMinWidth + gap); // Số cột = panelWidth / 410 lấy nguyên
-        if (columns < 1) columns = 1; // Đảm bảo ít nhất 1 cột
+        int columns = panelWidth / (buttonMinWidth + gap);
+        if (columns < 1) columns = 1;
 
         // Thiết lập GridLayout với số cột động
         buttonPanel.setLayout(new GridLayout(0, columns, gap, gap));
@@ -129,17 +134,27 @@ public class GridView {
                 }
             });
 
-            final int finalRowIndex = rowIndex;
-            editButton.addActionListener(e -> formDialogHandler.showFormDialog("edit", finalRowIndex));
+            // Chỉ thêm hành động chỉnh sửa nếu có quyền
+            if (canDelete) {
+                final int finalRowIndex = rowIndex;
+                editButton.addActionListener(e -> formDialogHandler.showFormDialog("all", finalRowIndex));
+            } else if (canEdit) {
+                final int finalRowIndex = rowIndex;
+                editButton.addActionListener(e -> formDialogHandler.showFormDialog("edit", finalRowIndex));
+            } else {
+                final int finalRowIndex = rowIndex;
+                editButton.addActionListener(e -> formDialogHandler.showFormDialog("detail", finalRowIndex));
+            }
+
             buttonPanel.add(editButton);
         }
 
         // Tính số hàng
         int estimatedRows = (int) Math.ceil((double) data.size() / columns);
-        int panelHeight = estimatedRows * (buttonHeight + gap) + gap; // Chiều cao
+        int panelHeight = estimatedRows * (buttonHeight + gap) + gap;
 
         // Đặt kích thước cho buttonPanel
-        buttonPanel.setMinimumSize(new Dimension(buttonMinWidth + gap + gap, panelHeight)); // Tối thiểu 1 button
+        buttonPanel.setMinimumSize(new Dimension(buttonMinWidth + gap + gap, panelHeight));
         buttonPanel.setPreferredSize(new Dimension(panelWidth, panelHeight));
 
         buttonPanel.revalidate();

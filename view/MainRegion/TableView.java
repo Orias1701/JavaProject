@@ -107,7 +107,7 @@ public class TableView {
         return table;
     }
 
-    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, FormDialogHandler formDialogHandler) {
+    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
         tableModel.setRowCount(0);
         tableModel.setColumnCount(0);
 
@@ -119,51 +119,74 @@ public class TableView {
 
         // Set column identifiers
         List<String> displayNames = new ArrayList<>(columnComments);
-        displayNames.add("");
-        displayNames.add("");
+
+        displayNames.add(""); // Cột Sửa hoặc chi tiết
+
+        if (canDelete) {
+            displayNames.add(""); // Cột Xóa
+        }
+
         tableModel.setColumnIdentifiers(displayNames.toArray());
-        // String tableName = tablePanel.getTableName();
         // Populate table data
         for (Map<String, String> row : data) {
-            Object[] rowData = new Object[columnNames.size() + 2];
+            Object[] rowData = new Object[displayNames.size()];
             for (int i = 0; i < columnNames.size(); i++) {
                 rowData[i] = row.get(columnNames.get(i));
             }
-            rowData[columnNames.size()] = "Sửa";
-            rowData[columnNames.size() + 1] = "Xóa";
+            if (canEdit) {
+                rowData[columnNames.size()] = "Sửa";
+            } else {
+                rowData[columnNames.size()] = "Chi tiết";
+            }
+
+            if (canDelete) {
+                rowData[columnNames.size() + (canEdit ? 1 : 0)] = "Xóa";
+            }
+
             tableModel.addRow(rowData);
         }
 
         // Configure edit and delete buttons
-        int editColumnIndex = table.getColumnCount() - 2;
-        int deleteColumnIndex = table.getColumnCount() - 1;
-
-        TableColumn editButton = table.getColumnModel().getColumn(editColumnIndex);
-        TableColumn deleteButton = table.getColumnModel().getColumn(deleteColumnIndex);
-
-        editButton.setCellRenderer(new ButtonRenderer());
-        editButton.setCellEditor(new ButtonEditor(new JCheckBox(), "edit", formDialogHandler));
-        editButton.setPreferredWidth(70);
-        editButton.setMaxWidth(70);
-        editButton.setMinWidth(70);
-        editButton.setResizable(false);
-
-        deleteButton.setCellRenderer(new ButtonRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (c instanceof JButton button) {
-                    button.setForeground(Color.RED);
+        if (canEdit) {
+            int editColumnIndex = table.getColumnCount() - (canDelete ? 2 : 1);
+            TableColumn editButton = table.getColumnModel().getColumn(editColumnIndex);
+            editButton.setCellRenderer(new ButtonRenderer());
+            editButton.setCellEditor(new ButtonEditor(new JCheckBox(), "edit", formDialogHandler));
+            editButton.setPreferredWidth(70);
+            editButton.setMaxWidth(70);
+            editButton.setMinWidth(70);
+            editButton.setResizable(false);
+        } else {
+            int detailColumnIndex = table.getColumnCount() - 1;
+            TableColumn detailButton = table.getColumnModel().getColumn(detailColumnIndex);
+            detailButton.setCellRenderer(new ButtonRenderer());
+            detailButton.setCellEditor(new ButtonEditor(new JCheckBox(), "detail", formDialogHandler));
+            detailButton.setPreferredWidth(120);
+            detailButton.setMaxWidth(120);
+            detailButton.setMinWidth(120);
+            detailButton.setResizable(false);
+        }
+    
+        if (canDelete) {
+            int deleteColumnIndex = table.getColumnCount() - 1;
+            TableColumn deleteButton = table.getColumnModel().getColumn(deleteColumnIndex);
+            deleteButton.setCellRenderer(new ButtonRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                    Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                    if (c instanceof JButton button) {
+                        button.setForeground(Color.RED);
+                    }
+                    return c;
                 }
-                return c;
-            }
-        });
-        deleteButton.setCellEditor(new ButtonEditor(new JCheckBox(), "delete", formDialogHandler));
-        deleteButton.setPreferredWidth(70);
-        deleteButton.setMaxWidth(70);
-        deleteButton.setMinWidth(70);
-        deleteButton.setResizable(false);
-
+            });
+            deleteButton.setCellEditor(new ButtonEditor(new JCheckBox(), "delete", formDialogHandler));
+            deleteButton.setPreferredWidth(70);
+            deleteButton.setMaxWidth(70);
+            deleteButton.setMinWidth(70);
+            deleteButton.setResizable(false);
+        }
+    
         table.revalidate();
         table.repaint();
     }

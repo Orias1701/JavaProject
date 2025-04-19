@@ -1,9 +1,9 @@
 package view.MainRegion;
 
 import controller.LogHandler;
+import controller.UserSession;
+
 import java.awt.*;
-// import java.util.List;
-// import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import model.ApiClient;
@@ -91,12 +91,16 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         LogHandler.logInfo("Tên bảng TablePanel: " + tableName);
         LogHandler.logInfo("Chú thích bảng TablePanel: " + tableComment);
 
-        if (isButtonView) {
-            gridView.updateView(data, columnNames, columnComments, formDialogHandler);
-        } else {
-            tableView.updateView(data, columnNames, columnComments, formDialogHandler);
-        }
+        boolean canAdd = UserSession.hasPermission(tableName, "10");
+        boolean canEdit = UserSession.hasPermission(tableName, "20");
+        boolean canDelete = UserSession.hasPermission(tableName, "30");
 
+        if (isButtonView) {
+            gridView.updateView(data, columnNames, columnComments, formDialogHandler, canAdd, canEdit, canDelete);
+        } else {
+            tableView.updateView(data, columnNames, columnComments, formDialogHandler, canAdd, canEdit, canDelete);
+        }
+        
         currentView.revalidate();
         currentView.repaint();
         scrollPane.revalidate();

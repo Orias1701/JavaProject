@@ -31,10 +31,10 @@ public class FormDialogPanel implements FormDialogHandler {
             return;
         }
         if (!tablePanel.getColumnNames().contains(tablePanel.getKeyColumn())) {
-            JOptionPane.showMessageDialog(tablePanel, "Khóa chính không khớp với các cột của bảng", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(tablePanel, " gegeKhóa chính không khớp với các cột của bảng", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (!actionType.equals("add") && (rowIndex < 0 || rowIndex >= tablePanel.getTable().getRowCount())) {
+        if (!actionType.equals("add") && !actionType.equals("detail") && (rowIndex < 0 || rowIndex >= tablePanel.getTable().getRowCount())) {
             JOptionPane.showMessageDialog(tablePanel, "Hàng được chọn không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -42,7 +42,9 @@ public class FormDialogPanel implements FormDialogHandler {
         // Tạo dialog chứa form nhập liệu
         JDialog dialog = new JDialog((Frame) null, true);
         dialog.setTitle(actionType.equals("add") ? "Thêm dữ liệu" :
-                actionType.equals("edit") ? "Sửa dữ liệu" : "Xóa dữ liệu");
+                actionType.equals("edit") ? "Sửa dữ liệu" :
+                actionType.equals("delete") ? "Xóa dữ liệu" :
+                actionType.equals("all") ? "Quản lý dữ liệu" : "Chi tiết dữ liệu");
         dialog.setLayout(new BorderLayout(10, 10));
         dialog.getContentPane().setBackground(Style.LIGHT_CL);
 
@@ -68,20 +70,19 @@ public class FormDialogPanel implements FormDialogHandler {
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
             ));
 
-            // Nếu đang sửa hoặc xóa thì lấy giá trị hiện có từ bảng
+            // Nếu đang sửa, xóa, all hoặc chi tiết thì lấy giá trị hiện có từ bảng
             if (!actionType.equals("add") && rowIndex >= 0) {
                 Object cellValue = tablePanel.getTable().getValueAt(rowIndex, i);
                 field.setText(cellValue != null ? cellValue.toString() : "");
             }
 
-            // Không cho sửa dữ liệu khi xóa
-            field.setEditable(!actionType.equals("delete"));
+            // Chỉ cho phép chỉnh sửa khi là add, edit hoặc all
+            // field.setEditable(actionType.equals("add") || actionType.equals("edit") || actionType.equals("all"));
 
-            // Nếu là khóa chính khi edit thì không cho sửa
-            if (actionType.equals("edit") && col.equals(tablePanel.getKeyColumn())) {
+            if (actionType.equals("delete") || actionType.equals("detail") ||col.equals(tablePanel.getKeyColumn())) {
                 field.setEditable(false);
                 field.setForeground(Style.ACT_CL);
-                field.setBackground(Style.FTH_CL);
+                field.setBackground(Style.LIGHT_CL);
             }
 
             formPanel.add(label);
@@ -94,24 +95,23 @@ public class FormDialogPanel implements FormDialogHandler {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setBackground(Style.LIGHT_CL);
 
-        // Tạo panel chứa các nút (Xác nhận, Xóa, Hủy)
+        // Tạo panel chứa các nút
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         buttonPanel.setBackground(Style.LIGHT_CL);
 
         // Nút xác nhận (Thêm/Cập nhật/Xóa)
-        Style.RoundedButton confirmButton = new Style.RoundedButton(
-                actionType.equals("add") ? "Thêm" :
-                        actionType.equals("edit") ? "Cập nhật" : "Xóa"
-        );
-        confirmButton.setFont(Style.MONS_14);
-        confirmButton.setBackground(Style.BLUE);
-        confirmButton.setForeground(Color.WHITE);
-        confirmButton.setPreferredSize(new Dimension(100, 40));
+        Style.RoundedButton confirmButton = null;
+        if (actionType.equals("add") || actionType.equals("edit") || actionType.equals("all")) {
+            confirmButton = new Style.RoundedButton(
+                    actionType.equals("add") ? "Thêm" : "Cập nhật"
+            );
+            confirmButton.setFont(Style.MONS_14);
+            confirmButton.setBackground(Style.BLUE);
+            confirmButton.setForeground(Color.WHITE);
+            confirmButton.setPreferredSize(new Dimension(100, 40));
 
-        // Sự kiện xử lý khi nhấn xác nhận
-        confirmButton.addActionListener(e -> {
-            // Kiểm tra dữ liệu đầu vào nếu là thêm/sửa
-            if (actionType.equals("add") || actionType.equals("edit")) {
+            confirmButton.addActionListener(e -> {
+                // Kiểm tra dữ liệu đầu vào
                 for (String col : tablePanel.getColumnNames()) {
                     String value = inputFields.get(col).getText();
                     if (value.isEmpty()) {
@@ -124,47 +124,60 @@ public class FormDialogPanel implements FormDialogHandler {
                         return;
                     }
                 }
-            }
 
-            String keyValue = inputFields.get(tablePanel.getKeyColumn()).getText();
-            LogHandler.logInfo("showFormDialog: actionType=" + actionType + ", keyColumn=" + tablePanel.getKeyColumn() + ", keyValue=" + keyValue);
+                String keyValue = inputFields.get(tablePanel.getKeyColumn()).getText();
+                LogHandler.logInfo("showFormDialog: actionType=" + actionType + ", keyColumn=" + tablePanel.getKeyColumn() + ", keyValue=" + keyValue);
 
-            try {
-                if (actionType.equals("add")) {
-                    Map<String, Object> rowData = new HashMap<>();
-                    for (String col : tablePanel.getColumnNames()) {
-                        rowData.put(col, inputFields.get(col).getText());
-                    }
-                    ApiResponse response = MainCtrl.addRow(tablePanel.getTableName(), rowData);
-                    if (response.isSuccess()) {
-                        JOptionPane.showMessageDialog(dialog, "Thêm dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                        tablePanel.refreshTable();
-                        dialog.dispose();
+                try {
+                    if (actionType.equals("add")) {
+                        Map<String, Object> rowData = new HashMap<>();
+                        for (String col : tablePanel.getColumnNames()) {
+                            rowData.put(col, inputFields.get(col).getText());
+                        }
+                        ApiResponse response = MainCtrl.addRow(tablePanel.getTableName(), rowData);
+                        if (response.isSuccess()) {
+                            JOptionPane.showMessageDialog(dialog, "Thêm dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                            tablePanel.refreshTable();
+                            dialog.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(dialog, response.message, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
                     } else {
-                        JOptionPane.showMessageDialog(dialog, response.message, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
+                        Map<String, Object> rowData = new HashMap<>();
+                        for (String col : tablePanel.getColumnNames()) {
+                            rowData.put(col, inputFields.get(col).getText());
+                        }
+                        ApiResponse response = MainCtrl.updateRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue, rowData);
+                        if (response.isSuccess()) {
+                            JOptionPane.showMessageDialog(dialog, "Cập nhật dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                            tablePanel.refreshTable();
+                            dialog.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(dialog, response.message, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
                     }
+                } catch (Exception ex) {
+                    LogHandler.logError("Lỗi kết nối: " + ex.getMessage(), ex);
+                    JOptionPane.showMessageDialog(dialog, "Lỗi kết nối: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            });
+        } else if (actionType.equals("delete")) {
+            confirmButton = new Style.RoundedButton("Xóa");
+            confirmButton.setFont(Style.MONS_14);
+            confirmButton.setBackground(Style.RED);
+            confirmButton.setForeground(Color.WHITE);
+            confirmButton.setPreferredSize(new Dimension(100, 40));
 
-                } else if (actionType.equals("edit")) {
-                    Map<String, Object> rowData = new HashMap<>();
-                    for (String col : tablePanel.getColumnNames()) {
-                        rowData.put(col, inputFields.get(col).getText());
-                    }
-                    ApiResponse response = MainCtrl.updateRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue, rowData);
-                    if (response.isSuccess()) {
-                        JOptionPane.showMessageDialog(dialog, "Cập nhật dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                        tablePanel.refreshTable();
-                        dialog.dispose();
-                    } else {
-                        JOptionPane.showMessageDialog(dialog, response.message, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-
-                } else if (actionType.equals("delete")) {
-                    int confirm = JOptionPane.showConfirmDialog(dialog,
-                            "Bạn có chắc chắn muốn xóa " + tablePanel.getKeyColumn() + ": " + keyValue + "?",
-                            "Xác nhận", JOptionPane.YES_NO_OPTION);
-                    if (confirm == JOptionPane.YES_OPTION) {
+            confirmButton.addActionListener(e -> {
+                String keyValue = inputFields.get(tablePanel.getKeyColumn()).getText();
+                int confirm = JOptionPane.showConfirmDialog(dialog,
+                        "Bạn có chắc chắn muốn xóa " + tablePanel.getKeyColumn() + ": " + keyValue + "?",
+                        "Xác nhận", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    try {
                         ApiResponse response = MainCtrl.deleteRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue);
                         if (response.isSuccess()) {
                             JOptionPane.showMessageDialog(dialog, "Xóa dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
@@ -174,18 +187,18 @@ public class FormDialogPanel implements FormDialogHandler {
                             JOptionPane.showMessageDialog(dialog, response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                             return;
                         }
+                    } catch (Exception ex) {
+                        LogHandler.logError("Lỗi kết nối: " + ex.getMessage(), ex);
+                        JOptionPane.showMessageDialog(dialog, "Lỗi kết nối: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
                 }
-            } catch (Exception ex) {
-                LogHandler.logError("Lỗi kết nối: " + ex.getMessage(), ex);
-                JOptionPane.showMessageDialog(dialog, "Lỗi kết nối: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        });
+            });
+        }
 
-        // Nút xóa phụ dành riêng cho dialog "edit"
+        // Nút xóa cho trường hợp all
         Style.RoundedButton deleteButton = null;
-        if (actionType.equals("edit")) {
+        if (actionType.equals("all")) {
             deleteButton = new Style.RoundedButton("Xóa");
             deleteButton.setFont(Style.MONS_14);
             deleteButton.setBackground(Style.RED);
@@ -214,20 +227,22 @@ public class FormDialogPanel implements FormDialogHandler {
             });
         }
 
-        // Nút hủy đóng dialog
-        Style.RoundedButton cancelButton = new Style.RoundedButton("Hủy");
+        // Nút hủy hoặc thoát
+        Style.RoundedButton cancelButton = new Style.RoundedButton(actionType.equals("detail") ? "Thoát" : "Hủy");
         cancelButton.setFont(Style.MONS_14);
-        cancelButton.setBackground(Style.DARK_CL);
+        cancelButton.setBackground(Style.GRAY_CL);
         cancelButton.setForeground(Color.WHITE);
         cancelButton.setPreferredSize(new Dimension(100, 40));
         cancelButton.addActionListener(e -> dialog.dispose());
 
-        // Thêm nút vào panel
+        // Thêm nút vào panel theo loại hành động
         buttonPanel.add(cancelButton);
         if (deleteButton != null) {
             buttonPanel.add(deleteButton);
         }
-        buttonPanel.add(confirmButton);
+        if (confirmButton != null) {
+            buttonPanel.add(confirmButton);
+        }
 
         // Thêm các phần tử vào dialog
         dialog.add(scrollPane, BorderLayout.CENTER);
