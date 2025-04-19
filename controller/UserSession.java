@@ -40,4 +40,8 @@ public class UserSession {
         int reqLevel = Integer.parseInt(requiredPermission);
         return permLevel >= reqLevel;
     }
+
+    public static void logOut() {
+        System.out.println("Logged out");
+    }
 }
