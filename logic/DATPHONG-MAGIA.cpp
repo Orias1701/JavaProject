@@ -1,108 +1,134 @@
 #include <stdio.h>
-
 // Dat phong 
+int thuc;
+int nhanphongtemp=nhanphong 
+int ao=nhanphong-5h 
+int tienphat=0; 
 class loaiphong{
 	string maloai;
-	int gialoai 
+	int gia
 }; 
-class khachhang {
+class khach {
 	string makhachhang, tinhtrangkhach;
-	arr tinhtrangkhach = {'dang o', 'da roi'};
+	ttkhach[3] = {'dang o', 'da roi','da dat'};
 };
 
 class phong {
 	string maphong,maloai; 
-	arr ttphong = {'trong', 'dang su dung', 'da dat'};
+	ttphong[3] = {'trong', 'dang su dung', 'da dat'};
 };
 
 class datphong {
 	string maphong, makhachhang;
 	int nhanphong, traphong,tienphat;
-	string cachdat;
-	string ttdat; 
+	cachdat[2]={'online',truc tiep};
+	ttdat[4]={'dang su dung','qua han','dang doi','da tra'}; 
 };
-void tienphong(int tienphong){
-	if(loaiphong.gialoai=phong.gialoai){
-		tienphong=loaiphong.gialoai; 
+void int tienphong(){
+	for(i:loaiphong.size){
+		if(loaiphong.maloai==phong.maloai){
+			tienphong = loaiphong.gia; 
+		} 
 	} 
-	return tienphong; 
+	return tienphong 
 } 
-bool quahan(int thuc, int nhanphong, int traphong, string cachdat) {
-	if (thuc > traphong + 30p) {
-		return true;
-	}
-	if (cachdat == "dat online" && thuc > nhanphong + 15p) {
-		return true;
-	}
-	return false;
+void int biphat{
+	int chophep=thuc+30p;
+	if (traphong > chophep) {
+    int soGioMuon = (traphong - chophep) / 60; 
+    tienphat = tienphong*0,3*sogiomuon; //tãng 30% moi gio 
 }
-
-bool dangdoi(string cachdat) {
-	if (cachdat == "dat online") {
-		return true;
-	}
-	return false;
-}
-int tinhTienPhat(int thuc, int traphong, string ttdat, string ttphong, int tienphong) {
-	int tienphat;
-	if (ttdat == "qua han" && ttphong == "dang su dung") {
-		if (thuc > traphong + 30p) {
-			int thoigianvuot = thuc - (traphong + 30p);
-			tienphat = tienphong * 0.3 * (thoigianvuot / 120);
-		}
-	}
 	else{
-		tienphat=0 
+		tienphat=0 ;
 	} 
-	return tienphat;
-}
-
-bool hople(int nhanphong, int traphong) {
-	if (traphong > nhanphong) {
-		return true;
+	return tienphat 
+} 
+bool dattructiep{
+	if(datphong.ttdat!='dang doi'){
+		return true; 
 	}
-	return false;
 }
-
+bool hople{
+	if(nhanphong<traphong||(datphong.ttdat='dangdoi'&&datphong.cachdat='online'&&traphong<nhanphongtemp)){
+		return true; 
+	}
+} 
+bool phongtrong{
+	if(datphong .ttdat='da tra'){
+		return true; 
+	}
+} 
+bool phongsudung{
+	if(datphong.ttdat='dang su sung'){
+		return true; 
+	} 
+} 
+bool phongdadat{
+	if(datphong.cachdat='online'&&datphong.ttdat='dang doi'){
+		return true; 
+	}
+} 
+void khachdango{
+	if(phongsudung){
+		khach.ttkhach='dang o'; 
+	} 
+} 
+void khachdaroi{
+	if(phongtrong){
+		khach.ttkhach='da roi'; 
+	} 
+} 
+void khachdadat{
+	if(phongdadat){
+		khach.ttkhach='da dat'; 
+	} 
+} 
 // MAIN
+ttdat[4]={'dang su dung','qua han','dang doi','da tra'}; 
 int main {
-	//ttdat:Dang su dung,Qua han,Dang doi,Da tra 
-	//ttphong:Trong,Dang su dung,Da dat
-	//cachdat:online,tructiep 
-//	int nhanphong, traphong, thuc;
-//	string ttdat, ttphong, cachdat, maphong, makhachhang;
-//	int tienphong;
-//	int tienphat;
-	int ao;
-	ao = nhanphong - 12h;
-	tienphat = tinhTienPhat(thuc, traphong, ttdat, ttphong, tienphong);
-	tienphong = tienphong + tienphat;
-	if (ttdat == "dang su dung") {
-		ttphong = "dang su dung";
-		tinhtrangkhach = "dang o";
-	}
-	else if (ttdat == "qua han" && quahan(thuc, nhanphong, traphong, cachdat)) {
-		if (cachdat == "dat truc tiep") {
-			ttphong = "dang su dung";
-			tinhtrangkhach = "dang o";
-			tienphong = tienphong + tinhTienPhat(thuc, traphong, ttdat, ttphong, tienphong);
-		} else {
-			ttphong = "trong";
-			tinhtrangkhach = "da roi";
-		}
-	}
-	else if (ttdat == "dang doi" && dangdoi(cachdat)) {
-		if (thuc < ao) {
-			ttphong = "trong";
-			tinhtrangkhach = "da roi";
-		} else if (thuc > ao) {
-			ttphong = "dang doi";
-			tinhtrangkhach = "dang o";
-		}
-	}
-	else if (ttdat == "da tra") {
-		ttphong = "trong";
-		tinhtrangkhach = "da roi";
-	}
+	if(hople){
+		if(datphong.cachdat='truc tiep'){
+			switch(datphong.ttdat){
+				case 'dang su dung':
+					khachdango;
+					phongsudung; 
+				case'qua han':
+					khachdango
+				    phongsudung
+					biphat
+				case'da tra': 
+					khachdaroi
+					phongtrong
+			} 
+		} 
+		if(datphong.cachdat='online'){
+			switch(datphong.ttdat){
+				case'dang doi':
+					if(thuc<ao){
+						phongtrong
+						khachdadat 
+					} 
+					else if(thuc>ao){
+						phongdadat
+						khachdadat 
+					} 
+					else if(nhanphong<thuc<chophep){
+						phongdangsudung
+						khachdadat 
+					} 
+					else if(thuc>chophep){
+						phongtrong
+						khachroi
+						datphong.ttdat='qua han'
+					} 
+				case 'dang su dung':
+					khachdango;
+					phongsudung; 
+				case'qua han':
+					khachroi
+					phongtrong 
+			} 
+		} 
+	} 
 }
 
