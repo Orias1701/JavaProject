@@ -48,8 +48,8 @@ public class CheckBooking {
     
             String sql = """
                 SELECT dp.MaDatPhong, dp.MaPhong, dp.NgayNhanPhong, dp.NgayTraPhong, dp.CachDat, dp.TinhTrang, p.TinhTrangPhong, kh.MaKhachHang
-                FROM a6_datphong dp
-                JOIN a5_phong p ON dp.MaPhong = p.MaPhong
+                FROM c3_datphong dp
+                JOIN c2_phong p ON dp.MaPhong = p.MaPhong
                 JOIN a1_khachhang kh ON dp.MaKhachHang = kh.MaKhachHang;
             """;
     
@@ -81,8 +81,8 @@ public class CheckBooking {
                     // Truy vấn tiền phòng từ loại phòng
                     String sqlLoaiPhong = """
                         SELECT lp.GiaLoai
-                        FROM a5_phong p
-                        JOIN a4_loaiphong lp ON p.MaLoai = lp.MaLoai
+                        FROM c2_phong p
+                        JOIN c1_loaiphong lp ON p.MaLoai = lp.MaLoai
                         WHERE p.MaPhong = ?;
                     """;
     
@@ -107,7 +107,7 @@ public class CheckBooking {
                                 System.out.println("Tiền phạt phòng " + maPhong + ": " + tienPhat);
                             
                                 // ✅ Cập nhật tiền phạt vào bảng đặt phòng
-                                String updateTienPhatSql = "UPDATE a6_datphong SET TienPhat = ? WHERE MaDatPhong = ?";
+                                String updateTienPhatSql = "UPDATE c3_datphong SET TienPhat = ? WHERE MaDatPhong = ?";
                                 try (PreparedStatement updateTienPhat = conn.prepareStatement(updateTienPhatSql)) {
                                     updateTienPhat.setDouble(1, tienPhat);
                                     updateTienPhat.setString(2, rs.getString("MaDatPhong"));
@@ -149,7 +149,7 @@ public class CheckBooking {
     
                     // Cập nhật phòng
                     if (newTinhTrangPhong != null) {
-                        try (PreparedStatement updatePhong = conn.prepareStatement("UPDATE a5_phong SET TinhTrangPhong = ? WHERE MaPhong = ?")) {
+                        try (PreparedStatement updatePhong = conn.prepareStatement("UPDATE c2_phong SET TinhTrangPhong = ? WHERE MaPhong = ?")) {
                             updatePhong.setString(1, newTinhTrangPhong);
                             updatePhong.setString(2, maPhong);
                             updatePhong.executeUpdate();
@@ -174,7 +174,7 @@ public class CheckBooking {
             }
     
             // ✅ Cập nhật các phòng không có trong đặt phòng → Trống
-            String sqlAllPhong = "SELECT MaPhong FROM a5_phong";
+            String sqlAllPhong = "SELECT MaPhong FROM c2_phong";
             try (PreparedStatement psAll = conn.prepareStatement(sqlAllPhong);
                  ResultSet rsAll = psAll.executeQuery()) {
     
@@ -182,7 +182,7 @@ public class CheckBooking {
                     String maPhong = rsAll.getString("MaPhong");
                     if (!phongDaXuLy.contains(maPhong)) {
                         try (PreparedStatement updatePhong = conn.prepareStatement(
-                                "UPDATE a5_phong SET TinhTrangPhong = 'Trống' WHERE MaPhong = ?")) {
+                                "UPDATE c2_phong SET TinhTrangPhong = 'Trống' WHERE MaPhong = ?")) {
                             updatePhong.setString(1, maPhong);
                             updatePhong.executeUpdate();
                             System.out.println("✔ Phòng " + maPhong + " không có đặt → cập nhật Trống");
@@ -195,7 +195,7 @@ public class CheckBooking {
             Set<String> khachDaXuLy = new HashSet<>();
 
             // Thu thập mã khách đã có đặt phòng
-            String sqlKhachDat = "SELECT DISTINCT MaKhachHang FROM a6_datphong";
+            String sqlKhachDat = "SELECT DISTINCT MaKhachHang FROM c3_datphong";
             try (PreparedStatement psDat = conn.prepareStatement(sqlKhachDat);
                 ResultSet rsDat = psDat.executeQuery()) {
                 while (rsDat.next()) {

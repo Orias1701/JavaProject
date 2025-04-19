@@ -17,7 +17,8 @@ public abstract class BaseHandler implements HttpHandler, HttpHandlerLogic {
     protected static final String DATA_DB_URL;
     protected static final String DB_USERNAME;
     protected static final String DB_PASSWORD;
-
+    protected static final String USER_PASS;
+    protected static final String USER_NAME;
     static {
         Properties props = new Properties();
         try (FileInputStream fis = new FileInputStream("config.properties")) {
@@ -26,6 +27,8 @@ public abstract class BaseHandler implements HttpHandler, HttpHandlerLogic {
             DATA_DB_URL = props.getProperty("data.db.url");
             DB_USERNAME = props.getProperty("db.username");
             DB_PASSWORD = props.getProperty("db.password");
+            USER_PASS = props.getProperty("user.password");
+            USER_NAME = props.getProperty("user.username");
         } catch (IOException e) {
             throw new RuntimeException("Failed to load config.properties: " + e.getMessage());
         }
