@@ -87,7 +87,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
                 this.columnComments.add(comment);
             }
         }
-
+        
         LogHandler.logInfo("Khóa chính TablePanel: " + keyColumn);
         LogHandler.logInfo("Tên bảng TablePanel: " + tableName);
         LogHandler.logInfo("Chú thích bảng TablePanel: " + tableComment);

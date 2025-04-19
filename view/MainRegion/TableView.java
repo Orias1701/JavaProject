@@ -26,7 +26,7 @@ public class TableView {
         table.setRowHeight(40);
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
-
+        
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -45,6 +45,30 @@ public class TableView {
                     } else {
                         label.setBackground(Style.LIGHT_CL);
                         label.setForeground(Style.DARK_CL);
+                    }
+        
+                    // Xử lý ngày giờ
+                    java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                    if (value instanceof java.util.Date date) {
+                        System.out.println("Date: " + date);
+                        label.setText(formatter.format(date));
+                    } else if (value instanceof String str && (table.getColumnName(column).equals("Ngày nhận phòng") || table.getColumnName(column).equals("Ngày trả phòng"))) {
+                        try {
+                            // Giả định chuỗi có định dạng yyyy-MM-dd HH:mm:ss hoặc yyyy-MM-dd HH
+                            java.text.SimpleDateFormat inputFormatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            java.util.Date date = inputFormatter.parse(str);
+                            label.setText(formatter.format(date));
+                        } catch (java.text.ParseException e) {
+                            try {
+                                // Thử định dạng khác nếu cần, ví dụ yyyy-MM-dd HH
+                                java.text.SimpleDateFormat fallbackFormatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH");
+                                java.util.Date date = fallbackFormatter.parse(str);
+                                label.setText(formatter.format(date));
+                            } catch (java.text.ParseException ex) {
+                                // Nếu không parse được, hiển thị chuỗi gốc
+                                label.setText(str);
+                            }
+                        }
                     }
                 }
                 return c;
