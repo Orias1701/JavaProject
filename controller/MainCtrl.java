@@ -34,10 +34,10 @@ public class MainCtrl {
         //Xử lý kiểm tra chi tiết phòng
         TablePanel tablePanel = new TablePanel(contentPanel);
         CheckDetail checker = new CheckDetail("Bearer your-auth-token", this.contentPanel, tablePanel);
-        checker.autoProcessCheckDetail("b0_kiemtrachitiet", "MaThietBi", "");
+        checker.autoProcessCheckDetail("b4_kiemtrachitiet", "MaThietBi", "");
         //Xử lý kiểm tra đặt phòng
         CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this.contentPanel, tablePanel);
-        checkBooking.autoProcessBooking("a6_datphong", "MaDatPhong", "");
+        checkBooking.autoProcessBooking("a3_datphong", "MaDatPhong", "");
 
     }
 
