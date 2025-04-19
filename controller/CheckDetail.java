@@ -53,7 +53,7 @@ public class CheckDetail {
     private void updateDenBuTheoTinhTrang() {
         try (Connection conn = DatabaseUtil.getConnection()) {
             // Trường hợp 'Tốt' => Đền Bù = 0
-            String updateTot = "UPDATE b0_kiemtrachitiet SET DenBu = 0 WHERE TinhTrang = 'Tốt'";
+            String updateTot = "UPDATE d4_kiemtrachitiet SET DenBu = 0 WHERE TinhTrang = 'Tốt'";
             try (PreparedStatement pstmt = conn.prepareStatement(updateTot)) {
                 int rows = pstmt.executeUpdate();
                 System.out.println("✔ Đã cập nhật " + rows + " dòng có Tình Trạng = 'Tốt' (Đền Bù = 0)");
@@ -61,8 +61,8 @@ public class CheckDetail {
 
             // Trường hợp 'Hỏng' => Lấy Đền Bù từ bảng a7_thietbi
             String updateHong = """
-                UPDATE b0_kiemtrachitiet kt
-                JOIN a7_thietbi tb ON kt.MaThietBi = tb.MaThietBi
+                UPDATE d4_kiemtrachitiet kt
+                JOIN d1_thietbi tb ON kt.MaThietBi = tb.MaThietBi
                 SET kt.DenBu = tb.DenBu
                 WHERE kt.TinhTrang = 'Hỏng'
             """;
