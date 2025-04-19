@@ -86,7 +86,7 @@ public class TableView {
                 label.setHorizontalAlignment(SwingConstants.LEFT);
                 label.setPreferredSize(new Dimension(label.getWidth(), 40));
                 label.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createMatteBorder(0, 1, 1, 1, Style.ACT_CL),
+                        BorderFactory.createMatteBorder(0, 1, 1, 1, Style.LIGHT_CL),
                         BorderFactory.createEmptyBorder(0, 30, 0, 0)
                 ));
                 return label;
