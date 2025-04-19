@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.*;
+
+// import controller.UserSession;
 import view.Style;
 
 public class TableView {
@@ -120,7 +122,7 @@ public class TableView {
         displayNames.add("");
         displayNames.add("");
         tableModel.setColumnIdentifiers(displayNames.toArray());
-
+        // String tableName = tablePanel.getTableName();
         // Populate table data
         for (Map<String, String> row : data) {
             Object[] rowData = new Object[columnNames.size() + 2];

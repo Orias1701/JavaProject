@@ -67,9 +67,4 @@ public class HeadPanel extends JPanel {
     public boolean isButtonViewActive() {
         return isButtonView;
     }
-
-    public void setCheckDetailCallback(Object object) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCheckDetailCallback'");
-    }
 }

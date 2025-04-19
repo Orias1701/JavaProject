@@ -10,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public abstract class BaseHandler implements HttpHandler, HttpHandlerLogic {
@@ -38,7 +40,7 @@ public abstract class BaseHandler implements HttpHandler, HttpHandlerLogic {
     public boolean authenticate(HttpExchange exchange) throws IOException {
         String authHeader = exchange.getRequestHeaders().getFirst("Authorization");
         if (authHeader == null || !authHeader.startsWith("Basic ")) {
-            sendResponse(exchange, 401, "Unauthorized");
+            sendResponse(exchange, 401, "{\"error\":\"Unauthorized\"}");
             return false;
         }
 
@@ -48,21 +50,62 @@ public abstract class BaseHandler implements HttpHandler, HttpHandlerLogic {
         String username = parts[0];
         String password = parts.length > 1 ? parts[1] : "";
 
-        try (Connection conn = DriverManager.getConnection(ACCOUNTS_DB_URL, DB_USERNAME, DB_PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement("SELECT password FROM users WHERE username = ?")) {
+        try (Connection conn = DriverManager.getConnection(ACCOUNTS_DB_URL, DB_USERNAME, DB_PASSWORD)) {
+            // Kiểm tra tài khoản
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT username, password, `Group` FROM users WHERE username = ?"
+            );
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
             if (rs.next() && rs.getString("password").equals(password)) {
+                String group = rs.getString("Group");
+                // Lấy quyền truy cập từ bảng group và manage
+                Map<String, String> permissions = getPermissions(conn, group);
+                UserSession.setUser(username, group, permissions);
                 return true;
             } else {
-                sendResponse(exchange, 401, "Unauthorized");
+                sendResponse(exchange, 401, "{\"error\":\"Unauthorized\"}");
                 return false;
             }
         } catch (Exception e) {
             LogHandler.logError("Authentication error: " + e.getMessage(), e);
-            sendResponse(exchange, 500, "Server error: " + e.getMessage());
+            sendResponse(exchange, 500, "{\"error\":\"Server error: " + e.getMessage() + "\"}");
             return false;
         }
+    }
+
+    private Map<String, String> getPermissions(Connection conn, String group) throws Exception {
+        Map<String, String> permissions = new HashMap<>();
+        // Lấy quyền từ bảng group
+        PreparedStatement groupStmt = conn.prepareStatement(
+            "SELECT a, b, c, d, e, f FROM `group` WHERE `Group` = ?"
+        );
+        groupStmt.setString(1, group);
+        ResultSet groupRs = groupStmt.executeQuery();
+        if (!groupRs.next()) {
+            return permissions;
+        }
+
+        Map<String, String> groupPermissions = new HashMap<>();
+        groupPermissions.put("a", groupRs.getString("a"));
+        groupPermissions.put("b", groupRs.getString("b"));
+        groupPermissions.put("c", groupRs.getString("c"));
+        groupPermissions.put("d", groupRs.getString("d"));
+        groupPermissions.put("e", groupRs.getString("e"));
+        groupPermissions.put("f", groupRs.getString("f"));
+
+        // Lấy danh sách bảng từ bảng manage
+        PreparedStatement manageStmt = conn.prepareStatement(
+            "SELECT TableName, TableGroup FROM manage WHERE TableGroup IN ('a', 'b', 'c', 'd', 'e', 'f')"
+        );
+        ResultSet manageRs = manageStmt.executeQuery();
+        while (manageRs.next()) {
+            String tableName = manageRs.getString("TableName");
+            String tableGroup = manageRs.getString("TableGroup");
+            permissions.put(tableName, groupPermissions.getOrDefault(tableGroup, "00"));
+        }
+
+        return permissions;
     }
 
     @Override

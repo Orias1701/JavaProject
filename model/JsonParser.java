@@ -2,13 +2,14 @@ package model;
 
 import controller.LogHandler;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class JsonParser {
     public Map<String, String> parseTableInfo(String json) {
-        Map<String, String> tableInfo = new LinkedHashMap<>(); // Sử dụng LinkedHashMap để giữ thứ tự
+        Map<String, String> tableInfo = new LinkedHashMap<>();
         json = json.substring(1, json.length() - 1);
         if (json.isEmpty()) return tableInfo;
 
@@ -25,7 +26,7 @@ public class JsonParser {
                 if ("name".equals(key)) name = value;
                 if ("comment".equals(key)) comment = value;
             }
-            tableInfo.put(name, comment); // Thứ tự được giữ bởi LinkedHashMap
+            tableInfo.put(name, comment);
         }
         return tableInfo;
     }
@@ -121,5 +122,45 @@ public class JsonParser {
         }
         json.append("}");
         return json.toString();
+    }
+
+    public Map<String, Object> parseLoginResponse(String json) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            json = json.trim();
+            if (!json.startsWith("{") || !json.endsWith("}")) {
+                LogHandler.logError("Invalid login JSON format");
+                return result;
+            }
+            json = json.substring(1, json.length() - 1);
+            String[] parts = json.split(",\"permissions\":");
+            if (parts.length != 2) {
+                LogHandler.logError("Invalid login JSON structure");
+                return result;
+            }
+
+            String[] headerParts = parts[0].split(",");
+            for (String part : headerParts) {
+                String[] kv = part.split(":");
+                String key = kv[0].replace("\"", "").trim();
+                String value = kv[1].replace("\"", "").trim();
+                result.put(key, value);
+            }
+
+            String permissionsJson = parts[1].substring(0, parts[1].length() - 1);
+            Map<String, String> permissions = new HashMap<>();
+            permissionsJson = permissionsJson.substring(1, permissionsJson.length() - 1);
+            String[] permPairs = permissionsJson.split(",");
+            for (String pair : permPairs) {
+                String[] kv = pair.split(":");
+                String key = kv[0].replace("\"", "").trim();
+                String value = kv[1].replace("\"", "").trim();
+                permissions.put(key, value);
+            }
+            result.put("permissions", permissions);
+        } catch (Exception e) {
+            LogHandler.logError("Error parsing login response: " + e.getMessage(), e);
+        }
+        return result;
     }
 }

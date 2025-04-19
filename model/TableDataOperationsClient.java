@@ -1,6 +1,8 @@
 package model;
 
 import controller.LogHandler;
+import controller.UserSession;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +27,10 @@ public class TableDataOperationsClient {
 
     // Hàm thêm dòng mới vào bảng
     public ApiResponse addRow(String tableName, Map<String, Object> data) {
+        if (!UserSession.hasPermission(tableName, "10")) {
+            LogHandler.logError("User does not have permission to add row to table: " + tableName);
+            return new ApiResponse(false, "Không có quyền thêm dữ liệu vào bảng " + tableName);
+        }
         try {
             // Kiểm tra tên bảng hợp lệ
             if (tableName == null || tableName.isEmpty()) {
@@ -69,6 +75,10 @@ public class TableDataOperationsClient {
 
     // Hàm cập nhật một dòng trong bảng
     public ApiResponse updateRow(String tableName, String keyColumn, Object keyValue, Map<String, Object> data) {
+        if (!UserSession.hasPermission(tableName, "20")) {
+            LogHandler.logError("User does not have permission to update row in table: " + tableName);
+            return new ApiResponse(false, "Không có quyền cập nhật dữ liệu trong bảng " + tableName);
+        }
         try {
             // Kiểm tra khóa chính và tên bảng hợp lệ
             if (keyColumn == null || keyColumn.isEmpty()) {
@@ -118,6 +128,10 @@ public class TableDataOperationsClient {
 
     // Hàm xóa một dòng trong bảng
     public ApiResponse deleteRow(String tableName, String keyColumn, Object keyValue) {
+        if (!UserSession.hasPermission(tableName, "30")) {
+            LogHandler.logError("User does not have permission to delete row from table: " + tableName);
+            return new ApiResponse(false, "Không có quyền xóa dữ liệu khỏi bảng " + tableName);
+        }
         try {
             // Kiểm tra khóa chính và tên bảng
             if (keyColumn == null || keyColumn.isEmpty()) {
@@ -160,6 +174,10 @@ public class TableDataOperationsClient {
         }
     }
     public ApiResponse getRow(String tableName, String keyColumn, Object keyValue) {
+        if (!UserSession.hasPermission(tableName, "00")) {
+            LogHandler.logError("User does not have permission to view row in table: " + tableName);
+            return new ApiResponse(false, "Không có quyền xem dữ liệu trong bảng " + tableName);
+        }
         try {
             if (tableName == null || tableName.isEmpty()) {
                 LogHandler.logError("Error: tableName is null or empty");

@@ -2,8 +2,8 @@ package view.MainRegion;
 
 import controller.LogHandler;
 import java.awt.*;
-import java.util.List;
-import java.util.Map;
+// import java.util.List;
+// import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import model.ApiClient;
@@ -30,7 +30,6 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         setLayout(new BorderLayout());
 
         // Initialize views
-        tableView = new TableView();
         gridView = new GridView(this);
         currentView = tableView.getView();
 
@@ -145,15 +144,5 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
 
     public JTable getTable() {
         return tableView.getTable();
-    }
-
-    public List<Map<String, String>> getData() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getData'");
-    }
-
-    public String getTableComment() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTableComment'");
     }
 }

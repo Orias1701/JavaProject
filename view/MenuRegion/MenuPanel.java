@@ -1,6 +1,7 @@
 package view.MenuRegion;
 
 import controller.LogHandler;
+import controller.UserSession;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,6 @@ public class MenuPanel extends JPanel {
     private TableSelectionListener tableSelectionListener;
     private Runnable homeSelectionListener;
 
-    // Các thông số kích thước
     private static final int MENU_WIDTH = 200;
     private static final int BUTTON_HEIGHT = 36;
     private static final int ACTIVE_BUTTON_HEIGHT = 50;
@@ -90,14 +90,18 @@ public class MenuPanel extends JPanel {
             return;
         }
 
+        Map<String, String> permissions = UserSession.getTablePermissions();
         for (Map.Entry<String, String> entry : tableInfo.entrySet()) {
             String tableName = entry.getKey();
             String tableComment = entry.getValue().toUpperCase();
-            MenuButton button = createMenuButton(tableComment, y);
-            button.putClientProperty("tableName", tableName);
-            add(button);
-            menuButtons.add(button);
-            y += BUTTON_HEIGHT;
+            // Chỉ hiển thị bảng nếu người dùng có quyền xem
+            if (permissions.getOrDefault(tableName, "00").compareTo("00") > -1) {
+                MenuButton button = createMenuButton(tableComment, y);
+                button.putClientProperty("tableName", tableName);
+                add(button);
+                menuButtons.add(button);
+                y += BUTTON_HEIGHT;
+            }
         }
 
         revalidate();
