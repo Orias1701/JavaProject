@@ -1,11 +1,11 @@
 package controller;
 
-import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LogHandler {
     private static final Logger LOGGER = Logger.getLogger(LogHandler.class.getName());
@@ -54,5 +54,8 @@ public class LogHandler {
         } catch (IOException e) {
             LOGGER.severe("Failed to write log to file: " + e.getMessage());
         }
+    }
+    public static void logWarn(String message) {
+        System.out.println("WARN: " + message);
     }
 }

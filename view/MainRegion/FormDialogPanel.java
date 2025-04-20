@@ -79,7 +79,7 @@ public class FormDialogPanel implements FormDialogHandler {
             // Chỉ cho phép chỉnh sửa khi là add, edit hoặc all
             // field.setEditable(actionType.equals("add") || actionType.equals("edit") || actionType.equals("all"));
 
-            if (actionType.equals("delete") || actionType.equals("detail") ||col.equals(tablePanel.getKeyColumn())) {
+            if (actionType.equals("delete") || actionType.equals("detail") || (col.equals(tablePanel.getKeyColumn()) && !actionType.equals("add"))) {
                 field.setEditable(false);
                 field.setForeground(Style.ACT_CL);
                 field.setBackground(Style.LIGHT_CL);

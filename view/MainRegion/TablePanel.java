@@ -2,7 +2,6 @@ package view.MainRegion;
 
 import controller.LogHandler;
 import controller.UserSession;
-
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
