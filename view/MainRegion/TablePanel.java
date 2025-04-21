@@ -116,7 +116,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         try {
             TableDataResult result = ApiClient.getTableData(tableName);
             if (result.data != null && !result.data.isEmpty()) {
-                updateTableData(result.data, result.columnComments, result.columnTypes,result.keyColumn, tableName, tableComment);
+                updateTableData(result.data, result.columnComments, result.columnTypes, result.keyColumn, tableName, tableComment);
             } else {
                 updateTableData(null, null, null, null, tableName, tableComment);
                 JOptionPane.showMessageDialog(parent, "Không có dữ liệu để hiển thị sau khi làm mới", "Cảnh báo", JOptionPane.WARNING_MESSAGE);

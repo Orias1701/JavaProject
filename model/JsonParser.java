@@ -34,20 +34,21 @@ public class JsonParser {
     public ApiClient.TableDataResult parseTableDataWithColumns(String json) {
         List<Map<String, String>> data = new ArrayList<>();
         Map<String, String> columnComments = new LinkedHashMap<>();
+        Map<String, String> columnTypes = new LinkedHashMap<>();
         String keyColumn = "";
 
         try {
             json = json.trim();
             if (!json.startsWith("{") || !json.endsWith("}")) {
                 LogHandler.logError("Invalid JSON format");
-                return new ApiClient.TableDataResult(data, columnComments, keyColumn);
+                return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn);
             }
             json = json.substring(1, json.length() - 1);
 
             String[] parts = json.split(",\"columns\":");
             if (parts.length != 2) {
                 LogHandler.logError("Invalid JSON structure");
-                return new ApiClient.TableDataResult(data, columnComments, keyColumn);
+                return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn);
             }
 
             String[] headerParts = parts[0].split(",\"data\":");
@@ -97,10 +98,10 @@ public class JsonParser {
                 }
             }
 
-            return new ApiClient.TableDataResult(data, columnComments, keyColumn);
+            return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn);
         } catch (Exception e) {
             LogHandler.logError("Error parsing table data: " + e.getMessage(), e);
-            return new ApiClient.TableDataResult(data, columnComments, keyColumn);
+            return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn);
         }
     }
 

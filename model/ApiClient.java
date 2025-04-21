@@ -19,14 +19,17 @@ public class ApiClient {
     public static class TableDataResult {
         public final List<Map<String, String>> data;
         public final Map<String, String> columnComments;
+        public final Map<String, String> columnTypes;
         public final String keyColumn;
-        public Map<String, String> columnTypes;
 
-        public TableDataResult(List<Map<String, String>> data, Map<String, String> columnComments, String keyColumn) {
-            this.data = data;
-            this.columnComments = columnComments;
-            this.keyColumn = keyColumn;
+        public TableDataResult(List<Map<String, String>> data, Map<String, String> columnComments, 
+                              Map<String, String> columnTypes, String keyColumn) {
+            this.data = data != null ? data : new ArrayList<>();
+            this.columnComments = columnComments != null ? columnComments : new HashMap<>();
+            this.columnTypes = columnTypes != null ? columnTypes : new HashMap<>(); // Đảm bảo không null
+            this.keyColumn = keyColumn != null ? keyColumn : "";
             LogHandler.logInfo("Khóa chính API: " + keyColumn);
+            LogHandler.logInfo("columnTypes: " + this.columnTypes);
         }
     }
 
@@ -46,12 +49,15 @@ public class ApiClient {
             this.message = message;
             this.data = data;
         }
+
         public boolean isSuccess() {
             return success;
         }
+
         public String getMessage() {
             return message;
         }
+
         public Map<String, Object> getData() {
             return data;
         }
@@ -72,7 +78,6 @@ public class ApiClient {
             LogHandler.logInfo("Login response status: " + response.statusCode);
             LogHandler.logInfo("Login response body: " + response.body);
             if (response.statusCode == 200) {
-                // Phân tích JSON để lấy thông tin quyền
                 Map<String, Object> responseData = jsonParser.parseLoginResponse(response.body);
                 if (responseData.containsKey("permissions")) {
                     @SuppressWarnings("unchecked")
@@ -120,7 +125,7 @@ public class ApiClient {
     public static TableDataResult getTableData(String tableName) {
         if (tableName == null || tableName.isEmpty()) {
             LogHandler.logError("Error: tableName is null or empty");
-            return new TableDataResult(new ArrayList<>(), new HashMap<>(), "");
+            return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "");
         }
         try {
             HttpUtil.HttpResponse response = httpUtil.sendRequest(
@@ -132,14 +137,16 @@ public class ApiClient {
             LogHandler.logInfo("Table data status: " + response.statusCode);
             LogHandler.logInfo("Table data body: " + response.body);
             if (response.statusCode == 200) {
-                return jsonParser.parseTableDataWithColumns(response.body);
+                TableDataResult result = jsonParser.parseTableDataWithColumns(response.body);
+                LogHandler.logInfo("columnTypes after parsing: " + result.columnTypes);
+                return result;
             } else {
                 LogHandler.logError("API error for table " + tableName + ": Status " + response.statusCode);
-                return new TableDataResult(new ArrayList<>(), new HashMap<>(), "");
+                return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "");
             }
         } catch (Exception e) {
             LogHandler.logError("Error fetching table data for " + tableName + ": " + e.getMessage(), e);
-            return new TableDataResult(new ArrayList<>(), new HashMap<>(), "");
+            return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "");
         }
     }
 }
