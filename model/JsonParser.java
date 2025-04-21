@@ -68,14 +68,18 @@ public class JsonParser {
                         String[] keyValuePairs = entry.split(",");
                         String name = "";
                         String comment = "";
+                        String dataType = "";
                         for (String pair : keyValuePairs) {
                             String[] kv = pair.split(":");
                             String key = kv[0].replace("\"", "").trim();
                             String value = kv[1].replace("\"", "").trim();
                             if ("name".equals(key)) name = value;
                             if ("comment".equals(key)) comment = value;
+                            if ("dataType".equals(key)) dataType = value;
+                            System.out.printf("datatype 122321: ", dataType);
                         }
                         columnComments.put(name, comment);
+                        columnTypes.put(name, dataType);
                     }
                 }
             }

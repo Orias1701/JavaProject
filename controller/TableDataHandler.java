@@ -68,7 +68,7 @@ public class TableDataHandler extends BaseHandler implements TableDataInterface 
 
         // Lấy metadata cột theo thứ tự ORDINAL_POSITION
         List<Map<String, String>> columns = new ArrayList<>();
-        String query = "SELECT COLUMN_NAME AS name, COLUMN_COMMENT AS comment " +
+        String query = "SELECT COLUMN_NAME AS name, COLUMN_COMMENT AS comment, DATA_TYPE AS dataType " +
                       "FROM INFORMATION_SCHEMA.COLUMNS " +
                       "WHERE TABLE_NAME = ? ORDER BY ORDINAL_POSITION";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -78,8 +78,10 @@ public class TableDataHandler extends BaseHandler implements TableDataInterface 
                     Map<String, String> column = new LinkedHashMap<>();
                     String name = rs.getString("name");
                     String comment = rs.getString("comment") != null ? rs.getString("comment") : "";
+                    String dataType = rs.getString("dataType");
                     column.put("name", name);
                     column.put("comment", comment);
+                    column.put("dataType", dataType);
                     columns.add(column);
                 }
             }

@@ -8,28 +8,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DatabaseUtil {
-    // Lấy tên schema (tên database) từ URL kết nối
     private static final String SCHEMA = BaseHandler.DATA_DB_URL.substring(BaseHandler.DATA_DB_URL.lastIndexOf("/") + 1);
 
-    // Kết nối đến database bằng thông tin trong BaseHandler.
     public static Connection getConnection() throws Exception {
         return DriverManager.getConnection(BaseHandler.DATA_DB_URL, BaseHandler.DB_USERNAME, BaseHandler.DB_PASSWORD);
     }
 
-    // Kiểm tra xem bảng có tồn tại trong schema không.
     public static boolean isTableExists(Connection conn, String tableName) throws Exception {
         PreparedStatement stmt = conn.prepareStatement(
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?"
         );
-        stmt.setString(1, SCHEMA);          // Gán schema (database name)
-        stmt.setString(2, tableName);       // Gán tên bảng
-        ResultSet rs = stmt.executeQuery(); // Thực thi truy vấn
-        boolean exists = rs.next();         // Nếu có dòng trả về => bảng tồn tại
+        stmt.setString(1, SCHEMA);
+        stmt.setString(2, tableName);
+        ResultSet rs = stmt.executeQuery();
+        boolean exists = rs.next();
         LogHandler.logInfo("Kiểm tra bảng " + tableName + ": " + (exists ? "tồn tại" : "không tồn tại"));
         return exists;
     }
 
-    // Lấy tên cột khóa chính của bảng.
     public static String getKeyColumn(Connection conn, String tableName) throws Exception {
         PreparedStatement pkStmt = conn.prepareStatement(
                 "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
@@ -43,12 +39,11 @@ public class DatabaseUtil {
         return keyColumn;
     }
 
-    // Lấy thông tin mô tả (comment) của các cột trong bảng.
-    // Nếu không có comment thì sẽ dùng tên cột làm comment mặc định.
-    public static Map<String, String> getColumnMetadata(Connection conn, String tableName) throws Exception {
-        Map<String, String> columnMetadata = new HashMap<>();
+    // Sửa đổi để trả về cả tên cột, comment và kiểu dữ liệu
+    public static Map<String, Map<String, String>> getColumnMetadata(Connection conn, String tableName) throws Exception {
+        Map<String, Map<String, String>> columnMetadata = new HashMap<>();
         PreparedStatement metaStmt = conn.prepareStatement(
-                "SELECT COLUMN_NAME, COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS " +
+                "SELECT COLUMN_NAME, COLUMN_COMMENT, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS " +
                 "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?"
         );
         metaStmt.setString(1, SCHEMA);
@@ -57,15 +52,16 @@ public class DatabaseUtil {
         while (metaRs.next()) {
             String columnName = metaRs.getString("COLUMN_NAME");
             String comment = metaRs.getString("COLUMN_COMMENT");
-            // Nếu comment bị null hoặc rỗng thì dùng tên cột làm comment mặc định
+            String dataType = metaRs.getString("DATA_TYPE");
             if (comment == null || comment.isEmpty()) comment = columnName;
-            columnMetadata.put(columnName, comment);
+            Map<String, String> metadata = new HashMap<>();
+            metadata.put("comment", comment);
+            metadata.put("dataType", dataType);
+            columnMetadata.put(columnName, metadata);
         }
         return columnMetadata;
     }
 
-    // Lấy danh sách tên các cột hợp lệ trong bảng.
-    // Dùng để kiểm tra các cột hợp lệ khi thao tác dữ liệu.
     public static Map<String, Boolean> getValidColumns(Connection conn, String tableName) throws Exception {
         Map<String, Boolean> validColumns = new HashMap<>();
         PreparedStatement metaStmt = conn.prepareStatement(

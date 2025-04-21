@@ -49,7 +49,7 @@ public class JsonUtil {
             if (!firstColumn) columnsJson.append(",");
             columnsJson.append("{\"name\":\"").append(column.get("name"))
                        .append("\",\"comment\":\"").append(column.get("comment").replace("\"", "\\\""))
-                       .append("\"}");
+                       .append("\",\"dataType\":\"").append(column.get("dataType")).append("\"}");
             firstColumn = false;
         }
         columnsJson.append("]");
