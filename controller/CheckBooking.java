@@ -93,7 +93,6 @@ public class CheckBooking {
                             "Lỗi", JOptionPane.ERROR_MESSAGE);
                         continue;
                     }
-
                     // Kiểm tra xung đột đặt phòng
                     if (hasBookingConflict(conn, maPhong, nhanPhong, traPhong, maDatPhong)) {
                         JOptionPane.showMessageDialog(null, "Xung đột đặt phòng cho phòng " + maPhong, "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -150,7 +149,6 @@ public class CheckBooking {
                                 if (traPhong.isBefore(thoiGianHuy)) {
                                     newTinhTrangPhong = "Trống";
                                     newTinhTrangKhach = "Đã rời";
-                                    newTinhTrangDat = "Hủy";
                                 } else if (traPhong.isBefore(nhanPhong)) {
                                     newTinhTrangPhong = "Đã đặt";
                                     newTinhTrangKhach = "Đã đặt";
