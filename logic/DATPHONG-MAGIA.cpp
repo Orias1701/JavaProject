@@ -32,8 +32,8 @@ void int tienphong(){
 void int biphat{
 	int chophep=hentra+30p;
 	if (traphong > chophep) {
-    int soGioMuon = (traphong - chophep) / 60; 
-    tienphat = tienphong*0,3*sogiomuon; //tãng 30% moi gio 
+    int soGioMuon = traphong - nhanphong 
+    tienphat = tienphong*0,3*sogiomuon; 
 }
 	else{
 		tienphat=0 ;
