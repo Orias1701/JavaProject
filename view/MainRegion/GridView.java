@@ -132,9 +132,6 @@ public class GridView {
                         } catch (NumberFormatException e) {
                             System.out.println("Parse error for decimal value in GridView: " + value);
                         }
-                        buttonText.append("<b style='color:#333;'>").append(comment).append(":</b> ")
-                                  .append("<span style='float:right'>").append(displayValue).append("</span><br>");
-                        continue; // Bỏ qua append mặc định
                     }
                 }
 
