@@ -77,7 +77,7 @@ public class CheckBooking {
 
                     if (nhanPhongTimestamp == null || traPhongTimestamp == null || henTraTimestamp == null) {
                         JOptionPane.showMessageDialog(null, 
-                            "❌ Đặt phòng không hợp lệ (phòng " + maPhong + "): Một hoặc nhiều cột thời gian (NgayNhanPhong, NgayTraPhong, NgayHen) là NULL.",
+                            "Đặt phòng không hợp lệ (phòng " + maPhong + "): Một hoặc nhiều cột thời gian (NgayNhanPhong, NgayTraPhong, NgayHen) là NULL.",
                             "Lỗi", JOptionPane.ERROR_MESSAGE);
                         continue;
                     }
@@ -90,14 +90,14 @@ public class CheckBooking {
                     // Kiểm tra tính hợp lệ thời gian
                     if (!isValidBooking(nhanPhong, traPhong, henTra)) {
                         JOptionPane.showMessageDialog(null, 
-                            "❌ Đặt phòng không hợp lệ (phòng " + maPhong + "): Ngày trả phòng phải sau ngày nhận phòng và trước hạn trả.",
+                            "Đặt phòng không hợp lệ (phòng " + maPhong + "): Ngày trả phòng phải sau ngày nhận phòng và trước hạn trả.",
                             "Lỗi", JOptionPane.ERROR_MESSAGE);
                         continue;
                     }
 
                     // Kiểm tra xung đột đặt phòng
                     if (hasBookingConflict(conn, maPhong, nhanPhong, traPhong, maDatPhong)) {
-                        JOptionPane.showMessageDialog(null, "❌ Xung đột đặt phòng cho phòng " + maPhong, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Xung đột đặt phòng cho phòng " + maPhong, "Lỗi", JOptionPane.ERROR_MESSAGE);
                         continue;
                     }
 
@@ -108,7 +108,7 @@ public class CheckBooking {
                     String newTinhTrangPhong = "Trống";
                     String newTinhTrangKhach = "Đã rời";
                     String newTinhTrangDat = tinhTrangDat;
-                    String tinhTrangPhong = rs.getString("TinhTrangPhong");
+                    // String tinhTrangPhong = rs.getString("TinhTrangPhong");
                     // Logic đặt trực tiếp
                     if ("Đặt trực tiếp".equalsIgnoreCase(cachDat)) {
                         System.out.println("Đặt trực tiếp");

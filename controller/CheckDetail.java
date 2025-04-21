@@ -79,15 +79,15 @@ public class CheckDetail {
     public void autoProcessCheckDetail(String tableName, String keyColumn, String keyValue) {
         try {
             processCheckDetail(tableName, keyColumn, keyValue);
-            // ✅ Lấy lại dữ liệu sau khi cập nhật
+            // Lấy lại dữ liệu sau khi cập nhật
             ApiClient.TableDataResult result = ApiClient.getTableData(tableName);
             if (result == null || result.data == null) {
                 JOptionPane.showMessageDialog(null, "Không thể lấy dữ liệu từ server", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            // ✅ Lấy lại cột khóa chính
+            // Lấy lại cột khóa chính
             updateDenBuTheoTinhTrang();
-            // ✅ Cập nhật bảng hiển thị
+            // Cập nhật bảng hiển thị
             contentPanel.updateTableData(result.data, result.columnComments, keyColumn, tableName, "Chi tiết kiểm tra");
     
             System.out.println("Done check detail");
