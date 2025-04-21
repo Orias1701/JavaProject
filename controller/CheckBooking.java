@@ -117,8 +117,8 @@ public class CheckBooking {
                                 break;
                             case "Quá hạn":
                                 if (traPhong.isAfter(henTra.plusMinutes(30))) {
-                                    newTinhTrangPhong = "Trống";
-                                    newTinhTrangKhach = "Đã rời";
+                                    newTinhTrangPhong = "Đang sử dụng";
+                                    newTinhTrangKhach = "Đang ở";
                                     updateTienPhat(conn, maDatPhong, tienPhat);
                                     System.out.println("Đã tính tiền phạt cho đặt phòng " + maDatPhong + " với số tiền: " + tienPhat);
                                 } else {
