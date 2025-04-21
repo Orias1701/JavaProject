@@ -19,8 +19,8 @@ import view.MainRegion.ContentPanel;
 import view.MenuRegion.MenuPanel;
 
 public class MainUI extends JFrame {
-
     private ContentPanel contentPanel;
+    private HeaderPanel headerPanel; // Thêm biến instance
 
     public MainUI() {
         setTitle("Hotel Management System");
@@ -32,7 +32,7 @@ public class MainUI extends JFrame {
         getContentPane().setBackground(Color.decode("#FFFFFF"));
 
         LogHandler.logInfo("MainUI constructor");
-        MainCtrl.startServer();
+        MainCtrl.startServer(this); // Truyền MainUI vào startServer
 
         add(new LoginPanel(this));
 
@@ -44,7 +44,7 @@ public class MainUI extends JFrame {
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 
-        HeaderPanel headerPanel = new HeaderPanel();
+        headerPanel = new HeaderPanel();
         FooterPanel footerPanel = new FooterPanel();
         MenuPanel menuPanel = new MenuPanel();
         contentPanel = new ContentPanel();
@@ -104,12 +104,17 @@ public class MainUI extends JFrame {
         add(menuScroll, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 
-        new MainCtrl(contentPanel, menuPanel);
+        new MainCtrl(contentPanel, menuPanel, this);
 
         menuPanel.refreshTableList();
         contentPanel.showHomePanel();
+        headerPanel.updateUserLabel(); // Cập nhật nhãn người dùng
 
         revalidate();
         repaint();
+    }
+
+    public HeaderPanel getHeaderPanel() {
+        return headerPanel;
     }
 }

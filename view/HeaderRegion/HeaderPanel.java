@@ -1,5 +1,7 @@
 package view.HeaderRegion;
 
+import view.LoginPanel;
+import view.MainUI;
 import view.Style;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -11,11 +13,20 @@ import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import controller.UserSession; // Giả sử có class này để xử lý đăng xuất
+import javax.swing.JOptionPane;
+
+import controller.LogHandler;
+import controller.UserSession;
+import model.ApiClient;
+import java.sql.SQLException;
+import java.util.Map;
 
 public class HeaderPanel extends javax.swing.JPanel {
+    private JLabel userLabel;
+
     public HeaderPanel() {
         setBackground(Color.WHITE);
         setPreferredSize(new Dimension(Style.WIN_WIDTH, 70));
@@ -42,12 +53,70 @@ public class HeaderPanel extends javax.swing.JPanel {
         gbc.insets = new java.awt.Insets(10, 20, 10, 0);
         add(branchLabel, gbc);
 
-        // Label "USER" sát trái hình tròn
-        JLabel userLabel = new JLabel("USER");
+        // Label hiển thị TenNhanVien
+        String username = UserSession.getCurrentUsername();
+        String displayName = "Guest";
+        if (username != null) {
+            try {
+                Map<String, String> employeeInfo = ApiClient.getEmployeeInfo(username);
+                displayName = employeeInfo.getOrDefault("TenNhanVien", username);
+            } catch (SQLException e) {
+                LogHandler.logError("Lỗi khi lấy tên nhân viên: " + e.getMessage(), e);
+                displayName = username;
+            }
+        }
+        userLabel = new JLabel(displayName);
         userLabel.setFont(Style.SC_S);
         userLabel.setForeground(Style.MAIN_CL);
         userLabel.setPreferredSize(new Dimension(150, 70));
         userLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        userLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        userLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (username != null) {
+                    try {
+                        Map<String, String> employeeInfo = ApiClient.getEmployeeInfo(username);
+                        if (!employeeInfo.isEmpty()) {
+                            String info = String.format(
+                                "Mã Nhân Viên: %s\nTên Nhân Viên: %s\nNhóm: %s",
+                                employeeInfo.getOrDefault("MaNhanVien", "N/A"),
+                                employeeInfo.getOrDefault("TenNhanVien", "N/A"),
+                                employeeInfo.getOrDefault("Group", "N/A")
+                            );
+                            JOptionPane.showMessageDialog(
+                                HeaderPanel.this,
+                                info,
+                                "Thông Tin Nhân Viên",
+                                JOptionPane.INFORMATION_MESSAGE
+                            );
+                        } else {
+                            JOptionPane.showMessageDialog(
+                                HeaderPanel.this,
+                                "Không tìm thấy thông tin nhân viên.",
+                                "Thông Báo",
+                                JOptionPane.WARNING_MESSAGE
+                            );
+                        }
+                    } catch (SQLException ex) {
+                        LogHandler.logError("Lỗi khi lấy thông tin nhân viên: " + ex.getMessage(), ex);
+                        JOptionPane.showMessageDialog(
+                            HeaderPanel.this,
+                            "Lỗi khi lấy thông tin: " + ex.getMessage(),
+                            "Lỗi",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(
+                        HeaderPanel.this,
+                        "Vui lòng đăng nhập để xem thông tin.",
+                        "Thông Báo",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                }
+            }
+        });
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
@@ -87,7 +156,6 @@ public class HeaderPanel extends javax.swing.JPanel {
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
                 g2d.setColor(Style.GRAY_CL);
-
                 int[] xDoors = {30, 10, 10, 30, 25, 15, 15, 25};
                 int[] yDoors = {10, 10, 40, 40, 35, 35, 15, 15};
                 g2d.fillPolygon(xDoors, yDoors, 8);
@@ -107,11 +175,17 @@ public class HeaderPanel extends javax.swing.JPanel {
         logoutButton.setToolTipText("Đăng xuất");
         logoutButton.addActionListener(e -> {
             try {
-                UserSession.logOut(); // Giả sử có phương thức này
-                javax.swing.JOptionPane.showMessageDialog(this, "Đăng xuất thành công", "Thông báo", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                // Có thể chuyển hướng đến màn hình đăng nhập
+                UserSession.logOut();
+                UserSession.clearSession(); // Xóa phiên người dùng
+                JOptionPane.showMessageDialog(this, "Đăng xuất thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                // Chuyển về LoginPanel
+                getTopLevelAncestor().removeAll();
+                ((JFrame) getTopLevelAncestor()).add(new LoginPanel((MainUI) getTopLevelAncestor()));
+                updateUserLabel(); // Cập nhật nhãn về "Guest"
+                getTopLevelAncestor().revalidate();
+                getTopLevelAncestor().repaint();
             } catch (Exception ex) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Lỗi khi đăng xuất: " + ex.getMessage(), "Lỗi", javax.swing.JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Lỗi khi đăng xuất: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
         gbc.gridx = 3;
@@ -120,5 +194,21 @@ public class HeaderPanel extends javax.swing.JPanel {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new java.awt.Insets(10, 5, 10, 15);
         add(logoutButton, gbc);
+    }
+
+    // Phương thức để cập nhật lại nhãn người dùng khi cần
+    public void updateUserLabel() {
+        String username = UserSession.getCurrentUsername();
+        String displayName = "Guest";
+        if (username != null) {
+            try {
+                Map<String, String> employeeInfo = ApiClient.getEmployeeInfo(username);
+                displayName = employeeInfo.getOrDefault("TenNhanVien", username);
+            } catch (SQLException e) {
+                LogHandler.logError("Lỗi khi lấy tên nhân viên: " + e.getMessage(), e);
+                displayName = username;
+            }
+        }
+        userLabel.setText(displayName);
     }
 }

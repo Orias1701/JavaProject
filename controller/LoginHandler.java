@@ -3,8 +3,15 @@ package controller;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.util.Map;
+import view.MainUI;
 
 public class LoginHandler extends BaseHandler {
+    private MainUI mainUI; // Tham chiếu đến MainUI
+
+    public LoginHandler(MainUI mainUI) {
+        this.mainUI = mainUI;
+    }
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         if (!"POST".equals(exchange.getRequestMethod())) {
@@ -21,6 +28,10 @@ public class LoginHandler extends BaseHandler {
                 username, group, mapToJson(permissions)
             );
             sendResponse(exchange, 200, jsonResponse);
+            // Cập nhật userLabel sau khi đăng nhập
+            if (mainUI != null) {
+                mainUI.getHeaderPanel().updateUserLabel();
+            }
         }
     }
 

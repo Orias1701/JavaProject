@@ -14,6 +14,10 @@ public class DatabaseUtil {
         return DriverManager.getConnection(BaseHandler.DATA_DB_URL, BaseHandler.DB_USERNAME, BaseHandler.DB_PASSWORD);
     }
 
+    public static Connection getAccountsConnection() throws Exception {
+        return DriverManager.getConnection(BaseHandler.ACCOUNTS_DB_URL, BaseHandler.DB_USERNAME, BaseHandler.DB_PASSWORD);
+    }
+
     public static boolean isTableExists(Connection conn, String tableName) throws Exception {
         PreparedStatement stmt = conn.prepareStatement(
                 "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?"
@@ -39,7 +43,6 @@ public class DatabaseUtil {
         return keyColumn;
     }
 
-    // Sửa đổi để trả về cả tên cột, comment và kiểu dữ liệu
     public static Map<String, Map<String, String>> getColumnMetadata(Connection conn, String tableName) throws Exception {
         Map<String, Map<String, String>> columnMetadata = new HashMap<>();
         PreparedStatement metaStmt = conn.prepareStatement(
