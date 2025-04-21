@@ -38,7 +38,6 @@ public class MainCtrl {
         //Xử lý kiểm tra đặt phòng
         CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this.contentPanel, tablePanel);
         checkBooking.autoProcessBooking("c3_datphong", "MaDatPhong", "");
-
     }
 
     public ContentPanel getContentPanel() {

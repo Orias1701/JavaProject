@@ -54,7 +54,7 @@ public class TableView {
                     if (value instanceof java.util.Date date) {
                         System.out.println("Date: " + date);
                         label.setText(formatter.format(date));
-                    } else if (value instanceof String str && (table.getColumnName(column).equals("Ngày nhận phòng") || table.getColumnName(column).equals("Ngày trả phòng"))) {
+                    } else if (value instanceof String str && (table.getColumnName(column).equals("Ngày nhận phòng") || table.getColumnName(column).equals("Ngày hẹn trả") || table.getColumnName(column).equals("Ngày trả phòng"))) {
                         try {
                             // Giả định chuỗi có định dạng yyyy-MM-dd HH:mm:ss hoặc yyyy-MM-dd HH
                             java.text.SimpleDateFormat inputFormatter = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
