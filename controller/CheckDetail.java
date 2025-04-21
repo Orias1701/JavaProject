@@ -88,7 +88,7 @@ public class CheckDetail {
             // Lấy lại cột khóa chính
             updateDenBuTheoTinhTrang();
             // Cập nhật bảng hiển thị
-            contentPanel.updateTableData(result.data, result.columnComments, keyColumn, tableName, "Chi tiết kiểm tra");
+            contentPanel.updateTableData(result.data, result.columnComments, result.columnTypes, keyColumn, tableName, "Chi tiết kiểm tra");
     
             System.out.println("Done check detail");
         } catch (Exception e) {

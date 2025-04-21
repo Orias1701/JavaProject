@@ -56,6 +56,7 @@ public class MainUI extends JFrame {
                     contentPanel.updateTableData(
                         result.data,
                         result.columnComments,
+                        result.columnTypes,
                         result.keyColumn,
                         tableName,
                         tableComment
@@ -67,7 +68,7 @@ public class MainUI extends JFrame {
                         "Cảnh báo",
                         JOptionPane.WARNING_MESSAGE
                     );
-                    contentPanel.updateTableData(null, null, null, tableName, tableComment);
+                    contentPanel.updateTableData(null, null, null, null, tableName, tableComment);
                 }
             } catch (Exception ex) {
                 LogHandler.logError("Lỗi khi tải dữ liệu bảng: " + ex.getMessage(), ex);

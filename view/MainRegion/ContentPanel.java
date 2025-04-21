@@ -43,7 +43,7 @@ public class ContentPanel extends JPanel {
     }
 
     // Hàm cập nhật dữ liệu cho bảng
-    public void updateTableData(List<Map<String, String>> data, Map<String, String> columnComments, String keyColumn, String tableName, String tableComment) {
+    public void updateTableData(List<Map<String, String>> data, Map<String, String> columnComments, Map<String, String> columnTypes, String keyColumn, String tableName, String tableComment) {
         // Nếu đang hiển thị trang chủ, cần xóa nó và cập nhật lại các panel
         if (isHomeDisplayed) {
             remove(homePanel);  // Xóa homePanel khỏi ContentPanel
@@ -82,7 +82,7 @@ public class ContentPanel extends JPanel {
         }
 
         // Cập nhật dữ liệu cho bảng và tiêu đề
-        tablePanel.updateTableData(data, columnComments, keyColumn, tableName, tableComment);
+        tablePanel.updateTableData(data, columnComments, columnTypes, keyColumn, tableName, tableComment);
         headPanel.updateTableNameLabel(tableComment != null && !tableComment.isEmpty() ? tableComment : tableName);
 
         // Cập nhật lại giao diện sau khi thay đổi
