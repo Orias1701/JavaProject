@@ -265,7 +265,7 @@ public class CheckBooking {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     double giaLoai = rs.getDouble("GiaLoai");
-                    long hoursUsed = Duration.between(nhanPhong, traPhong).toHours();
+                    // long hoursUsed = Duration.between(nhanPhong, traPhong).toHours();
                     return giaLoai;
                 }
             }
