@@ -42,7 +42,7 @@ public class CheckDetail {
             updateDenBuTheoTinhTrang(); // Cập nhật đền bù theo tình trạng thiết bị
             tablePanel.refreshTable();
         } else {
-            System.err.println("❌ Lỗi: " + res.getMessage());
+            System.err.println("Lỗi: " + res.getMessage());
         }
     
         return res;
