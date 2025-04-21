@@ -85,7 +85,6 @@ public class CheckBooking {
                     LocalDateTime nhanPhong = nhanPhongTimestamp.toLocalDateTime();
                     LocalDateTime traPhong = traPhongTimestamp.toLocalDateTime();
                     LocalDateTime henTra = henTraTimestamp.toLocalDateTime();
-                    LocalDateTime now = LocalDateTime.now();
 
                     // Kiểm tra tính hợp lệ thời gian
                     if (!isValidBooking(nhanPhong, traPhong, henTra)) {
@@ -103,12 +102,12 @@ public class CheckBooking {
 
                     // Tính tiền phòng (dùng để tính tiền phạt)
                     double tienPhong = calculateRoomPrice(conn, maPhong, nhanPhong, traPhong);
-                    double tienPhat = calculateLateFee(tienPhong, traPhong, henTra, now);
+                    double tienPhat = calculateLateFee(tienPhong, traPhong, henTra);
 
                     String newTinhTrangPhong = "Trống";
                     String newTinhTrangKhach = "Đã rời";
                     String newTinhTrangDat = tinhTrangDat;
-                    // String tinhTrangPhong = rs.getString("TinhTrangPhong");
+
                     // Logic đặt trực tiếp
                     if ("Đặt trực tiếp".equalsIgnoreCase(cachDat)) {
                         System.out.println("Đặt trực tiếp");
@@ -139,7 +138,7 @@ public class CheckBooking {
                                 newTinhTrangKhach = "Đã rời";
                                 break;
                             default:
-                            System.out.println("Trạng thái không xác định: " + tinhTrangDat);
+                                System.out.println("Trạng thái không xác định: " + tinhTrangDat);
                         }
                     }
 
@@ -148,17 +147,18 @@ public class CheckBooking {
                         switch (tinhTrangDat) {
                             case "Đang đợi":
                                 LocalDateTime thoiGianHuy = nhanPhong.minusHours(5);
-                                if (now.isBefore(thoiGianHuy)) {
+                                if (traPhong.isBefore(thoiGianHuy)) {
                                     newTinhTrangPhong = "Trống";
                                     newTinhTrangKhach = "Đã rời";
-                                } else if (now.isBefore(nhanPhong)) {
+                                    newTinhTrangDat = "Hủy";
+                                } else if (traPhong.isBefore(nhanPhong)) {
                                     newTinhTrangPhong = "Đã đặt";
                                     newTinhTrangKhach = "Đã đặt";
-                                } else if (now.isAfter(nhanPhong) && now.isBefore(henTra)) {
+                                } else if (traPhong.isAfter(nhanPhong) && traPhong.isBefore(henTra)) {
                                     newTinhTrangDat = "Đang sử dụng";
                                     newTinhTrangPhong = "Đang sử dụng";
                                     newTinhTrangKhach = "Đang ở";
-                                } else if (now.isAfter(henTra)) {
+                                } else if (traPhong.isAfter(henTra)) {
                                     newTinhTrangDat = "Quá hạn";
                                     newTinhTrangPhong = "Trống";
                                     newTinhTrangKhach = "Đã rời";
@@ -166,7 +166,7 @@ public class CheckBooking {
                                 }
                                 break;
                             case "Đang sử dụng":
-                                if (now.isAfter(henTra)) {
+                                if (traPhong.isAfter(henTra)) {
                                     newTinhTrangDat = "Quá hạn";
                                     newTinhTrangPhong = "Trống";
                                     newTinhTrangKhach = "Đã rời";
@@ -240,7 +240,7 @@ public class CheckBooking {
             SELECT MaDatPhong
             FROM c3_datphong
             WHERE MaPhong = ? AND TinhTrang NOT IN ('Đã trả')
-            AND (NgayNhanPhong <= ? AND NgayTraPhong >= ?)
+            AND (NgayNhanPhong <= ? AND NgayHen >= ?)
             AND MaDatPhong != ?
         """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -277,11 +277,11 @@ public class CheckBooking {
     }
 
     // Tính tiền phạt
-    private double calculateLateFee(double tienPhong, LocalDateTime traPhong, LocalDateTime henTra, LocalDateTime now) {
+    private double calculateLateFee(double tienPhong, LocalDateTime traPhong, LocalDateTime henTra) {
         LocalDateTime chophep = henTra.plusMinutes(30);
-        if (now.isAfter(chophep)) {
+        if (traPhong.isAfter(chophep)) {
             long minutesLate = Duration.between(chophep, traPhong).toMinutes();
-            long hoursLate = minutesLate / 60;
+            long hoursLate = (minutesLate + 59) / 60; // Làm tròn lên
             return tienPhong * 0.3 * hoursLate;
         }
         return 0;
