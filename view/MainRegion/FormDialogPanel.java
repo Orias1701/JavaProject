@@ -58,6 +58,8 @@ public class FormDialogPanel implements FormDialogHandler {
         for (int i = 0; i < tablePanel.getColumnNames().size(); i++) {
             String col = tablePanel.getColumnNames().get(i);
             String comment = tablePanel.getColumnComments().get(i);
+            // String type = tablePanel.getColumnTypes().get(i);   
+            // System.out.printf("Type", type);
 
             JLabel label = new JLabel(comment + ":");
             label.setFont(Style.MONS_14);
