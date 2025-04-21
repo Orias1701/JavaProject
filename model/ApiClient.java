@@ -20,6 +20,7 @@ public class ApiClient {
         public final List<Map<String, String>> data;
         public final Map<String, String> columnComments;
         public final String keyColumn;
+        public Map<String, String> columnTypes;
 
         public TableDataResult(List<Map<String, String>> data, Map<String, String> columnComments, String keyColumn) {
             this.data = data;

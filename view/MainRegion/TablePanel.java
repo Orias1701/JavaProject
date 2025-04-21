@@ -19,6 +19,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     private String tableComment;
     private java.util.List<String> columnNames;
     private java.util.List<String> columnComments;
+    private java.util.List<String> columnTypes;
     private FormDialogHandler formDialogHandler;
     private TableView tableView;
     private GridView gridView;
@@ -72,7 +73,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     }
 
     @Override
-    public void updateTableData(java.util.List<java.util.Map<String, String>> data, java.util.Map<String, String> columnCommentsMap, String keyColumn, String tableName, String tableComment) {
+    public void updateTableData(java.util.List<java.util.Map<String, String>> data, java.util.Map<String, String> columnCommentsMap, java.util.Map<String, String> columnTypesMap,String keyColumn, String tableName, String tableComment) {
         this.keyColumn = keyColumn;
         this.tableName = tableName;
         this.tableComment = tableComment;
@@ -109,15 +110,15 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     @Override
     public void refreshTable() {
         if (tableName == null || tableName.isEmpty()) {
-            updateTableData(null, null, null, tableName, tableComment);
+            updateTableData(null, null, null, null, tableName, tableComment);
             return;
         }
         try {
             TableDataResult result = ApiClient.getTableData(tableName);
             if (result.data != null && !result.data.isEmpty()) {
-                updateTableData(result.data, result.columnComments, result.keyColumn, tableName, tableComment);
+                updateTableData(result.data, result.columnComments, result.columnTypes,result.keyColumn, tableName, tableComment);
             } else {
-                updateTableData(null, null, null, tableName, tableComment);
+                updateTableData(null, null, null, null, tableName, tableComment);
                 JOptionPane.showMessageDialog(parent, "Không có dữ liệu để hiển thị sau khi làm mới", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             }
         } catch (Exception ex) {
@@ -145,6 +146,9 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         return columnComments;
     }
 
+    public java.util.List<String> getColumnTypes(){
+        return columnTypes;
+    }
     public JTable getTable() {
         return tableView.getTable();
     }

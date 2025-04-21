@@ -36,8 +36,8 @@ public class CheckBooking {
             }
             
             // Cập nhật giao diện
-            contentPanel.updateTableData(result.data, result.columnComments, keyColumn, tableName, "Thông tin đặt phòng");
-            tablePanel.updateTableData(result.data, result.columnComments, keyColumn, tableName, "Thông tin đặt phòng");
+            contentPanel.updateTableData(result.data, result.columnComments, result.columnTypes, keyColumn, tableName, "Thông tin đặt phòng");
+            tablePanel.updateTableData(result.data, result.columnComments, result.columnTypes, keyColumn, tableName, "Thông tin đặt phòng");
             System.out.println("✔ Đã cập nhật trạng thái đặt phòng");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Lỗi xử lý đặt phòng: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);

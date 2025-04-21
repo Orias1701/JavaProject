@@ -26,7 +26,7 @@ public class MainCtrl {
         menuPanel.setTableSelectionListener((tableName, tableComment) -> {
             if (tableName != null && !tableName.isEmpty()) {
                 ApiClient.TableDataResult result = ApiClient.getTableData(tableName);
-                contentPanel.updateTableData(result.data, result.columnComments, result.keyColumn, tableName, tableComment);
+                contentPanel.updateTableData(result.data, result.columnComments, result.columnTypes, result.keyColumn, tableName, tableComment);
             } else {
                 LogHandler.logError("Invalid table name received");
             }
@@ -38,7 +38,6 @@ public class MainCtrl {
         //Xử lý kiểm tra đặt phòng
         CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this.contentPanel, tablePanel);
         checkBooking.autoProcessBooking("c3_datphong", "MaDatPhong", "");
-
     }
 
     public ContentPanel getContentPanel() {
