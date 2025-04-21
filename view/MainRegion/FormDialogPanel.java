@@ -3,6 +3,7 @@ package view.MainRegion;
 import controller.LogHandler;
 import controller.MainCtrl;
 import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.swing.*;
 import model.ApiClient.ApiResponse;
@@ -31,7 +32,7 @@ public class FormDialogPanel implements FormDialogHandler {
             return;
         }
         if (!tablePanel.getColumnNames().contains(tablePanel.getKeyColumn())) {
-            JOptionPane.showMessageDialog(tablePanel, " gegeKhóa chính không khớp với các cột của bảng", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(tablePanel, "Khóa chính không khớp với các cột của bảng", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
         if (!actionType.equals("add") && !actionType.equals("detail") && (rowIndex < 0 || rowIndex >= tablePanel.getTable().getRowCount())) {
@@ -54,12 +55,19 @@ public class FormDialogPanel implements FormDialogHandler {
         formPanel.setBackground(Style.LIGHT_CL);
         Map<String, JTextField> inputFields = new HashMap<>();
 
+        // Formatter cho datetime
+        SimpleDateFormat outputFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat[] inputFormatters = {
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
+            new SimpleDateFormat("yyyy-MM-dd HH:mm"),
+            new SimpleDateFormat("yyyy-MM-dd HH")
+        };
+
         // Duyệt qua các cột của bảng để tạo label + textfield tương ứng
         for (int i = 0; i < tablePanel.getColumnNames().size(); i++) {
             String col = tablePanel.getColumnNames().get(i);
             String comment = tablePanel.getColumnComments().get(i);
-            // String type = tablePanel.getColumnTypes().get(i);   
-            // System.out.printf("Type", type);
+            String type = tablePanel.getColumnTypes().get(i);
 
             JLabel label = new JLabel(comment + ":");
             label.setFont(Style.MONS_14);
@@ -72,15 +80,39 @@ public class FormDialogPanel implements FormDialogHandler {
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
             ));
 
-            // Nếu đang sửa, xóa, all hoặc chi tiết thì lấy giá trị hiện có từ bảng
+            // Xử lý giá trị và định dạng
+            String value = "";
             if (!actionType.equals("add") && rowIndex >= 0) {
                 Object cellValue = tablePanel.getTable().getValueAt(rowIndex, i);
-                field.setText(cellValue != null ? cellValue.toString() : "");
+                value = cellValue != null ? cellValue.toString() : "";
             }
 
-            // Chỉ cho phép chỉnh sửa khi là add, edit hoặc all
-            // field.setEditable(actionType.equals("add") || actionType.equals("edit") || actionType.equals("all"));
+            if (type.equalsIgnoreCase("datetime") && value != null && !value.isEmpty()) {
+                boolean parsed = false;
+                for (SimpleDateFormat formatter : inputFormatters) {
+                    try {
+                        java.util.Date date = formatter.parse(value);
+                        value = outputFormatter.format(date);
+                        parsed = true;
+                        break;
+                    } catch (java.text.ParseException ignored) {
+                    }
+                }
+                if (!parsed) {
+                    LogHandler.logWarn("Parse error for datetime value in FormDialogPanel: " + value);
+                }
+            } else if (type.equalsIgnoreCase("decimal") && value != null && !value.isEmpty()) {
+                try {
+                    double number = Double.parseDouble(value);
+                    value = String.format("%,.0f", number);
+                } catch (NumberFormatException e) {
+                    LogHandler.logWarn("Parse error for decimal value in FormDialogPanel: " + value);
+                }
+            }
 
+            field.setText(value);
+
+            // Chỉ cho phép chỉnh sửa khi là add, edit hoặc all
             if (actionType.equals("delete") || actionType.equals("detail") || (col.equals(tablePanel.getKeyColumn()) && !actionType.equals("add"))) {
                 field.setEditable(false);
                 field.setForeground(Style.ACT_CL);
@@ -116,6 +148,8 @@ public class FormDialogPanel implements FormDialogHandler {
                 // Kiểm tra dữ liệu đầu vào
                 for (String col : tablePanel.getColumnNames()) {
                     String value = inputFields.get(col).getText();
+                    int colIndex = tablePanel.getColumnNames().indexOf(col);
+                    String type = tablePanel.getColumnTypes().get(colIndex);
                     if (value.isEmpty()) {
                         JOptionPane.showMessageDialog(dialog, "Vui lòng điền đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
                         return;
@@ -125,45 +159,44 @@ public class FormDialogPanel implements FormDialogHandler {
                         JOptionPane.showMessageDialog(dialog, "Email không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
+                    // Kiểm tra decimal hợp lệ
+                    if (type.equalsIgnoreCase("decimal") && !value.replace(",", "").matches("-?\\d+(\\.\\d+)?")) {
+                        JOptionPane.showMessageDialog(dialog, "Giá trị " + tablePanel.getColumnComments().get(colIndex) + " không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
                 }
 
                 String keyValue = inputFields.get(tablePanel.getKeyColumn()).getText();
                 LogHandler.logInfo("showFormDialog: actionType=" + actionType + ", keyColumn=" + tablePanel.getKeyColumn() + ", keyValue=" + keyValue);
 
                 try {
+                    Map<String, Object> rowData = new HashMap<>();
+                    for (String col : tablePanel.getColumnNames()) {
+                        String value = inputFields.get(col).getText();
+                        int colIndex = tablePanel.getColumnNames().indexOf(col);
+                        String type = tablePanel.getColumnTypes().get(colIndex);
+                        // Loại bỏ dấu phẩy cho decimal
+                        if (type.equalsIgnoreCase("decimal")) {
+                            value = value.replace(",", "");
+                        }
+                        rowData.put(col, value);
+                    }
+                    ApiResponse response;
                     if (actionType.equals("add")) {
-                        Map<String, Object> rowData = new HashMap<>();
-                        for (String col : tablePanel.getColumnNames()) {
-                            rowData.put(col, inputFields.get(col).getText());
-                        }
-                        ApiResponse response = MainCtrl.addRow(tablePanel.getTableName(), rowData);
-                        if (response.isSuccess()) {
-                            JOptionPane.showMessageDialog(dialog, "Thêm dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                            tablePanel.refreshTable();
-                            dialog.dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(dialog, response.message, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
+                        response = MainCtrl.addRow(tablePanel.getTableName(), rowData);
                     } else {
-                        Map<String, Object> rowData = new HashMap<>();
-                        for (String col : tablePanel.getColumnNames()) {
-                            rowData.put(col, inputFields.get(col).getText());
-                        }
-                        ApiResponse response = MainCtrl.updateRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue, rowData);
-                        if (response.isSuccess()) {
-                            JOptionPane.showMessageDialog(dialog, "Cập nhật dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                            tablePanel.refreshTable();
-                            dialog.dispose();
-                        } else {
-                            JOptionPane.showMessageDialog(dialog, response.message, "Lỗi", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
+                        response = MainCtrl.updateRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue, rowData);
+                    }
+                    if (response.isSuccess()) {
+                        JOptionPane.showMessageDialog(dialog, actionType.equals("add") ? "Thêm dữ liệu thành công" : "Cập nhật dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                        tablePanel.refreshTable();
+                        dialog.dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(dialog, response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (Exception ex) {
                     LogHandler.logError("Lỗi kết nối: " + ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(dialog, "Lỗi kết nối: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return;
                 }
             });
         } else if (actionType.equals("delete")) {
@@ -187,12 +220,10 @@ public class FormDialogPanel implements FormDialogHandler {
                             dialog.dispose();
                         } else {
                             JOptionPane.showMessageDialog(dialog, response.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                            return;
                         }
                     } catch (Exception ex) {
                         LogHandler.logError("Lỗi kết nối: " + ex.getMessage(), ex);
                         JOptionPane.showMessageDialog(dialog, "Lỗi kết nối: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
                     }
                 }
             });

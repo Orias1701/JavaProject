@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.table.*;
 
+import controller.LogHandler;
 import view.Style;
 
 public class TableView {
@@ -153,11 +154,17 @@ public class TableView {
                 if (columnIndex < 0 && parent.getColumnNames() != null) {
                     columnIndex = parent.getColumnNames().indexOf(columnName);
                 }
-
                 if (columnIndex >= 0 && columnTypes != null && columnIndex < columnTypes.size()) {
                     String dataType = columnTypes.get(columnIndex);
                     if (dataType.equalsIgnoreCase("decimal")) {
                         label.setHorizontalAlignment(SwingConstants.RIGHT);
+                        if (value != null && value instanceof String) {
+                            try {
+                                value = String.format("%,.0f", Double.parseDouble((String) value));
+                            } catch (NumberFormatException e) {
+                                LogHandler.logWarn("Invalid decimal value in TableView: " + value);
+                            }
+                        }
                     } else {
                         label.setHorizontalAlignment(SwingConstants.LEFT);
                     }

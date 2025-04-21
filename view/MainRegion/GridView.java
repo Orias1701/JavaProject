@@ -1,6 +1,7 @@
 package view.MainRegion;
 
 import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
@@ -12,6 +13,7 @@ public class GridView {
     private List<Map<String, String>> data; // Lưu dữ liệu
     private List<String> columnNames; // Lưu tên cột
     private List<String> columnComments; // Lưu chú thích cột
+    private List<String> columnTypes; // Lưu kiểu dữ liệu cột
     private FormDialogHandler formDialogHandler; // Lưu handler
     private boolean canAdd;
     private boolean canEdit;
@@ -33,8 +35,8 @@ public class GridView {
         containerPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
-                if (data != null && columnNames != null && columnComments != null && formDialogHandler != null) {
-                    updateView(data, columnNames, columnComments, formDialogHandler, canAdd, canEdit, canDelete);
+                if (data != null && columnNames != null && columnComments != null && columnTypes != null && formDialogHandler != null) {
+                    updateView(data, columnNames, columnComments, columnTypes, formDialogHandler, canAdd, canEdit, canDelete);
                 }
             }
         });
@@ -44,11 +46,12 @@ public class GridView {
         return containerPanel;
     }
 
-    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
+    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, List<String> columnTypes, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
         // Lưu các tham số để sử dụng khi resize
         this.data = data;
         this.columnNames = columnNames;
         this.columnComments = columnComments;
+        this.columnTypes = columnTypes;
         this.formDialogHandler = formDialogHandler;
         this.canAdd = canAdd;
         this.canEdit = canEdit;
@@ -83,6 +86,14 @@ public class GridView {
         // Thiết lập GridLayout với số cột động
         buttonPanel.setLayout(new GridLayout(0, columns, gap, gap));
 
+        // Formatter cho datetime
+        SimpleDateFormat outputFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat[] inputFormatters = {
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
+            new SimpleDateFormat("yyyy-MM-dd HH:mm"),
+            new SimpleDateFormat("yyyy-MM-dd HH")
+        };
+
         for (int rowIndex = 0; rowIndex < data.size(); rowIndex++) {
             Map<String, String> row = data.get(rowIndex);
             StringBuilder buttonText = new StringBuilder("<html><body style='width:100%'>");
@@ -90,8 +101,46 @@ public class GridView {
                 String columnName = columnNames.get(i);
                 String comment = columnComments.size() > i ? columnComments.get(i) : columnName;
                 String value = row.get(columnName);
+                String displayValue = value != null ? value : "";
+
+                // Xử lý định dạng dựa trên columnTypes
+                if (i < columnTypes.size()) {
+                    String dataType = columnTypes.get(i);
+                    if (dataType.equalsIgnoreCase("datetime") || dataType.equalsIgnoreCase("timestamp")) {
+                        if (value != null) {
+                            boolean parsed = false;
+                            for (SimpleDateFormat formatter : inputFormatters) {
+                                try {
+                                    java.util.Date date = formatter.parse(value);
+                                    displayValue = outputFormatter.format(date);
+                                    parsed = true;
+                                    break;
+                                } catch (java.text.ParseException ignored) {
+                                }
+                            }
+                            if (!parsed) {
+                                System.out.println("Parse error for datetime value in GridView: " + value);
+                            }
+                        }
+                    } else if (dataType.equalsIgnoreCase("decimal")) {
+                        // Căn phải và định dạng số
+                        try {
+                            if (value != null) {
+                                double number = Double.parseDouble(value);
+                                displayValue = String.format("%,.0f", number);
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Parse error for decimal value in GridView: " + value);
+                        }
+                        buttonText.append("<b style='color:#333;'>").append(comment).append(":</b> ")
+                                  .append("<span style='float:right'>").append(displayValue).append("</span><br>");
+                        continue; // Bỏ qua append mặc định
+                    }
+                }
+
+                // Mặc định căn trái
                 buttonText.append("<b style='color:#333;'>").append(comment).append(":</b> ")
-                          .append(value != null ? value : "").append("<br>");
+                          .append(displayValue).append("<br>");
             }
             buttonText.append("</body></html>");
 

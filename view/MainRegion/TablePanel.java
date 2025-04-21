@@ -24,6 +24,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     private TableView tableView;
     private GridView gridView;
     private JPanel currentView;
+    private java.util.List<java.util.Map<String, String>> currentData; // Lưu dữ liệu hiện tại
 
     public TablePanel(ContentPanel parent) {
         this.parent = parent;
@@ -74,6 +75,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         this.keyColumn = keyColumn;
         this.tableName = tableName;
         this.tableComment = tableComment;
+        this.currentData = data;
         this.columnNames = data != null && !data.isEmpty() ? new java.util.ArrayList<>(data.get(0).keySet()) : null;
         this.columnComments = new java.util.ArrayList<>();
         this.columnTypes = new java.util.ArrayList<>();
@@ -96,11 +98,20 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         boolean canEdit = UserSession.hasPermission(tableName, "20");
         boolean canDelete = UserSession.hasPermission(tableName, "30");
 
+        // Tạo FormDialogHandler mới để đồng bộ với bảng hiện tại
+        this.formDialogHandler = new FormDialogPanel(this);
+
+        // Cập nhật cả TableView và GridView để đồng bộ dữ liệu
+        tableView.updateView(data, columnNames, columnComments, formDialogHandler, canAdd, canEdit, canDelete);
+        gridView.updateView(data, columnNames, columnComments, columnTypes, formDialogHandler, canAdd, canEdit, canDelete);
+
+        // Hiển thị view đúng
         if (isButtonView) {
-            gridView.updateView(data, columnNames, columnComments, formDialogHandler, canAdd, canEdit, canDelete);
+            currentView = gridView.getView();
         } else {
-            tableView.updateView(data, columnNames, columnComments, formDialogHandler, canAdd, canEdit, canDelete);
+            currentView = tableView.getView();
         }
+        scrollPane.setViewportView(currentView);
         
         currentView.revalidate();
         currentView.repaint();
