@@ -6,7 +6,7 @@ import java.util.Map;
 public class UserSession {
     private static String currentUsername;
     private static String currentGroup;
-    private static Map<String, String> tablePermissions = new HashMap<>(); // tableName -> permission (00, 10, 20, 30)
+    private static Map<String, String> tablePermissions = new HashMap<>(); // tableName -> permission
 
     public static void setUser(String username, String group, Map<String, String> permissions) {
         currentUsername = username;

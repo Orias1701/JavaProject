@@ -26,7 +26,7 @@ public class ApiClient {
                               Map<String, String> columnTypes, String keyColumn) {
             this.data = data != null ? data : new ArrayList<>();
             this.columnComments = columnComments != null ? columnComments : new HashMap<>();
-            this.columnTypes = columnTypes != null ? columnTypes : new HashMap<>(); // Đảm bảo không null
+            this.columnTypes = columnTypes != null ? columnTypes : new HashMap<>();
             this.keyColumn = keyColumn != null ? keyColumn : "";
             LogHandler.logInfo("Khóa chính API: " + keyColumn);
             LogHandler.logInfo("columnTypes: " + this.columnTypes);

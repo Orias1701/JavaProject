@@ -56,7 +56,7 @@ public class ContentPanel extends JPanel {
 
         // Định dạng ngày giờ cho các cột có kiểu datetime
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        DateTimeFormatter fallbackFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); // Hỗ trợ định dạng không có giây
+        DateTimeFormatter fallbackFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         for (Map<String, String> row : data) {
             for (String column : row.keySet()) {
                 String value = row.get(column);
