@@ -120,7 +120,7 @@ public class CheckBooking {
                                     newTinhTrangPhong = "Trống";
                                     newTinhTrangKhach = "Đã rời";
                                     updateTienPhat(conn, maDatPhong, tienPhat);
-                                    System.out.println("Đã tính tiền phạt cho đặt phòng " + maDatPhong);
+                                    System.out.println("Đã tính tiền phạt cho đặt phòng " + maDatPhong + " với số tiền: " + tienPhat);
                                 } else {
                                     newTinhTrangPhong = "Đang sử dụng";
                                     newTinhTrangKhach = "Đang ở";
@@ -266,7 +266,7 @@ public class CheckBooking {
                 if (rs.next()) {
                     double giaLoai = rs.getDouble("GiaLoai");
                     long hoursUsed = Duration.between(nhanPhong, traPhong).toHours();
-                    return giaLoai * hoursUsed;
+                    return giaLoai;
                 }
             }
         }
@@ -280,9 +280,9 @@ public class CheckBooking {
         if (traPhong.isAfter(chophep)) {
             long minutesLate = Duration.between(chophep, traPhong).toMinutes();
             long hoursLate = (minutesLate + 59) / 60; // Làm tròn lên
-            return tienPhong * 0.3 * hoursLate;
+            return tienPhong * 0.3 * hoursLate; // Tiền phạt = 30% tiền phòng * số giờ trễ
         }
-        return 0;
+        return 0; // Trả đúng giờ hoặc sớm: Tiền phạt = 0
     }
 
     // Cập nhật tiền phạt
