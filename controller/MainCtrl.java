@@ -9,6 +9,8 @@ import model.TableDataOperationsClient;
 import view.MainRegion.ContentPanel;
 import view.MainRegion.TablePanel;
 import view.MenuRegion.MenuPanel;
+import view.MainUI;
+
 public class MainCtrl {
     private final ContentPanel contentPanel;
     private final MenuPanel menuPanel;
@@ -16,7 +18,7 @@ public class MainCtrl {
     private CheckDetail checkDetail;
     private CheckBooking checkBooking;
 
-    public MainCtrl(ContentPanel contentPanel, MenuPanel menuPanel) {
+    public MainCtrl(ContentPanel contentPanel, MenuPanel menuPanel, MainUI mainUI) {
         if (contentPanel == null || menuPanel == null) {
             throw new IllegalArgumentException("ContentPanel and MenuPanel must not be null");
         }
@@ -77,11 +79,11 @@ public class MainCtrl {
         return operationsClient.deleteRow(tableName, keyColumn, keyValue);
     }
 
-    public static void startServer() {
+    public static void startServer(MainUI mainUI) {
         new Thread(() -> {
             try {
                 HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
-                server.createContext("/api/login", new LoginHandler());
+                server.createContext("/api/login", new LoginHandler(mainUI));
                 server.createContext("/api/tables", new TablesHandler());
                 server.createContext("/api/table/", new TableDataHandler());
                 server.setExecutor(null);

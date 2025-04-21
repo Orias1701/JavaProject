@@ -1,9 +1,14 @@
 package model;
 
+import controller.DatabaseUtil;
 import controller.LogHandler;
 import controller.UserSession;
 
 import java.net.URI;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -148,5 +153,28 @@ public class ApiClient {
             LogHandler.logError("Error fetching table data for " + tableName + ": " + e.getMessage(), e);
             return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "");
         }
+    }
+
+    public static Map<String, String> getEmployeeInfo(String username) throws SQLException {
+        Map<String, String> employeeInfo = new HashMap<>();
+        String query = "SELECT MaNhanVien, TenNhanVien, `Group` FROM users WHERE UserName = ?";
+        try (Connection conn = DatabaseUtil.getAccountsConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, username);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    employeeInfo.put("MaNhanVien", rs.getString("MaNhanVien"));
+                    employeeInfo.put("TenNhanVien", rs.getString("TenNhanVien"));
+                    employeeInfo.put("Group", rs.getString("Group"));
+                }
+            }
+        } catch (Exception e) {
+            LogHandler.logError("Lỗi khi lấy thông tin nhân viên: " + e.getMessage(), e);
+            if (e instanceof SQLException) {
+                throw (SQLException) e;
+            }
+            return employeeInfo;
+        }
+        return employeeInfo;
     }
 }
