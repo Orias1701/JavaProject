@@ -22,15 +22,20 @@ public class CheckBooking {
         this.tablePanel = tablePanel;
     }
 
+    // Hàm chính: Tự động xử lý và cập nhật trạng thái đặt phòng
     public void autoProcessBooking(String tableName, String keyColumn, String keyValue) {
         try {
-            processBooking(tableName, keyColumn, keyValue);
+            // Cập nhật trạng thái trước
+            updatePhongTheoTinhTrang();
+            
+            // Lấy dữ liệu mới từ server để cập nhật giao diện
             TableDataResult result = ApiClient.getTableData(tableName);
             if (result == null || result.data == null) {
                 JOptionPane.showMessageDialog(null, "Không thể lấy dữ liệu từ server", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            updatePhongTheoTinhTrang();
+            
+            // Cập nhật giao diện
             contentPanel.updateTableData(result.data, result.columnComments, keyColumn, tableName, "Thông tin đặt phòng");
             tablePanel.updateTableData(result.data, result.columnComments, keyColumn, tableName, "Thông tin đặt phòng");
             System.out.println("✔ Đã cập nhật trạng thái đặt phòng");
@@ -39,181 +44,286 @@ public class CheckBooking {
         }
     }
 
-    private void processBooking(String tableName, String keyColumn, String keyValue) {
-        // Có thể bổ sung xử lý tùy theo nhu cầu
-    }
-
+    // Hàm cốt lõi: Xử lý logic cập nhật trạng thái phòng, khách, và đặt phòng
     private void updatePhongTheoTinhTrang() throws Exception {
         try (Connection conn = DatabaseUtil.getConnection()) {
             Set<String> phongDaXuLy = new HashSet<>();
+            Set<String> khachDat = new HashSet<>();
 
             String sql = """
-                SELECT dp.MaDatPhong, dp.MaPhong, dp.NgayNhanPhong, dp.NgayTraPhong, 
+                SELECT dp.MaDatPhong, dp.MaPhong, dp.NgayNhanPhong, dp.NgayTraPhong, dp.NgayHen,
                        dp.CachDat, dp.TinhTrang, p.TinhTrangPhong, 
                        kh.MaKhachHang, kh.TinhTrangKhach
                 FROM c3_datphong dp
                 JOIN c2_phong p ON dp.MaPhong = p.MaPhong
                 JOIN a1_khachhang kh ON dp.MaKhachHang = kh.MaKhachHang
-                WHERE dp.TinhTrang IN ('Đang sử dụng', 'Quá hạn', 'Đang đợi', 'Đã trả')
-                  AND kh.TinhTrangKhach IN ('Đang ở', 'Đã rời', 'Đang đợi', 'Đã trả');
+                WHERE dp.TinhTrang IN ('Đang sử dụng', 'Quá hạn', 'Đang đợi', 'Đã trả');
             """;
 
             try (PreparedStatement ps = conn.prepareStatement(sql);
                  ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+                    System.out.println("Đang xử lý đặt phòng: " + rs.getString("MaDatPhong"));
+                    String maDatPhong = rs.getString("MaDatPhong");
                     String maPhong = rs.getString("MaPhong");
+                    String maKhachHang = rs.getString("MaKhachHang");
                     String tinhTrangDat = rs.getString("TinhTrang");
                     String cachDat = rs.getString("CachDat");
-                    String maKhachHang = rs.getString("MaKhachHang");
-                    String maDatPhong = rs.getString("MaDatPhong");
 
-                    String newTinhTrangPhong = rs.getString("TinhTrangPhong");
-                    String newTinhTrangKhach = rs.getString("TinhTrangKhach");
-                    if (newTinhTrangPhong == null) newTinhTrangPhong = "Trống";
-                    if (newTinhTrangKhach == null) newTinhTrangKhach = "Đã rời";
+                    // Kiểm tra giá trị null cho các cột thời gian
+                    Timestamp nhanPhongTimestamp = rs.getTimestamp("NgayNhanPhong");
+                    Timestamp traPhongTimestamp = rs.getTimestamp("NgayTraPhong");
+                    Timestamp henTraTimestamp = rs.getTimestamp("NgayHen");
 
-                    double tienPhong = 0;
-                    double tienPhat = 0;
-                    phongDaXuLy.add(maPhong);
-
-                    LocalDateTime nhanPhong = rs.getTimestamp("NgayNhanPhong").toLocalDateTime();
-                    LocalDateTime traPhong = rs.getTimestamp("NgayTraPhong").toLocalDateTime();
-                    LocalDateTime now = LocalDateTime.now();
-
-                    if (traPhong.isBefore(nhanPhong)) {
-                        JOptionPane.showMessageDialog(null, "❌ Ngày trả phòng phải sau ngày nhận phòng (phòng " + maPhong + ")");
+                    if (nhanPhongTimestamp == null || traPhongTimestamp == null || henTraTimestamp == null) {
+                        JOptionPane.showMessageDialog(null, 
+                            "❌ Đặt phòng không hợp lệ (phòng " + maPhong + "): Một hoặc nhiều cột thời gian (NgayNhanPhong, NgayTraPhong, NgayHen) là NULL.",
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
                         continue;
                     }
 
-                    // Lấy giá phòng từ loại phòng
-                    String sqlLoaiPhong = """
-                        SELECT lp.GiaLoai
-                        FROM c2_phong p
-                        JOIN c1_loaiphong lp ON p.MaLoai = lp.MaLoai
-                        WHERE p.MaPhong = ?;
-                    """;
+                    LocalDateTime nhanPhong = nhanPhongTimestamp.toLocalDateTime();
+                    LocalDateTime traPhong = traPhongTimestamp.toLocalDateTime();
+                    LocalDateTime henTra = henTraTimestamp.toLocalDateTime();
+                    LocalDateTime now = LocalDateTime.now();
 
-                    try (PreparedStatement psLoaiPhong = conn.prepareStatement(sqlLoaiPhong)) {
-                        psLoaiPhong.setString(1, maPhong);
-                        try (ResultSet rsLoaiPhong = psLoaiPhong.executeQuery()) {
-                            if (rsLoaiPhong.next()) {
-                                tienPhong = rsLoaiPhong.getDouble("GiaLoai");
-                            }
-                        }
+                    // Kiểm tra tính hợp lệ thời gian
+                    if (!isValidBooking(nhanPhong, traPhong, henTra)) {
+                        JOptionPane.showMessageDialog(null, 
+                            "❌ Đặt phòng không hợp lệ (phòng " + maPhong + "): Ngày trả phòng phải sau ngày nhận phòng và trước hạn trả.",
+                            "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        continue;
                     }
 
-                    // Logic xử lý đặt trực tiếp
+                    // Kiểm tra xung đột đặt phòng
+                    if (hasBookingConflict(conn, maPhong, nhanPhong, traPhong, maDatPhong)) {
+                        JOptionPane.showMessageDialog(null, "❌ Xung đột đặt phòng cho phòng " + maPhong, "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        continue;
+                    }
+
+                    // Tính tiền phòng (dùng để tính tiền phạt)
+                    double tienPhong = calculateRoomPrice(conn, maPhong, nhanPhong, traPhong);
+                    double tienPhat = calculateLateFee(tienPhong, traPhong, henTra, now);
+
+                    String newTinhTrangPhong = "Trống";
+                    String newTinhTrangKhach = "Đã rời";
+                    String newTinhTrangDat = tinhTrangDat;
+                    String tinhTrangPhong = rs.getString("TinhTrangPhong");
+                    // Logic đặt trực tiếp
                     if ("Đặt trực tiếp".equalsIgnoreCase(cachDat)) {
-                        if ("Đang sử dụng".equalsIgnoreCase(tinhTrangDat)) {
-                            newTinhTrangPhong = "Đang sử dụng";
-                            newTinhTrangKhach = "Đang ở";
-                        } else if ("Quá hạn".equalsIgnoreCase(tinhTrangDat)) {
-                            if (now.isAfter(traPhong.plusMinutes(30))) {
-                                long minutesLate = Duration.between(traPhong.plusMinutes(30), now).toMinutes();
-                                tienPhat = tienPhong * 0.3 * (minutesLate / 120.0);
-                                String updateTienPhatSql = "UPDATE c3_datphong SET TienPhat = ? WHERE MaDatPhong = ?";
-                                try (PreparedStatement updateTienPhat = conn.prepareStatement(updateTienPhatSql)) {
-                                    updateTienPhat.setDouble(1, tienPhat);
-                                    updateTienPhat.setString(2, maDatPhong);
-                                    updateTienPhat.executeUpdate();
+                        System.out.println("Đặt trực tiếp");
+                        switch (tinhTrangDat) {
+                            case "Đang sử dụng":
+                                newTinhTrangPhong = "Đang sử dụng";
+                                newTinhTrangKhach = "Đang ở";
+                                break;
+                            case "Quá hạn":
+                                if (traPhong.isAfter(henTra.plusMinutes(30))) {
+                                    newTinhTrangPhong = "Trống";
+                                    newTinhTrangKhach = "Đã rời";
+                                    updateTienPhat(conn, maDatPhong, tienPhat);
+                                    System.out.println("Đã tính tiền phạt cho đặt phòng " + maDatPhong);
+                                } else {
+                                    newTinhTrangPhong = "Đang sử dụng";
+                                    newTinhTrangKhach = "Đang ở";
                                 }
-                                newTinhTrangKhach= "Đang ở";
-                                System.out.println("✔ Đã cập nhật tiền phạt cho đặt phòng " + maDatPhong + ": " + tienPhat);
-                            }
-                        } else if ("Đang đợi".equalsIgnoreCase(tinhTrangDat)) {
-                            JOptionPane.showMessageDialog(null, "⚠ Đặt trực tiếp không thể ở trạng thái Đang đợi (phòng " + maPhong + ")");
-                            continue;
+                                break;
+                            case "Đang đợi":
+                                JOptionPane.showMessageDialog(null, 
+                                    "⚠ Đặt trực tiếp không thể có trạng thái 'Đang đợi' (phòng " + maPhong + ")", 
+                                    "Lỗi", JOptionPane.WARNING_MESSAGE);
+                                continue;
+                            case "Đã trả":
+                            case "Hủy":
+                                newTinhTrangPhong = "Trống";
+                                newTinhTrangKhach = "Đã rời";
+                                break;
+                            default:
+                            System.out.println("Trạng thái không xác định: " + tinhTrangDat);
                         }
                     }
 
                     // Logic đặt online
-                    else if ("Đặt online".equalsIgnoreCase(cachDat)) {
-                        if ("Quá hạn".equalsIgnoreCase(tinhTrangDat)) {
-                            if (now.isAfter(traPhong.plusMinutes(30))) {
+                    if ("Đặt online".equalsIgnoreCase(cachDat)) {
+                        switch (tinhTrangDat) {
+                            case "Đang đợi":
+                                LocalDateTime thoiGianHuy = nhanPhong.minusHours(5);
+                                if (now.isBefore(thoiGianHuy)) {
+                                    newTinhTrangPhong = "Trống";
+                                    newTinhTrangKhach = "Đã rời";
+                                } else if (now.isBefore(nhanPhong)) {
+                                    newTinhTrangPhong = "Đã đặt";
+                                    newTinhTrangKhach = "Đã đặt";
+                                } else if (now.isAfter(nhanPhong) && now.isBefore(henTra)) {
+                                    newTinhTrangDat = "Đang sử dụng";
+                                    newTinhTrangPhong = "Đang sử dụng";
+                                    newTinhTrangKhach = "Đang ở";
+                                } else if (now.isAfter(henTra)) {
+                                    newTinhTrangDat = "Quá hạn";
+                                    newTinhTrangPhong = "Trống";
+                                    newTinhTrangKhach = "Đã rời";
+                                    updateTienPhat(conn, maDatPhong, tienPhat);
+                                }
+                                break;
+                            case "Đang sử dụng":
+                                if (now.isAfter(henTra)) {
+                                    newTinhTrangDat = "Quá hạn";
+                                    newTinhTrangPhong = "Trống";
+                                    newTinhTrangKhach = "Đã rời";
+                                    updateTienPhat(conn, maDatPhong, tienPhat);
+                                } else {
+                                    newTinhTrangPhong = "Đang sử dụng";
+                                    newTinhTrangKhach = "Đang ở";
+                                }
+                                break;
+                            case "Quá hạn":
                                 newTinhTrangPhong = "Trống";
                                 newTinhTrangKhach = "Đã rời";
-                            }
-                        } else if ("Đang sử dụng".equalsIgnoreCase(tinhTrangDat)) {
-                            LocalDateTime before12h = nhanPhong.plusHours(12);
-                            if (now.isAfter(before12h)) {
+                                updateTienPhat(conn, maDatPhong, tienPhat);
+                                break;
+                            case "Đã trả":
+                            case "Hủy":
                                 newTinhTrangPhong = "Trống";
                                 newTinhTrangKhach = "Đã rời";
-                            } else {
-                                newTinhTrangPhong = "Đã đặt";
-                                newTinhTrangKhach = "Đang ở";
-                            }
-                        } else if ("Đang đợi".equalsIgnoreCase(tinhTrangDat)) {
-                            LocalDateTime before12h = nhanPhong.minusHours(12);
-                            if (now.isBefore(before12h)) {
-                                newTinhTrangPhong = "Trống";
-                                newTinhTrangKhach = "Đã rời";
-                            } else {
-                                newTinhTrangPhong = "Đã đặt";
-                                newTinhTrangKhach = "Đang ở";
-                            }
+                                break;
                         }
                     }
 
-                    if ("Đã trả".equalsIgnoreCase(tinhTrangDat)) {
-                        newTinhTrangPhong = "Trống";
-                        newTinhTrangKhach = "Đã rời";
-                    }
+                    // Cập nhật trạng thái
+                    updatePhongStatus(conn, maPhong, newTinhTrangPhong);
+                    updateKhachStatus(conn, maKhachHang, newTinhTrangKhach);
+                    updateDatPhongStatus(conn, maDatPhong, newTinhTrangDat);
 
-                    // Cập nhật phòng
-                    try (PreparedStatement updatePhong = conn.prepareStatement("UPDATE c2_phong SET TinhTrangPhong = ? WHERE MaPhong = ?")) {
-                        updatePhong.setString(1, newTinhTrangPhong);
-                        updatePhong.setString(2, maPhong);
-                        updatePhong.executeUpdate();
-                    }
-
-                    // Cập nhật khách
-                    try (PreparedStatement updateKhach = conn.prepareStatement("UPDATE a1_khachhang SET TinhTrangKhach = ? WHERE MaKhachHang = ?")) {
-                        updateKhach.setString(1, newTinhTrangKhach);
-                        updateKhach.setString(2, maKhachHang);
-                        updateKhach.executeUpdate();
-                    }
+                    phongDaXuLy.add(maPhong);
+                    khachDat.add(maKhachHang);
                 }
             }
 
-            // Cập nhật phòng không nằm trong danh sách đặt → Trống
-            String sqlAllPhong = "SELECT MaPhong FROM c2_phong";
-            try (PreparedStatement psAll = conn.prepareStatement(sqlAllPhong);
-                 ResultSet rsAll = psAll.executeQuery()) {
-                while (rsAll.next()) {
-                    String maPhong = rsAll.getString("MaPhong");
+            // Cập nhật trạng thái mặc định cho phòng không được xử lý
+            try (PreparedStatement ps = conn.prepareStatement("SELECT MaPhong FROM c2_phong");
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String maPhong = rs.getString("MaPhong");
                     if (!phongDaXuLy.contains(maPhong)) {
-                        try (PreparedStatement updatePhong = conn.prepareStatement(
-                                "UPDATE c2_phong SET TinhTrangPhong = 'Trống' WHERE MaPhong = ?")) {
-                            updatePhong.setString(1, maPhong);
-                            updatePhong.executeUpdate();
-                        }
+                        updatePhongStatus(conn, maPhong, "Trống");
                     }
                 }
             }
 
-            // Cập nhật khách không có đơn đặt phòng → Đã rời
-            String sqlAllKhach = "SELECT MaKhachHang FROM a1_khachhang";
-            Set<String> khachDaXuLy = new HashSet<>();
-            try (PreparedStatement psDat = conn.prepareStatement("SELECT DISTINCT MaKhachHang FROM c3_datphong");
-                 ResultSet rsDat = psDat.executeQuery()) {
-                while (rsDat.next()) {
-                    khachDaXuLy.add(rsDat.getString("MaKhachHang"));
-                }
-            }
-
-            try (PreparedStatement psAllKhach = conn.prepareStatement(sqlAllKhach);
-                 ResultSet rsAllKhach = psAllKhach.executeQuery()) {
-                while (rsAllKhach.next()) {
-                    String maKhach = rsAllKhach.getString("MaKhachHang");
-                    if (!khachDaXuLy.contains(maKhach)) {
-                        try (PreparedStatement updateKhach = conn.prepareStatement(
-                                "UPDATE a1_khachhang SET TinhTrangKhach = 'Đã rời' WHERE MaKhachHang = ?")) {
-                            updateKhach.setString(1, maKhach);
-                            updateKhach.executeUpdate();
-                        }
+            // Cập nhật trạng thái mặc định cho khách không có đặt phòng
+            try (PreparedStatement ps = conn.prepareStatement("SELECT MaKhachHang FROM a1_khachhang");
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String maKhach = rs.getString("MaKhachHang");
+                    if (!khachDat.contains(maKhach)) {
+                        updateKhachStatus(conn, maKhach, "Đã rời");
                     }
                 }
             }
+            //Cập nhật lại data datphong 
+            TableDataResult result = ApiClient.getTableData("c3_datphong");
+            if (result == null || result.data == null) {
+                JOptionPane.showMessageDialog(null, "Không thể lấy dữ liệu từ server", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+    }
+
+    // Kiểm tra tính hợp lệ của thời gian đặt phòng
+    private boolean isValidBooking(LocalDateTime nhanPhong, LocalDateTime traPhong, LocalDateTime henTra) {
+        return nhanPhong.isBefore(henTra) && traPhong.isAfter(nhanPhong);
+    }
+
+    // Kiểm tra xung đột đặt phòng
+    private boolean hasBookingConflict(Connection conn, String maPhong, LocalDateTime nhanPhong, LocalDateTime traPhong, String maDatPhong) throws SQLException {
+        String sql = """
+            SELECT MaDatPhong
+            FROM c3_datphong
+            WHERE MaPhong = ? AND TinhTrang NOT IN ('Đã trả')
+            AND (NgayNhanPhong <= ? AND NgayTraPhong >= ?)
+            AND MaDatPhong != ?
+        """;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, maPhong);
+            ps.setTimestamp(2, Timestamp.valueOf(traPhong));
+            ps.setTimestamp(3, Timestamp.valueOf(nhanPhong));
+            ps.setString(4, maDatPhong);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    // Tính tiền phòng (dùng để tính tiền phạt)
+    private double calculateRoomPrice(Connection conn, String maPhong, LocalDateTime nhanPhong, LocalDateTime traPhong) throws SQLException {
+        String sql = """
+            SELECT lp.GiaLoai
+            FROM c2_phong p
+            JOIN c1_loaiphong lp ON p.MaLoai = lp.MaLoai
+            WHERE p.MaPhong = ?
+        """;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, maPhong);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    double giaLoai = rs.getDouble("GiaLoai");
+                    long hoursUsed = Duration.between(nhanPhong, traPhong).toHours();
+                    return giaLoai * hoursUsed;
+                }
+            }
+        }
+        JOptionPane.showMessageDialog(null, "⚠ Không tìm thấy giá loại phòng cho phòng " + maPhong, "Lỗi", JOptionPane.WARNING_MESSAGE);
+        return 0;
+    }
+
+    // Tính tiền phạt
+    private double calculateLateFee(double tienPhong, LocalDateTime traPhong, LocalDateTime henTra, LocalDateTime now) {
+        LocalDateTime chophep = henTra.plusMinutes(30);
+        if (now.isAfter(chophep)) {
+            long minutesLate = Duration.between(chophep, traPhong).toMinutes();
+            long hoursLate = minutesLate / 60;
+            return tienPhong * 0.3 * hoursLate;
+        }
+        return 0;
+    }
+
+    // Cập nhật tiền phạt
+    private void updateTienPhat(Connection conn, String maDatPhong, double tienPhat) throws SQLException {
+        String sql = "UPDATE c3_datphong SET TienPhat = ? WHERE MaDatPhong = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, tienPhat);
+            ps.setString(2, maDatPhong);
+            ps.executeUpdate();
+        }
+    }
+
+    // Cập nhật trạng thái phòng
+    private void updatePhongStatus(Connection conn, String maPhong, String tinhTrangPhong) throws SQLException {
+        String sql = "UPDATE c2_phong SET TinhTrangPhong = ? WHERE MaPhong = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, tinhTrangPhong);
+            ps.setString(2, maPhong);
+            ps.executeUpdate();
+        }
+    }
+
+    // Cập nhật trạng thái khách
+    private void updateKhachStatus(Connection conn, String maKhachHang, String tinhTrangKhach) throws SQLException {
+        String sql = "UPDATE a1_khachhang SET TinhTrangKhach = ? WHERE MaKhachHang = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, tinhTrangKhach);
+            ps.setString(2, maKhachHang);
+            ps.executeUpdate();
+        }
+    }
+
+    // Cập nhật trạng thái đặt phòng
+    private void updateDatPhongStatus(Connection conn, String maDatPhong, String tinhTrangDat) throws SQLException {
+        String sql = "UPDATE c3_datphong SET TinhTrang = ? WHERE MaDatPhong = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, tinhTrangDat);
+            ps.setString(2, maDatPhong);
+            ps.executeUpdate();
         }
     }
 }

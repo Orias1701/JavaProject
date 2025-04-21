@@ -3,7 +3,6 @@
 int thuc;
 int nhanphongtemp=nhanphong 
 int ao=nhanphong-5h 
-int tienphat=0; 
 class loaiphong{
 	string maloai;
 	int gia
@@ -20,20 +19,18 @@ class phong {
 
 class datphong {
 	string maphong, makhachhang;
-	int nhanphong, traphong,tienphat;
+	int nhanphong, traphong,tienphat,tienphat,hentra;
 	cachdat[2]={'online',truc tiep};
 	ttdat[4]={'dang su dung','qua han','dang doi','da tra'}; 
 };
 void int tienphong(){
-	for(i:loaiphong.size){
-		if(loaiphong.maloai==phong.maloai){
+		if(loaiphong.maloai==phong.maloai&&phong.maphong==datphong.maphong){
 			tienphong = loaiphong.gia; 
 		} 
-	} 
 	return tienphong 
 } 
 void int biphat{
-	int chophep=thuc+30p;
+	int chophep=hentra+30p;
 	if (traphong > chophep) {
     int soGioMuon = (traphong - chophep) / 60; 
     tienphat = tienphong*0,3*sogiomuon; //tãng 30% moi gio 
@@ -49,7 +46,7 @@ bool dattructiep{
 	}
 }
 bool hople{
-	if(nhanphong<traphong||(datphong.ttdat='dangdoi'&&datphong.cachdat='online'&&traphong<nhanphongtemp)){
+	if(nhanphong<hentra||(datphong.ttdat='dangdoi'&&datphong.cachdat='online'&&traphong<nhanphongtemp)){
 		return true; 
 	}
 } 
@@ -84,7 +81,7 @@ void khachdadat{
 	} 
 } 
 // MAIN
-ttdat[4]={'dang su dung','qua han','dang doi','da tra'}; 
+//ttdat[4]={'dang su dung','qua han','dang doi','da tra'}; 
 int main {
 	if(hople){
 		if(datphong.cachdat='truc tiep'){
@@ -121,12 +118,15 @@ int main {
 						khachroi
 						datphong.ttdat='qua han'
 					} 
+					break; 
 				case 'dang su dung':
 					khachdango;
 					phongsudung; 
+					break; 
 				case'qua han':
 					khachroi
 					phongtrong 
+					break; 
 			} 
 		} 
 	} 
