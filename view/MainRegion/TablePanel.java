@@ -19,7 +19,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     private String tableComment;
     private java.util.List<String> columnNames;
     private java.util.List<String> columnComments;
-    private java.util.List<String> columnTypes;
+    private java.util.List<String> columnTypes; // Danh sách kiểu dữ liệu cột
     private FormDialogHandler formDialogHandler;
     private TableView tableView;
     private GridView gridView;
@@ -28,18 +28,15 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     public TablePanel(ContentPanel parent) {
         this.parent = parent;
         setLayout(new BorderLayout());
-        tableView = new TableView();
-        // Initialize views
+        tableView = new TableView(this);
         gridView = new GridView(this);
         currentView = tableView.getView();
 
-        // Initialize JScrollPane
         scrollPane = new JScrollPane(currentView);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setOpaque(false);
 
-        // Customize scrollbar
         JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
         verticalScrollBar.setUI(new Style.CustomScrollBarUI());
         verticalScrollBar.setPreferredSize(new Dimension(13, Integer.MAX_VALUE));
@@ -73,23 +70,27 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     }
 
     @Override
-    public void updateTableData(java.util.List<java.util.Map<String, String>> data, java.util.Map<String, String> columnCommentsMap, java.util.Map<String, String> columnTypesMap,String keyColumn, String tableName, String tableComment) {
+    public void updateTableData(java.util.List<java.util.Map<String, String>> data, java.util.Map<String, String> columnCommentsMap, java.util.Map<String, String> columnTypesMap, String keyColumn, String tableName, String tableComment) {
         this.keyColumn = keyColumn;
         this.tableName = tableName;
         this.tableComment = tableComment;
         this.columnNames = data != null && !data.isEmpty() ? new java.util.ArrayList<>(data.get(0).keySet()) : null;
         this.columnComments = new java.util.ArrayList<>();
-        
+        this.columnTypes = new java.util.ArrayList<>();
+
         if (columnNames != null) {
             for (String columnName : columnNames) {
                 String comment = columnCommentsMap != null ? columnCommentsMap.getOrDefault(columnName, columnName) : columnName;
+                String type = columnTypesMap != null ? columnTypesMap.getOrDefault(columnName, "unknown") : "unknown";
                 this.columnComments.add(comment);
+                this.columnTypes.add(type);
             }
         }
         
         LogHandler.logInfo("Khóa chính TablePanel: " + keyColumn);
         LogHandler.logInfo("Tên bảng TablePanel: " + tableName);
         LogHandler.logInfo("Chú thích bảng TablePanel: " + tableComment);
+        LogHandler.logInfo("Kiểu dữ liệu cột: " + columnTypes);
 
         boolean canAdd = UserSession.hasPermission(tableName, "10");
         boolean canEdit = UserSession.hasPermission(tableName, "20");
@@ -146,9 +147,10 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         return columnComments;
     }
 
-    public java.util.List<String> getColumnTypes(){
+    public java.util.List<String> getColumnTypes() {
         return columnTypes;
     }
+
     public JTable getTable() {
         return tableView.getTable();
     }
