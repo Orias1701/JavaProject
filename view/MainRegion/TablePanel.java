@@ -82,7 +82,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         updateTableData(data, columnCommentsMap, columnTypesMap, keyColumn, new ArrayList<>(), tableName, tableComment);
     }
 
-    // Phương thức nạp chồng mới với primaryKeyColumns (không có @Override)
+    // Phương thức nạp chồng mới với primaryKeyColumns
     public void updateTableData(List<Map<String, String>> data, Map<String, String> columnCommentsMap, 
                                Map<String, String> columnTypesMap, String keyColumn, List<String> primaryKeyColumns, 
                                String tableName, String tableComment) {
@@ -117,10 +117,9 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         // Tạo FormDialogHandler mới để đồng bộ với bảng hiện tại
         this.formDialogHandler = new FormDialogPanel(this);
 
-        // Cập nhật TableView và GridView (tạm thời dùng chữ ký hiện tại, cần cập nhật sau)
-        // TODO: Cập nhật TableView.java và GridView.java để chấp nhận primaryKeyColumns
-        tableView.updateView(data, columnNames, columnComments, formDialogHandler, canAdd, canEdit, canDelete);
-        gridView.updateView(data, columnNames, columnComments, columnTypes, formDialogHandler, canAdd, canEdit, canDelete);
+        // Cập nhật TableView và GridView với primaryKeyColumns
+        tableView.updateView(data, columnNames, columnComments, primaryKeyColumns, formDialogHandler, canAdd, canEdit, canDelete);
+        gridView.updateView(data, columnNames, columnComments, columnTypes, primaryKeyColumns, formDialogHandler, canAdd, canEdit, canDelete);
 
         // Hiển thị view đúng
         if (isButtonView) {

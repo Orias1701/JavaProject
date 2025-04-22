@@ -23,7 +23,7 @@ public class FormDialogPanel implements FormDialogHandler {
     @Override
     public void showFormDialog(String actionType, int rowIndex) {
         // Kiểm tra điều kiện đầu vào để tránh lỗi logic
-        if (tablePanel.getKeyColumn() == null || tablePanel.getKeyColumn().isEmpty()) {
+        if (tablePanel.getPrimaryKeyColumns() == null || tablePanel.getPrimaryKeyColumns().isEmpty()) {
             JOptionPane.showMessageDialog(tablePanel, "Không tìm thấy khóa chính của bảng", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -31,9 +31,11 @@ public class FormDialogPanel implements FormDialogHandler {
             JOptionPane.showMessageDialog(tablePanel, "Không xác định được tên bảng", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (!tablePanel.getColumnNames().contains(tablePanel.getKeyColumn())) {
-            JOptionPane.showMessageDialog(tablePanel, "Khóa chính không khớp với các cột của bảng", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
+        for (String keyCol : tablePanel.getPrimaryKeyColumns()) {
+            if (!tablePanel.getColumnNames().contains(keyCol)) {
+                JOptionPane.showMessageDialog(tablePanel, "Khóa chính '" + keyCol + "' không khớp với các cột của bảng", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
         if (!actionType.equals("add") && !actionType.equals("detail") && (rowIndex < 0 || rowIndex >= tablePanel.getTable().getRowCount())) {
             JOptionPane.showMessageDialog(tablePanel, "Hàng được chọn không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -113,7 +115,7 @@ public class FormDialogPanel implements FormDialogHandler {
             field.setText(value);
 
             // Chỉ cho phép chỉnh sửa khi là add, edit hoặc all
-            if (actionType.equals("delete") || actionType.equals("detail") || (col.equals(tablePanel.getKeyColumn()) && !actionType.equals("add"))) {
+            if (actionType.equals("delete") || actionType.equals("detail") || (tablePanel.getPrimaryKeyColumns().contains(col) && !actionType.equals("add"))) {
                 field.setEditable(false);
                 field.setForeground(Style.ACT_CL);
                 field.setBackground(Style.LIGHT_CL);
@@ -146,43 +148,60 @@ public class FormDialogPanel implements FormDialogHandler {
 
             confirmButton.addActionListener(e -> {
                 // Kiểm tra dữ liệu đầu vào
+                Map<String, Object> rowData = new HashMap<>();
+                java.util.List<String> primaryKeyColumns = tablePanel.getPrimaryKeyColumns();
+                java.util.List<String> emptyNonKeyColumns = new ArrayList<>();
+
                 for (String col : tablePanel.getColumnNames()) {
-                    String value = inputFields.get(col).getText();
+                    String value = inputFields.get(col).getText().trim();
                     int colIndex = tablePanel.getColumnNames().indexOf(col);
                     String type = tablePanel.getColumnTypes().get(colIndex);
-                    if (value.isEmpty()) {
-                        JOptionPane.showMessageDialog(dialog, "Vui lòng điền đầy đủ thông tin", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    String comment = tablePanel.getColumnComments().get(colIndex);
+
+                    // Kiểm tra cột khóa chính
+                    if (primaryKeyColumns.contains(col) && value.isEmpty()) {
+                        JOptionPane.showMessageDialog(dialog, "Cột khóa chính '" + comment + "' không được để trống", "Lỗi", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    // Kiểm tra email hợp lệ
-                    if (col.toLowerCase().contains("email") && !value.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-                        JOptionPane.showMessageDialog(dialog, "Email không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                        return;
+
+                    // Kiểm tra các cột không phải khóa chính
+                    if (!primaryKeyColumns.contains(col) && value.isEmpty()) {
+                        emptyNonKeyColumns.add(comment);
+                    } else {
+                        // Kiểm tra email hợp lệ
+                        if (col.toLowerCase().contains("email") && !value.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                            JOptionPane.showMessageDialog(dialog, "Email không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
+                        // Kiểm tra decimal hợp lệ
+                        if (type.equalsIgnoreCase("decimal") && !value.isEmpty() && !value.matches("-?\\d+(\\.\\d+)?")) {
+                            JOptionPane.showMessageDialog(dialog, "Giá trị '" + comment + "' không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            return;
+                        }
                     }
-                    // Kiểm tra decimal hợp lệ
-                    if (type.equalsIgnoreCase("decimal") && !value.matches("-?\\d+(\\.\\d+)?")) {
-                        JOptionPane.showMessageDialog(dialog, "Giá trị " + tablePanel.getColumnComments().get(colIndex) + " không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+
+                    rowData.put(col, value);
+                }
+
+                // Nếu có cột không phải khóa chính trống, hỏi xác nhận
+                if (!emptyNonKeyColumns.isEmpty()) {
+                    String message = "Các cột sau đang trống: " + String.join(", ", emptyNonKeyColumns) + "\nBạn có muốn tiếp tục lưu dữ liệu?";
+                    int choice = JOptionPane.showConfirmDialog(dialog, message, "Xác nhận", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    if (choice != JOptionPane.YES_OPTION) {
                         return;
                     }
                 }
 
-                String keyValue = inputFields.get(tablePanel.getKeyColumn()).getText();
-                LogHandler.logInfo("showFormDialog: actionType=" + actionType + ", keyColumn=" + tablePanel.getKeyColumn() + ", keyValue=" + keyValue);
-
                 try {
-                    Map<String, Object> rowData = new HashMap<>();
-                    for (String col : tablePanel.getColumnNames()) {
-                        String value = inputFields.get(col).getText();
-                        // int colIndex = tablePanel.getColumnNames().indexOf(col);
-                        // String type = tablePanel.getColumnTypes().get(colIndex);
-                        // Không cần loại bỏ dấu phẩy vì giá trị đã là chuỗi số hợp lệ
-                        rowData.put(col, value);
-                    }
                     ApiResponse response;
                     if (actionType.equals("add")) {
                         response = MainCtrl.addRow(tablePanel.getTableName(), rowData);
                     } else {
-                        response = MainCtrl.updateRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue, rowData);
+                        Map<String, String> keyValues = new HashMap<>();
+                        for (String keyCol : primaryKeyColumns) {
+                            keyValues.put(keyCol, inputFields.get(keyCol).getText().trim());
+                        }
+                        response = MainCtrl.updateRow(tablePanel.getTableName(), primaryKeyColumns, keyValues, rowData);
                     }
                     if (response.isSuccess()) {
                         JOptionPane.showMessageDialog(dialog, actionType.equals("add") ? "Thêm dữ liệu thành công" : "Cập nhật dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
@@ -204,13 +223,19 @@ public class FormDialogPanel implements FormDialogHandler {
             confirmButton.setPreferredSize(new Dimension(100, 40));
 
             confirmButton.addActionListener(e -> {
-                String keyValue = inputFields.get(tablePanel.getKeyColumn()).getText();
-                int confirm = JOptionPane.showConfirmDialog(dialog,
-                        "Bạn có chắc chắn muốn xóa " + tablePanel.getKeyColumn() + ": " + keyValue + "?",
-                        "Xác nhận", JOptionPane.YES_NO_OPTION);
+                java.util.List<String> primaryKeyColumns = tablePanel.getPrimaryKeyColumns();
+                Map<String, String> keyValues = new HashMap<>();
+                StringBuilder confirmMessage = new StringBuilder("Bạn có chắc chắn muốn xóa hàng với: ");
+                for (String keyCol : primaryKeyColumns) {
+                    String keyValue = inputFields.get(keyCol).getText().trim();
+                    keyValues.put(keyCol, keyValue);
+                    confirmMessage.append(keyCol).append(": ").append(keyValue).append("; ");
+                }
+                confirmMessage.append("?");
+                int confirm = JOptionPane.showConfirmDialog(dialog, confirmMessage.toString(), "Xác nhận", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     try {
-                        ApiResponse response = MainCtrl.deleteRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue);
+                        ApiResponse response = MainCtrl.deleteRow(tablePanel.getTableName(), primaryKeyColumns, keyValues);
                         if (response.isSuccess()) {
                             JOptionPane.showMessageDialog(dialog, "Xóa dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                             tablePanel.refreshTable();
@@ -235,13 +260,19 @@ public class FormDialogPanel implements FormDialogHandler {
             deleteButton.setForeground(Color.WHITE);
             deleteButton.setPreferredSize(new Dimension(100, 40));
             deleteButton.addActionListener(e -> {
-                String keyValue = inputFields.get(tablePanel.getKeyColumn()).getText();
-                int confirm = JOptionPane.showConfirmDialog(dialog,
-                        "Bạn có chắc chắn muốn xóa " + tablePanel.getKeyColumn() + ": " + keyValue + "?",
-                        "Xác nhận", JOptionPane.YES_NO_OPTION);
+                java.util.List<String> primaryKeyColumns = tablePanel.getPrimaryKeyColumns();
+                Map<String, String> keyValues = new HashMap<>();
+                StringBuilder confirmMessage = new StringBuilder("Bạn có chắc chắn muốn xóa hàng với: ");
+                for (String keyCol : primaryKeyColumns) {
+                    String keyValue = inputFields.get(keyCol).getText().trim();
+                    keyValues.put(keyCol, keyValue);
+                    confirmMessage.append(keyCol).append(": ").append(keyValue).append("; ");
+                }
+                confirmMessage.append("?");
+                int confirm = JOptionPane.showConfirmDialog(dialog, confirmMessage.toString(), "Xác nhận", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     try {
-                        ApiResponse response = MainCtrl.deleteRow(tablePanel.getTableName(), tablePanel.getKeyColumn(), keyValue);
+                        ApiResponse response = MainCtrl.deleteRow(tablePanel.getTableName(), primaryKeyColumns, keyValues);
                         if (response.isSuccess()) {
                             JOptionPane.showMessageDialog(dialog, "Xóa dữ liệu thành công", "Thành công", JOptionPane.INFORMATION_MESSAGE);
                             tablePanel.refreshTable();

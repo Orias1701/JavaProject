@@ -147,7 +147,7 @@ public class TableView {
      * Cập nhật dữ liệu cho bảng từ danh sách Map (key là tên cột, value là giá trị),
      * thêm nút Sửa/Xóa/Chi tiết tùy theo quyền.
      */
-    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
+    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, List<String> primaryKeyColumns, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
         tableModel.setRowCount(0);
         tableModel.setColumnCount(0);
 
@@ -187,7 +187,7 @@ public class TableView {
         if (canEdit) {
             editButton.setCellEditor(new ButtonEditor(new JCheckBox(), "edit", formDialogHandler));
         } else {
-            editButton.setCellEditor(new ButtonEditor(new JCheckBox(), "detail",formDialogHandler));
+            editButton.setCellEditor(new ButtonEditor(new JCheckBox(), "detail", formDialogHandler));
         }
         editButton.setPreferredWidth(canEdit ? 70 : 120);
         editButton.setMaxWidth(canEdit ? 70 : 120);

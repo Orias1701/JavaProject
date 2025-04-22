@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,18 +39,50 @@ public class TableDataHandler extends BaseHandler implements TableDataInterface 
                     operations.handlePost(exchange, conn, pathParts[0]);
                     break;
                 case "PUT":
-                    if (pathParts.length < 2) {
-                        sendResponse(exchange, 400, "Yêu cầu không hợp lệ: Thiếu giá trị khóa chính");
-                        return;
+                    if (pathParts.length >= 3 && "composite".equals(pathParts[1])) {
+                        // Xử lý PUT với nhiều khóa chính
+                        if ((pathParts.length - 2) % 2 != 0) {
+                            sendResponse(exchange, 400, "Yêu cầu không hợp lệ: Số lượng tham số khóa chính không hợp lệ");
+                            return;
+                        }
+                        List<String> primaryKeyColumns = new ArrayList<>();
+                        Map<String, String> keyValues = new HashMap<>();
+                        for (int i = 2; i < pathParts.length; i += 2) {
+                            primaryKeyColumns.add(pathParts[i]);
+                            if (i + 1 < pathParts.length) {
+                                keyValues.put(pathParts[i], pathParts[i + 1]);
+                            }
+                        }
+                        operations.handlePut(exchange, conn, pathParts[0], primaryKeyColumns, keyValues);
+                    } else if (pathParts.length == 2) {
+                        // Xử lý PUT với khóa chính đơn
+                        operations.handlePut(exchange, conn, pathParts[0], pathParts[1]);
+                    } else {
+                        sendResponse(exchange, 400, "Yêu cầu không hợp lệ: Định dạng đường dẫn không đúng");
                     }
-                    operations.handlePut(exchange, conn, pathParts[0], pathParts[1]);
                     break;
                 case "DELETE":
-                    if (pathParts.length < 2) {
-                        sendResponse(exchange, 400, "Yêu cầu không hợp lệ: Thiếu giá trị khóa chính");
-                        return;
+                    if (pathParts.length >= 3 && "composite".equals(pathParts[1])) {
+                        // Xử lý DELETE với nhiều khóa chính
+                        if ((pathParts.length - 2) % 2 != 0) {
+                            sendResponse(exchange, 400, "Yêu cầu không hợp lệ: Số lượng tham số khóa chính không hợp lệ");
+                            return;
+                        }
+                        List<String> primaryKeyColumns = new ArrayList<>();
+                        Map<String, String> keyValues = new HashMap<>();
+                        for (int i = 2; i < pathParts.length; i += 2) {
+                            primaryKeyColumns.add(pathParts[i]);
+                            if (i + 1 < pathParts.length) {
+                                keyValues.put(pathParts[i], pathParts[i + 1]);
+                            }
+                        }
+                        operations.handleDelete(exchange, conn, pathParts[0], primaryKeyColumns, keyValues);
+                    } else if (pathParts.length == 2) {
+                        // Xử lý DELETE với khóa chính đơn
+                        operations.handleDelete(exchange, conn, pathParts[0], pathParts[1]);
+                    } else {
+                        sendResponse(exchange, 400, "Yêu cầu không hợp lệ: Định dạng đường dẫn không đúng");
                     }
-                    operations.handleDelete(exchange, conn, pathParts[0], pathParts[1]);
                     break;
                 default:
                     sendResponse(exchange, 405, "Phương thức không được phép");
@@ -118,7 +151,17 @@ public class TableDataHandler extends BaseHandler implements TableDataInterface 
     }
 
     @Override
+    public void handlePut(HttpExchange exchange, Connection conn, String tableName, List<String> primaryKeyColumns, Map<String, String> keyValues) throws Exception {
+        operations.handlePut(exchange, conn, tableName, primaryKeyColumns, keyValues);
+    }
+
+    @Override
     public void handleDelete(HttpExchange exchange, Connection conn, String tableName, String keyValue) throws Exception {
         operations.handleDelete(exchange, conn, tableName, keyValue);
+    }
+
+    @Override
+    public void handleDelete(HttpExchange exchange, Connection conn, String tableName, List<String> primaryKeyColumns, Map<String, String> keyValues) throws Exception {
+        operations.handleDelete(exchange, conn, tableName, primaryKeyColumns, keyValues);
     }
 }

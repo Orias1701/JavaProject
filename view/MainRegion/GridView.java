@@ -14,6 +14,7 @@ public class GridView {
     private List<String> columnNames; // Lưu tên cột
     private List<String> columnComments; // Lưu chú thích cột
     private List<String> columnTypes; // Lưu kiểu dữ liệu cột
+    private List<String> primaryKeyColumns; // Lưu danh sách khóa chính
     private FormDialogHandler formDialogHandler; // Lưu handler
     private boolean canAdd;
     private boolean canEdit;
@@ -36,7 +37,7 @@ public class GridView {
             @Override
             public void componentResized(java.awt.event.ComponentEvent e) {
                 if (data != null && columnNames != null && columnComments != null && columnTypes != null && formDialogHandler != null) {
-                    updateView(data, columnNames, columnComments, columnTypes, formDialogHandler, canAdd, canEdit, canDelete);
+                    updateView(data, columnNames, columnComments, columnTypes, primaryKeyColumns, formDialogHandler, canAdd, canEdit, canDelete);
                 }
             }
         });
@@ -46,12 +47,13 @@ public class GridView {
         return containerPanel;
     }
 
-    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, List<String> columnTypes, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
+    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, List<String> columnTypes, List perderKeyColumns, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
         // Lưu các tham số để sử dụng khi resize
         this.data = data;
         this.columnNames = columnNames;
         this.columnComments = columnComments;
         this.columnTypes = columnTypes;
+        this.primaryKeyColumns = primaryKeyColumns;
         this.formDialogHandler = formDialogHandler;
         this.canAdd = canAdd;
         this.canEdit = canEdit;

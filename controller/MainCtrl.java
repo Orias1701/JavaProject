@@ -78,12 +78,36 @@ public class MainCtrl {
         return operationsClient.updateRow(tableName, keyColumn, keyValue, data);
     }
 
+    public static ApiClient.ApiResponse updateRow(String tableName, java.util.List<String> primaryKeyColumns, Map<String, String> keyValues, Map<String, Object> data) {
+        if (operationsClient == null) {
+            LogHandler.logError("Không thể thực hiện updateRow: operationsClient là null. Người dùng có thể chưa đăng nhập.");
+            return new ApiClient.ApiResponse(false, "Vui lòng đăng nhập trước khi thực hiện thao tác này");
+        }
+        if (primaryKeyColumns == null || primaryKeyColumns.isEmpty() || keyValues == null || keyValues.isEmpty()) {
+            LogHandler.logError("primaryKeyColumns hoặc keyValues không hợp lệ.");
+            return new ApiClient.ApiResponse(false, "Dữ liệu khóa chính không hợp lệ");
+        }
+        return operationsClient.updateRow(tableName, primaryKeyColumns, keyValues, data);
+    }
+
     public static ApiClient.ApiResponse deleteRow(String tableName, String keyColumn, Object keyValue) {
         if (operationsClient == null) {
             LogHandler.logError("Không thể thực hiện deleteRow: operationsClient là null. Người dùng có thể chưa đăng nhập.");
             return new ApiClient.ApiResponse(false, "Vui lòng đăng nhập trước khi thực hiện thao tác này");
         }
         return operationsClient.deleteRow(tableName, keyColumn, keyValue);
+    }
+
+    public static ApiClient.ApiResponse deleteRow(String tableName, java.util.List<String> primaryKeyColumns, Map<String, String> keyValues) {
+        if (operationsClient == null) {
+            LogHandler.logError("Không thể thực hiện deleteRow: operationsClient là null. Người dùng có thể chưa đăng nhập.");
+            return new ApiClient.ApiResponse(false, "Vui lòng đăng nhập trước khi thực hiện thao tác này");
+        }
+        if (primaryKeyColumns == null || primaryKeyColumns.isEmpty() || keyValues == null || keyValues.isEmpty()) {
+            LogHandler.logError("primaryKeyColumns hoặc keyValues không hợp lệ.");
+            return new ApiClient.ApiResponse(false, "Dữ liệu khóa chính không hợp lệ");
+        }
+        return operationsClient.deleteRow(tableName, primaryKeyColumns, keyValues);
     }
 
     public static void startServer(MainUI mainUI) {
