@@ -120,7 +120,7 @@ public class CheckBill {
                 SELECT 
                     hdc.MaHoaDon, hdc.MaPhong, hdc.MaSDDV, hdc.MaKiemTra, hdc.MaDatPhong,
                     COALESCE(sddv.TongTien, 0) AS TongTienSDDV,
-                    DATEDIFF(dp.NgayHen, dp.NgayNhanPhong) AS SoNgayThue,
+                    DATEDIFF(dp.NgayTraPhong, dp.NgayNhanPhong) AS SoNgayThue,
                     COALESCE(lp.GiaLoai, 0) AS GiaLoai,
                     COALESCE(dp.TienPhat, 0) AS TienPhat,
                     COALESCE(kt.TongTien, 0) AS TongTienDenBu

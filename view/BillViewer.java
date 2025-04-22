@@ -4,137 +4,152 @@ import java.awt.*;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-public class BillViewer extends JDialog {
-    private JTable table;
-    private JLabel lblMaHD, lblKhachHang, lblNgayLap, lblTongTien;
-    private JButton btnIn, btnDong;
-
-    public BillViewer(Frame parent, Map<String, String> hoaDonInfo, List<Map<String, String>> chiTietHoaDon) {
-        super(parent, "Chi tiết hóa đơn", true);
-        setSize(750, 500);
+public class BillViewer extends JFrame {
+    public BillViewer(Frame parent, Map<String, String> hoaDonInfo, List<Map<String, String>> phongInfo, int soLuongPhong,
+                     Map<String, Object> kiemTraPhongInfo, List<Map<String, String>> dichVuInfo, int soLuongDichVuDaDat) {
+        super("Chi tiết hóa đơn");
+        setSize(800, 600);
         setLocationRelativeTo(parent);
-        setLayout(new BorderLayout(10, 10));
-        getContentPane().setBackground(Color.WHITE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-        // Panel tiêu đề
-        JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(Color.WHITE);
-        JLabel titleLabel = new JLabel("CHI TIẾT HÓA ĐƠN", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        titlePanel.add(titleLabel);
-        add(titlePanel, BorderLayout.NORTH);
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        mainPanel.setBackground(Color.WHITE);
 
-        // Panel thông tin hóa đơn
-        JPanel infoPanel = new JPanel(new GridLayout(4, 2, 15, 5));
-        infoPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
-        infoPanel.setBackground(Color.WHITE);
+        // Phần thông tin hóa đơn (dauhd)
+        JPanel hoaDonPanel = new JPanel(new GridLayout(4, 2, 10, 5));
+        hoaDonPanel.setBackground(Color.WHITE);
+        hoaDonPanel.add(new JLabel("Mã hóa đơn:"));
+        hoaDonPanel.add(new JLabel(hoaDonInfo.getOrDefault("mahoadon", "")));
+        hoaDonPanel.add(new JLabel("Nhân viên:"));
+        hoaDonPanel.add(new JLabel(hoaDonInfo.getOrDefault("tennhanvien", "")));
+        hoaDonPanel.add(new JLabel("Ngày lập:"));
+        hoaDonPanel.add(new JLabel(hoaDonInfo.getOrDefault("ngaylap", "")));
+        hoaDonPanel.add(new JLabel("Tổng tiền:"));
+        hoaDonPanel.add(new JLabel(hoaDonInfo.getOrDefault("tongtien", "")));
 
-        lblMaHD = new JLabel("Mã hóa đơn: " + hoaDonInfo.getOrDefault("mahoadon", "N/A"));
-        lblKhachHang = new JLabel("Khách hàng: " + hoaDonInfo.getOrDefault("tenkhach", "N/A"));
-        lblNgayLap = new JLabel("Ngày lập: " + hoaDonInfo.getOrDefault("ngaylap", "N/A"));
-        lblTongTien = new JLabel("Tổng tiền: " + hoaDonInfo.getOrDefault("tongtien", "0") + " VNĐ");
+        // Phần thông tin phòng (hdphong)
+        JPanel phongPanel = new JPanel(new BorderLayout());
+        phongPanel.setBackground(Color.WHITE);
+        JLabel phongLabel = new JLabel("Số lượng phòng đã đặt: " + soLuongPhong);
+        phongPanel.add(phongLabel, BorderLayout.NORTH);
 
-        lblMaHD.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblKhachHang.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblNgayLap.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        lblTongTien.setFont(new Font("Segoe UI", Font.BOLD, 14));
-
-        infoPanel.add(new JLabel("Mã hóa đơn:", SwingConstants.RIGHT));
-        infoPanel.add(lblMaHD);
-        infoPanel.add(new JLabel("Khách hàng:", SwingConstants.RIGHT));
-        infoPanel.add(lblKhachHang);
-        infoPanel.add(new JLabel("Ngày lập:", SwingConstants.RIGHT));
-        infoPanel.add(lblNgayLap);
-        infoPanel.add(new JLabel("Tổng tiền:", SwingConstants.RIGHT));
-        infoPanel.add(lblTongTien);
-
-        add(infoPanel, BorderLayout.WEST);
-
-        // Bảng chi tiết món
-        String[] columnNames = {"Tên món", "Số lượng", "Đơn giá", "Thành tiền"};
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Tắt chỉnh sửa ô
-            }
-        };
-
-        for (Map<String, String> row : chiTietHoaDon) {
-            model.addRow(new Object[]{
-                row.getOrDefault("tenmon", "N/A"),
-                row.getOrDefault("soluong", "0"),
-                row.getOrDefault("dongia", "0"),
-                row.getOrDefault("thanhtien", "0")
+        DefaultTableModel phongModel = new DefaultTableModel(
+            new String[]{"Mã phòng", "Loại phòng", "Giá phòng", "Ngày nhận", "Ngày trả", "Ngày hẹn", "Tiền phòng", "Tiền phạt", "Tổng tiền"},
+            0
+        );
+        JTable phongTable = new JTable(phongModel);
+        phongTable.setRowHeight(30);
+        for (Map<String, String> row : phongInfo) {
+            phongModel.addRow(new Object[]{
+                row.get("maphong"),
+                row.get("tenloaiphong"),
+                row.get("giaphong"),
+                row.get("ngaynhan"),
+                row.get("ngaytra"),
+                row.get("ngayhen"),
+                row.get("tienphong"),
+                row.get("tienphat"),
+                row.get("tongtienphong")
             });
         }
+        phongPanel.add(new JScrollPane(phongTable), BorderLayout.CENTER);
 
-        table = new JTable(model);
-        table.setRowHeight(28);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        table.setGridColor(Color.LIGHT_GRAY);
-        table.setShowGrid(true);
+        // Phần kiểm tra phòng (ktphong)
+        JPanel kiemTraPanel = new JPanel(new BorderLayout());
+        kiemTraPanel.setBackground(Color.WHITE);
+       // Đoạn cần sửa (dòng 63 trong class gốc)
+String tienDenBu = String.valueOf(kiemTraPhongInfo.get("tiendenbu"));
 
-        // Căn giữa tiêu đề cột
-        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
-        headerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        headerRenderer.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        table.getTableHeader().setDefaultRenderer(headerRenderer);
+        JLabel kiemTraLabel = new JLabel("Tiền đền bù: " + tienDenBu);
+        kiemTraPanel.add(kiemTraLabel, BorderLayout.NORTH);
 
-        // Căn giữa nội dung cột
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        table.setDefaultRenderer(Object.class, centerRenderer);
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(new EmptyBorder(10, 20, 10, 20));
-        add(scrollPane, BorderLayout.CENTER);
-
-        // Panel nút
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
-        buttonPanel.setBackground(Color.WHITE);
-        btnIn = new JButton("In hóa đơn");
-        btnDong = new JButton("Đóng");
-
-        btnIn.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        btnDong.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-
-        btnDong.addActionListener(e -> dispose());
-        btnIn.addActionListener(e -> inHoaDon());
-
-        buttonPanel.add(btnIn);
-        buttonPanel.add(btnDong);
-        add(buttonPanel, BorderLayout.SOUTH);
-    }
-
-    private void inHoaDon() {
-        try {
-            table.print(); // In bảng trực tiếp
-            JOptionPane.showMessageDialog(this, "Đã gửi yêu cầu in hóa đơn!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Lỗi khi in hóa đơn: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        if (!tienDenBu.equals("0")) {
+            DefaultTableModel thietBiModel = new DefaultTableModel(
+                new String[]{"Tên thiết bị", "Tiền đền", "Số lượng hỏng", "Tổng tiền"},
+                0
+            );
+            JTable thietBiTable = new JTable(thietBiModel);
+            thietBiTable.setRowHeight(30);
+            @SuppressWarnings("unchecked")
+            List<Map<String, String>> thietBiHong = (List<Map<String, String>>) kiemTraPhongInfo.get("thietbihong");
+            for (Map<String, String> row : thietBiHong) {
+                thietBiModel.addRow(new Object[]{
+                    row.get("tenthietbi"),
+                    row.get("tienden"),
+                    row.get("soluonghong"),
+                    row.get("tongtienden")
+                });
+            }
+            kiemTraPanel.add(new JScrollPane(thietBiTable), BorderLayout.CENTER);
         }
+
+        // Phần dịch vụ (sddv)
+        JPanel dichVuPanel = new JPanel(new BorderLayout());
+        dichVuPanel.setBackground(Color.WHITE);
+        JLabel dichVuLabel = new JLabel("Số lượng dịch vụ đã đặt: " + soLuongDichVuDaDat);
+        dichVuPanel.add(dichVuLabel, BorderLayout.NORTH);
+
+        DefaultTableModel dichVuModel = new DefaultTableModel(
+            new String[]{"Tên dịch vụ", "Tiền dịch vụ", "Số lượng", "Tổng tiền"},
+            0
+        );
+        JTable dichVuTable = new JTable(dichVuModel);
+        dichVuTable.setRowHeight(30);
+        for (Map<String, String> row : dichVuInfo) {
+            dichVuModel.addRow(new Object[]{
+                row.get("tendichvu"),
+                row.get("tiendichvu"),
+                row.get("soluong"),
+                row.get("tongtiendichvu")
+            });
+        }
+        dichVuPanel.add(new JScrollPane(dichVuTable), BorderLayout.CENTER);
+
+        // Thêm các panel vào tabbed pane
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Thông tin hóa đơn", hoaDonPanel);
+        tabbedPane.addTab("Phòng đã đặt", phongPanel);
+        tabbedPane.addTab("Kiểm tra phòng", kiemTraPanel);
+        tabbedPane.addTab("Dịch vụ sử dụng", dichVuPanel);
+
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
+        add(mainPanel);
     }
-
-    // Test giao diện
     public static void main(String[] args) {
+        // Test the BillViewer class
         Map<String, String> hoaDonInfo = Map.of(
-                "mahoadon", "HD001",
-                "tenkhach", "Nguyen Van A",
-                "ngaylap", "2023-10-01",
-                "tongtien", "500000"
+            "mahoadon", "HD001",
+            "tennhanvien", "Nguyen Van A",
+            "ngaylap", "2023-10-01",
+            "tongtien", "1000000"
         );
 
-        List<Map<String, String>> chiTietHoaDon = List.of(
-                Map.of("tenmon", "Món 1", "soluong", "2", "dongia", "100000", "thanhtien", "200000"),
-                Map.of("tenmon", "Món 2", "soluong", "1", "dongia", "300000", "thanhtien", "300000")
+        List<Map<String, String>> phongInfo = List.of(
+            Map.of("maphong", "P001", "tenloaiphong", "Phòng đơn", "giaphong", "500000", "ngaynhan", "2023-10-01", "ngaytra", "2023-10-05", "ngayhen", "2023-10-06", "tienphong", "2000000", "tienphat", "0", "tongtienphong", "2000000")
         );
 
-        BillViewer billViewer = new BillViewer(null, hoaDonInfo, chiTietHoaDon);
+        int soLuongPhong = 1;
+
+        Map<String, Object> kiemTraPhongInfo = Map.of(
+            "tiendenbu", 50000,
+            "thietbihong", List.of(Map.of("tenthietbi", "Điều hòa", "tienden", 50000, "soluonghong", 1, "tongtienden", 50000))
+        );
+
+        List<Map<String, String>> dichVuInfo = List.of(
+            (Map<String, String>) Map.of(
+                "tendichvu", "Giặt là",
+                "tiendichvu", String.valueOf(100000),
+                "soluong", String.valueOf(2),
+                "tongtiendichvu", String.valueOf(200000)
+            )
+        );
+
+        int soLuongDichVuDaDat = 1;
+
+        BillViewer billViewer = new BillViewer(null, hoaDonInfo, phongInfo, soLuongPhong, kiemTraPhongInfo, dichVuInfo, soLuongDichVuDaDat);
         billViewer.setVisible(true);
     }
-    
 }
