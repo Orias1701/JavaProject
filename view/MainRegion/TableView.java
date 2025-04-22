@@ -1,5 +1,6 @@
 package view.MainRegion;
 
+import controller.BillHandler;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -218,4 +219,72 @@ public class TableView {
         table.revalidate();
         table.repaint();
     } 
+    class ButtonEditor extends DefaultCellEditor {
+    private JButton button;
+    private String action;
+    private boolean isPushed;
+    private FormDialogHandler formDialogHandler;
+    private int selectedRow;
+
+    public ButtonEditor(JCheckBox checkBox, String action, FormDialogHandler formDialogHandler) {
+        super(checkBox);
+        this.action = action;
+        this.formDialogHandler = formDialogHandler;
+        button = new JButton(action.equals("edit") ? "Sửa" : action.equals("delete") ? "Xóa" : "Chi tiết");
+        button.setOpaque(true);
+        button.addActionListener(e -> fireEditingStopped());
+    }
+
+    @Override
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        button.setText(value != null ? value.toString() : "");
+        isPushed = true;
+        selectedRow = row;
+        return button;
+    }
+
+    @Override
+    public Object getCellEditorValue() {
+        if (isPushed && selectedRow >= 0) {
+            try {
+                if ("edit".equals(action)) {
+                    if (formDialogHandler != null) {
+                        formDialogHandler.showFormDialog("edit", selectedRow);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "FormDialogHandler chưa được khởi tạo!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else if ("detail".equals(action)) {
+                    String maHoaDon = table.getValueAt(selectedRow, 0).toString();
+                    BillHandler billHandler = new BillHandler(parent.getContentPanel(), parent);
+                    Window window = SwingUtilities.getWindowAncestor(parent);
+                    if (window instanceof Frame frame) {
+                        billHandler.showInvoiceDetail(frame, maHoaDon);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Parent window is not a Frame!", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else if ("delete".equals(action)) {
+                    if (formDialogHandler != null) {
+                        formDialogHandler.showFormDialog("delete", selectedRow);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "FormDialogHandler chưa được khởi tạo!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Lỗi khi thực hiện hành động: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        } else if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(null, "Vui lòng chọn một hàng để thực hiện hành động!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+        isPushed = false;
+        return button.getText();
+    }
+
+    @Override
+    public boolean stopCellEditing() {
+        isPushed = false;
+        return super.stopCellEditing();
+    }
+}
+
 }
