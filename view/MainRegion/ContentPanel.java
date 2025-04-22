@@ -15,7 +15,6 @@ public class ContentPanel extends JPanel {
     private HomePanel homePanel;
     private boolean isHomeDisplayed;
     private String currentTableName;
-
     public ContentPanel() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -37,6 +36,10 @@ public class ContentPanel extends JPanel {
 
     private void onAddButtonClicked(Void ignored) {
         tablePanel.showAddFormDialog();
+    }
+    public JPanel getContentPanel() {
+        // Return the appropriate JPanel instance
+        return new JPanel(); // Replace with the actual content panel logic
     }
 
     // Phương thức gốc để duy trì tính tương thích ngược

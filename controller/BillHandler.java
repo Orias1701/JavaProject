@@ -8,15 +8,23 @@ import view.MainRegion.ContentPanel;
 import view.MainRegion.TablePanel;
 
 public class BillHandler {
+    private final CheckBill checkBill;
 
-    private final CheckBill checkBill = new CheckBill("defaultString", new ContentPanel(), new TablePanel(new ContentPanel()));
+    // Constructor mặc định (giữ lại để tương thích)
+    public BillHandler() {
+        this.checkBill = new CheckBill("defaultString", new ContentPanel(), new TablePanel(new ContentPanel()));
+    }
+
+    // Constructor mới nhận ContentPanel và TablePanel
+    public BillHandler(ContentPanel contentPanel, TablePanel tablePanel) {
+        this.checkBill = new CheckBill("defaultString", contentPanel, tablePanel);
+    }
 
     /**
      * Hiển thị giao diện chi tiết hóa đơn.
      * @param parent JFrame cha
      * @param maHoaDon Mã hóa đơn
      */
-
     public void showInvoiceDetail(Frame parent, String maHoaDon) {
         try {
             // 1. Lấy danh sách mã chi tiết
@@ -37,7 +45,6 @@ public class BillHandler {
 
                     Map<String, String> row = new HashMap<>();
                     row.put("tenmon", tenMon);
-                    row.put("soluong", String.valueOf(data.getOrDefault("SoLuong", "0")));
                     row.put("dongia", String.valueOf(data.getOrDefault("DonGia", "0")));
                     row.put("thanhtien", String.valueOf(data.getOrDefault("ThanhTien", "0")));
                     chiTietHoaDon.add(row);
@@ -68,7 +75,7 @@ public class BillHandler {
             pstmt.setString(1, maHoaDon);
             var rs = pstmt.executeQuery();
             while (rs.next()) {
-                list.add(rs.getString("MaChiTiet"));
+                list.add(rs.getString("MaHoaDon"));
             }
         }
         return list;

@@ -187,4 +187,8 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     public JTable getTable() {
         return tableView.getTable();
     }
+
+    ContentPanel getContentPanel() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
