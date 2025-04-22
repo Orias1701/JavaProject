@@ -102,11 +102,11 @@ public class FormDialogPanel implements FormDialogHandler {
                     LogHandler.logWarn("Parse error for datetime value in FormDialogPanel: " + value);
                 }
             } else if (type.equalsIgnoreCase("decimal") && value != null && !value.isEmpty()) {
+                // Không định dạng chuỗi, giữ nguyên giá trị số
                 try {
-                    double number = Double.parseDouble(value);
-                    value = String.format("%,.0f", number);
+                    Double.parseDouble(value); // Kiểm tra giá trị hợp lệ
                 } catch (NumberFormatException e) {
-                    LogHandler.logWarn("Parse error for decimal value in FormDialogPanel: " + value);
+                    LogHandler.logWarn("Invalid decimal value in FormDialogPanel: " + value);
                 }
             }
 
@@ -160,7 +160,7 @@ public class FormDialogPanel implements FormDialogHandler {
                         return;
                     }
                     // Kiểm tra decimal hợp lệ
-                    if (type.equalsIgnoreCase("decimal") && !value.replace(",", "").matches("-?\\d+(\\.\\d+)?")) {
+                    if (type.equalsIgnoreCase("decimal") && !value.matches("-?\\d+(\\.\\d+)?")) {
                         JOptionPane.showMessageDialog(dialog, "Giá trị " + tablePanel.getColumnComments().get(colIndex) + " không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
@@ -173,12 +173,9 @@ public class FormDialogPanel implements FormDialogHandler {
                     Map<String, Object> rowData = new HashMap<>();
                     for (String col : tablePanel.getColumnNames()) {
                         String value = inputFields.get(col).getText();
-                        int colIndex = tablePanel.getColumnNames().indexOf(col);
-                        String type = tablePanel.getColumnTypes().get(colIndex);
-                        // Loại bỏ dấu phẩy cho decimal
-                        if (type.equalsIgnoreCase("decimal")) {
-                            value = value.replace(",", "");
-                        }
+                        // int colIndex = tablePanel.getColumnNames().indexOf(col);
+                        // String type = tablePanel.getColumnTypes().get(colIndex);
+                        // Không cần loại bỏ dấu phẩy vì giá trị đã là chuỗi số hợp lệ
                         rowData.put(col, value);
                     }
                     ApiResponse response;
