@@ -16,6 +16,7 @@ import javax.swing.border.EmptyBorder;
 import model.ApiClient;
 import model.ApiClient.TableDataResult;
 import view.Style;
+import java.awt.event.*;
 
 public class TablePanel extends JPanel implements TableViewDataHandler {
     private final JScrollPane scrollPane;
