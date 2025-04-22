@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import view.HomePanel;
-
 public class ContentPanel extends JPanel {
     private HeadPanel headPanel;
     private TablePanel tablePanel;
