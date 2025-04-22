@@ -287,4 +287,9 @@ public class FormDialogPanel implements FormDialogHandler {
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
     }
+
+    @Override
+    public void handleAction(String action, JTable table, int selectedRow) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
