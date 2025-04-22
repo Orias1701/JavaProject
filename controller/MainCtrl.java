@@ -28,7 +28,8 @@ public class MainCtrl {
         menuPanel.setTableSelectionListener((tableName, tableComment) -> {
             if (tableName != null && !tableName.isEmpty()) {
                 ApiClient.TableDataResult result = ApiClient.getTableData(tableName);
-                contentPanel.updateTableData(result.data, result.columnComments, result.columnTypes, result.keyColumn, tableName, tableComment);
+                contentPanel.updateTableData(result.data, result.columnComments, result.columnTypes, 
+                                            result.keyColumn, result.primaryKeyColumns, tableName, tableComment);
             } else {
                 LogHandler.logError("Invalid table name received");
             }

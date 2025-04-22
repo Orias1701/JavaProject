@@ -26,14 +26,17 @@ public class ApiClient {
         public final Map<String, String> columnComments;
         public final Map<String, String> columnTypes;
         public final String keyColumn;
+        public final List<String> primaryKeyColumns;
 
         public TableDataResult(List<Map<String, String>> data, Map<String, String> columnComments, 
-                              Map<String, String> columnTypes, String keyColumn) {
+                              Map<String, String> columnTypes, String keyColumn, List<String> primaryKeyColumns) {
             this.data = data != null ? data : new ArrayList<>();
             this.columnComments = columnComments != null ? columnComments : new HashMap<>();
             this.columnTypes = columnTypes != null ? columnTypes : new HashMap<>();
             this.keyColumn = keyColumn != null ? keyColumn : "";
+            this.primaryKeyColumns = primaryKeyColumns != null ? primaryKeyColumns : new ArrayList<>();
             LogHandler.logInfo("Khóa chính API: " + keyColumn);
+            LogHandler.logInfo("Primary key columns API: " + this.primaryKeyColumns);
             LogHandler.logInfo("columnTypes: " + this.columnTypes);
         }
     }
@@ -135,7 +138,7 @@ public class ApiClient {
     public static TableDataResult getTableData(String tableName) {
         if (tableName == null || tableName.isEmpty()) {
             LogHandler.logError("Error: tableName is null or empty");
-            return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "");
+            return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "", new ArrayList<>());
         }
         try {
             HttpUtil.HttpResponse response = httpUtil.sendRequest(
@@ -149,14 +152,15 @@ public class ApiClient {
             if (response.statusCode == 200) {
                 TableDataResult result = jsonParser.parseTableDataWithColumns(response.body);
                 LogHandler.logInfo("columnTypes after parsing: " + result.columnTypes);
+                LogHandler.logInfo("primaryKeyColumns after parsing: " + result.primaryKeyColumns);
                 return result;
             } else {
                 LogHandler.logError("API error for table " + tableName + ": Status " + response.statusCode);
-                return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "");
+                return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "", new ArrayList<>());
             }
         } catch (Exception e) {
             LogHandler.logError("Error fetching table data for " + tableName + ": " + e.getMessage(), e);
-            return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "");
+            return new TableDataResult(new ArrayList<>(), new HashMap<>(), new HashMap<>(), "", new ArrayList<>());
         }
     }
 

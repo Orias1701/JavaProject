@@ -3,6 +3,9 @@ package view.MainRegion;
 import controller.LogHandler;
 import controller.UserSession;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import model.ApiClient;
@@ -15,16 +18,17 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     private final ContentPanel parent;
     private boolean isButtonView = false;
     private String keyColumn;
+    private List<String> primaryKeyColumns; // Danh sách các cột khóa chính
     private String tableName;
     private String tableComment;
-    private java.util.List<String> columnNames;
-    private java.util.List<String> columnComments;
-    private java.util.List<String> columnTypes; // Danh sách kiểu dữ liệu cột
+    private List<String> columnNames;
+    private List<String> columnComments;
+    private List<String> columnTypes; // Danh sách kiểu dữ liệu cột
     private FormDialogHandler formDialogHandler;
     private TableView tableView;
     private GridView gridView;
     private JPanel currentView;
-    private java.util.List<java.util.Map<String, String>> currentData; // Lưu dữ liệu hiện tại
+    private List<Map<String, String>> currentData; // Lưu dữ liệu hiện tại
 
     public TablePanel(ContentPanel parent) {
         this.parent = parent;
@@ -71,14 +75,25 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     }
 
     @Override
-    public void updateTableData(java.util.List<java.util.Map<String, String>> data, java.util.Map<String, String> columnCommentsMap, java.util.Map<String, String> columnTypesMap, String keyColumn, String tableName, String tableComment) {
+    public void updateTableData(List<Map<String, String>> data, Map<String, String> columnCommentsMap, 
+                               Map<String, String> columnTypesMap, String keyColumn, 
+                               String tableName, String tableComment) {
+        // Chuyển tiếp đến phương thức mới với danh sách primaryKeyColumns rỗng
+        updateTableData(data, columnCommentsMap, columnTypesMap, keyColumn, new ArrayList<>(), tableName, tableComment);
+    }
+
+    // Phương thức nạp chồng mới với primaryKeyColumns (không có @Override)
+    public void updateTableData(List<Map<String, String>> data, Map<String, String> columnCommentsMap, 
+                               Map<String, String> columnTypesMap, String keyColumn, List<String> primaryKeyColumns, 
+                               String tableName, String tableComment) {
         this.keyColumn = keyColumn;
+        this.primaryKeyColumns = primaryKeyColumns;
         this.tableName = tableName;
         this.tableComment = tableComment;
         this.currentData = data;
-        this.columnNames = data != null && !data.isEmpty() ? new java.util.ArrayList<>(data.get(0).keySet()) : null;
-        this.columnComments = new java.util.ArrayList<>();
-        this.columnTypes = new java.util.ArrayList<>();
+        this.columnNames = data != null && !data.isEmpty() ? new ArrayList<>(data.get(0).keySet()) : null;
+        this.columnComments = new ArrayList<>();
+        this.columnTypes = new ArrayList<>();
 
         if (columnNames != null) {
             for (String columnName : columnNames) {
@@ -90,6 +105,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         }
         
         LogHandler.logInfo("Khóa chính TablePanel: " + keyColumn);
+        LogHandler.logInfo("Các cột khóa chính TablePanel: " + primaryKeyColumns);
         LogHandler.logInfo("Tên bảng TablePanel: " + tableName);
         LogHandler.logInfo("Chú thích bảng TablePanel: " + tableComment);
         LogHandler.logInfo("Kiểu dữ liệu cột: " + columnTypes);
@@ -101,7 +117,8 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         // Tạo FormDialogHandler mới để đồng bộ với bảng hiện tại
         this.formDialogHandler = new FormDialogPanel(this);
 
-        // Cập nhật cả TableView và GridView để đồng bộ dữ liệu
+        // Cập nhật TableView và GridView (tạm thời dùng chữ ký hiện tại, cần cập nhật sau)
+        // TODO: Cập nhật TableView.java và GridView.java để chấp nhận primaryKeyColumns
         tableView.updateView(data, columnNames, columnComments, formDialogHandler, canAdd, canEdit, canDelete);
         gridView.updateView(data, columnNames, columnComments, columnTypes, formDialogHandler, canAdd, canEdit, canDelete);
 
@@ -128,9 +145,10 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         try {
             TableDataResult result = ApiClient.getTableData(tableName);
             if (result.data != null && !result.data.isEmpty()) {
-                updateTableData(result.data, result.columnComments, result.columnTypes, result.keyColumn, tableName, tableComment);
+                updateTableData(result.data, result.columnComments, result.columnTypes, 
+                               result.keyColumn, result.primaryKeyColumns, tableName, tableComment);
             } else {
-                updateTableData(null, null, null, null, tableName, tableComment);
+                updateTableData(null, null, null, null, new ArrayList<>(), tableName, tableComment);
                 JOptionPane.showMessageDialog(parent, "Không có dữ liệu để hiển thị sau khi làm mới", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             }
         } catch (Exception ex) {
@@ -149,16 +167,20 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         return keyColumn;
     }
 
+    public List<String> getPrimaryKeyColumns() {
+        return primaryKeyColumns;
+    }
+
     @Override
-    public java.util.List<String> getColumnNames() {
+    public List<String> getColumnNames() {
         return columnNames;
     }
 
-    public java.util.List<String> getColumnComments() {
+    public List<String> getColumnComments() {
         return columnComments;
     }
 
-    public java.util.List<String> getColumnTypes() {
+    public List<String> getColumnTypes() {
         return columnTypes;
     }
 

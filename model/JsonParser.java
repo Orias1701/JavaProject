@@ -36,25 +36,38 @@ public class JsonParser {
         Map<String, String> columnComments = new LinkedHashMap<>();
         Map<String, String> columnTypes = new LinkedHashMap<>();
         String keyColumn = "";
+        List<String> primaryKeyColumns = new ArrayList<>();
 
         try {
             json = json.trim();
             if (!json.startsWith("{") || !json.endsWith("}")) {
                 LogHandler.logError("Invalid JSON format");
-                return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn);
+                return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn, primaryKeyColumns);
             }
             json = json.substring(1, json.length() - 1);
 
             String[] parts = json.split(",\"columns\":");
             if (parts.length != 2) {
                 LogHandler.logError("Invalid JSON structure");
-                return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn);
+                return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn, primaryKeyColumns);
             }
 
-            String[] headerParts = parts[0].split(",\"data\":");
+            String[] headerParts = parts[0].split(",\"primaryKeyColumns\":");
             String keyColumnJson = headerParts[0].replace("\"keyColumn\":", "").trim();
             if (keyColumnJson.startsWith("\"") && keyColumnJson.endsWith("\"")) {
                 keyColumn = keyColumnJson.substring(1, keyColumnJson.length() - 1);
+            }
+
+            String primaryKeysJson = headerParts[1].substring(0, headerParts[1].indexOf(",\"data\":"));
+            primaryKeysJson = primaryKeysJson.trim();
+            if (primaryKeysJson.startsWith("[") && primaryKeysJson.endsWith("]")) {
+                primaryKeysJson = primaryKeysJson.substring(1, primaryKeysJson.length() - 1);
+                if (!primaryKeysJson.isEmpty()) {
+                    String[] keys = primaryKeysJson.split(",");
+                    for (String key : keys) {
+                        primaryKeyColumns.add(key.replace("\"", "").trim());
+                    }
+                }
             }
 
             String columnsJson = parts[1].substring(0, parts[1].indexOf(",\"data\":"));
@@ -76,7 +89,6 @@ public class JsonParser {
                             if ("name".equals(key)) name = value;
                             if ("comment".equals(key)) comment = value;
                             if ("dataType".equals(key)) dataType = value;
-                            System.out.printf("datatype 122321: ", dataType);
                         }
                         columnComments.put(name, comment);
                         columnTypes.put(name, dataType);
@@ -102,10 +114,10 @@ public class JsonParser {
                 }
             }
 
-            return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn);
+            return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn, primaryKeyColumns);
         } catch (Exception e) {
             LogHandler.logError("Error parsing table data: " + e.getMessage(), e);
-            return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn);
+            return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn, primaryKeyColumns);
         }
     }
 

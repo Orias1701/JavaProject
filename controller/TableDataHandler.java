@@ -64,7 +64,9 @@ public class TableDataHandler extends BaseHandler implements TableDataInterface 
     @Override
     public void handleGet(HttpExchange exchange, Connection conn, String tableName) throws Exception {
         String keyColumn = DatabaseUtil.getKeyColumn(conn, tableName);
+        List<String> primaryKeyColumns = DatabaseUtil.getPrimaryKeys(conn, tableName);
         LogHandler.logInfo("Khóa chính Handler: " + keyColumn);
+        LogHandler.logInfo("Primary key columns Handler: " + primaryKeyColumns);
 
         // Lấy metadata cột theo thứ tự ORDINAL_POSITION
         List<Map<String, String>> columns = new ArrayList<>();
@@ -90,11 +92,17 @@ public class TableDataHandler extends BaseHandler implements TableDataInterface 
         // Tạo JSON cho columns
         String columnsJson = JsonUtil.buildColumnsJsonFromList(columns);
 
+        // Tạo JSON cho primaryKeyColumns
+        String primaryKeysJson = JsonUtil.buildPrimaryKeysJson(primaryKeyColumns);
+
         // Lấy dữ liệu bảng
         try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM " + tableName);
              ResultSet rs = stmt.executeQuery()) {
             String dataJson = JsonUtil.buildDataJson(rs);
-            String json = "{\"keyColumn\":\"" + (keyColumn != null ? keyColumn : "") + "\",\"columns\":" + columnsJson + ",\"data\":" + dataJson + "}";
+            String json = "{\"keyColumn\":\"" + (keyColumn != null ? keyColumn : "") + 
+                          "\",\"primaryKeyColumns\":" + primaryKeysJson + 
+                          ",\"columns\":" + columnsJson + 
+                          ",\"data\":" + dataJson + "}";
             sendResponse(exchange, 200, json);
         }
     }

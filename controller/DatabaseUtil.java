@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DatabaseUtil {
@@ -41,6 +43,24 @@ public class DatabaseUtil {
         String keyColumn = pkRs.next() ? pkRs.getString("COLUMN_NAME") : null;
         LogHandler.logInfo("Truy vấn khóa chính cho " + tableName + ": " + (keyColumn != null ? keyColumn : "không tìm thấy"));
         return keyColumn;
+    }
+
+    public static List<String> getPrimaryKeys(Connection conn, String tableName) throws Exception {
+        List<String> primaryKeys = new ArrayList<>();
+        PreparedStatement pkStmt = conn.prepareStatement(
+                "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
+                "WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND CONSTRAINT_NAME = 'PRIMARY' " +
+                "ORDER BY ORDINAL_POSITION"
+        );
+        pkStmt.setString(1, SCHEMA);
+        pkStmt.setString(2, tableName);
+        ResultSet pkRs = pkStmt.executeQuery();
+        while (pkRs.next()) {
+            String columnName = pkRs.getString("COLUMN_NAME");
+            primaryKeys.add(columnName);
+        }
+        LogHandler.logInfo("Primary keys for " + tableName + ": " + (primaryKeys.isEmpty() ? "none found" : primaryKeys));
+        return primaryKeys;
     }
 
     public static Map<String, Map<String, String>> getColumnMetadata(Connection conn, String tableName) throws Exception {

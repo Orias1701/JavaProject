@@ -3,10 +3,12 @@ package view.MainRegion;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
 import view.HomePanel;
+
 public class ContentPanel extends JPanel {
     private HeadPanel headPanel;
     private TablePanel tablePanel;
@@ -25,7 +27,7 @@ public class ContentPanel extends JPanel {
         isHomeDisplayed = false;
 
         headPanel.setChangeLayoutCallback(isButtonView -> {
-            System.out.println("Changed");
+            System.out.println("Đã thay đổi");
             tablePanel.setButtonView(isButtonView);
         });
 
@@ -37,13 +39,24 @@ public class ContentPanel extends JPanel {
         tablePanel.showAddFormDialog();
     }
 
-    public void updateTableData(List<Map<String, String>> data, Map<String, String> columnComments, Map<String, String> columnTypes, String keyColumn, String tableName, String tableComment) {
+    // Phương thức gốc để duy trì tính tương thích ngược
+    public void updateTableData(List<Map<String, String>> data, Map<String, String> columnComments, 
+                               Map<String, String> columnTypes, String keyColumn, 
+                               String tableName, String tableComment) {
+        // Chuyển tiếp đến phương thức mới với danh sách primaryKeyColumns rỗng
+        updateTableData(data, columnComments, columnTypes, keyColumn, new ArrayList<>(), tableName, tableComment);
+    }
+
+    // Phương thức nạp chồng mới với primaryKeyColumns
+    public void updateTableData(List<Map<String, String>> data, Map<String, String> columnComments, 
+                               Map<String, String> columnTypes, String keyColumn, List<String> primaryKeyColumns, 
+                               String tableName, String tableComment) {
         if (isHomeDisplayed) {
             remove(homePanel);
             headPanel = new HeadPanel(this::onAddButtonClicked, tableName);
             tablePanel = new TablePanel(this); // Tạo lại TablePanel
             headPanel.setChangeLayoutCallback(isButtonView -> {
-                System.out.println("Changed");
+                System.out.println("Đã thay đổi");
                 tablePanel.setButtonView(isButtonView);
             });
             add(headPanel, BorderLayout.NORTH);
@@ -71,15 +84,15 @@ public class ContentPanel extends JPanel {
                             dateTime = LocalDateTime.parse(value, formatter);
                         }
                         row.put(column, dateTime.format(formatter));
-                        System.out.println("Formatted datetime value for column " + column + ": " + row.get(column));
+                        System.out.println("Đã định dạng giá trị datetime cho cột " + column + ": " + row.get(column));
                     } catch (Exception e) {
-                        System.out.println("Parse error for datetime value in column " + column + ": " + value + " → " + e.getMessage());
+                        System.out.println("Lỗi phân tích giá trị datetime trong cột " + column + ": " + value + " → " + e.getMessage());
                     }
                 }
             }
         }
 
-        tablePanel.updateTableData(data, columnComments, columnTypes, keyColumn, tableName, tableComment);
+        tablePanel.updateTableData(data, columnComments, columnTypes, keyColumn, primaryKeyColumns, tableName, tableComment);
         headPanel.updateTableNameLabel(tableComment != null && !tableComment.isEmpty() ? tableComment : tableName);
 
         revalidate();

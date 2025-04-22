@@ -173,6 +173,7 @@ public class TableDataOperationsClient {
             return new ApiResponse(false, "Lỗi mạng: " + e.getMessage());
         }
     }
+
     public ApiResponse getRow(String tableName, String keyColumn, Object keyValue) {
         if (!UserSession.hasPermission(tableName, "00")) {
             LogHandler.logError("User does not have permission to view row in table: " + tableName);
@@ -201,8 +202,9 @@ public class TableDataOperationsClient {
                 ApiClient.TableDataResult result = jsonParser.parseTableDataWithColumns(response.body);
 
                 if (result.data != null && !result.data.isEmpty()) {
-                    Map<String, String> row = result.data.get(0);
-                    return new ApiResponse(true, "Lấy dòng dữ liệu thành công", new HashMap<>(row));
+                    Map<String, Object> rowData = new HashMap<>(result.data.get(0));
+                    rowData.put("primaryKeyColumns", result.primaryKeyColumns);
+                    return new ApiResponse(true, "Lấy dòng dữ liệu thành công", rowData);
                 } else {
                     return new ApiResponse(false, "Không tìm thấy dữ liệu");
                 }
