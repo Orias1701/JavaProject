@@ -41,37 +41,55 @@ public class JsonParser {
         try {
             json = json.trim();
             if (!json.startsWith("{") || !json.endsWith("}")) {
-                LogHandler.logError("Invalid JSON format");
+                LogHandler.logError("Invalid JSON format: JSON must start with '{' and end with '}'");
                 return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn, primaryKeyColumns);
             }
             json = json.substring(1, json.length() - 1);
 
+            // Tách JSON thành các phần: keyColumn, primaryKeyColumns, columns, data
             String[] parts = json.split(",\"columns\":");
             if (parts.length != 2) {
-                LogHandler.logError("Invalid JSON structure");
+                LogHandler.logError("Invalid JSON structure: Expected 'columns' field");
                 return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn, primaryKeyColumns);
             }
 
+            // Xử lý keyColumn và primaryKeyColumns
             String[] headerParts = parts[0].split(",\"primaryKeyColumns\":");
+            if (headerParts.length != 2) {
+                LogHandler.logError("Invalid JSON structure: Expected 'primaryKeyColumns' field");
+                return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn, primaryKeyColumns);
+            }
+
+            // Lấy keyColumn
             String keyColumnJson = headerParts[0].replace("\"keyColumn\":", "").trim();
             if (keyColumnJson.startsWith("\"") && keyColumnJson.endsWith("\"")) {
                 keyColumn = keyColumnJson.substring(1, keyColumnJson.length() - 1);
             }
 
-            String primaryKeysJson = headerParts[1].substring(0, headerParts[1].indexOf(",\"data\":"));
-            primaryKeysJson = primaryKeysJson.trim();
+            // Lấy primaryKeyColumns
+            int dataIndex = headerParts[1].indexOf(",\"data\":");
+            String primaryKeysJson;
+            if (dataIndex != -1) {
+                primaryKeysJson = headerParts[1].substring(0, dataIndex).trim();
+            } else {
+                // Nếu không tìm thấy ,"data":, thử lấy đến cuối chuỗi
+                primaryKeysJson = headerParts[1].trim();
+                LogHandler.logWarn("Could not find 'data' field after primaryKeyColumns, taking remaining string: " + primaryKeysJson);
+            }
             if (primaryKeysJson.startsWith("[") && primaryKeysJson.endsWith("]")) {
-                primaryKeysJson = primaryKeysJson.substring(1, primaryKeysJson.length() - 1);
+                primaryKeysJson = primaryKeysJson.substring(1, primaryKeysJson.length() - 1).trim();
                 if (!primaryKeysJson.isEmpty()) {
                     String[] keys = primaryKeysJson.split(",");
                     for (String key : keys) {
                         primaryKeyColumns.add(key.replace("\"", "").trim());
                     }
                 }
+            } else {
+                LogHandler.logWarn("Invalid primaryKeyColumns format, expected array: " + primaryKeysJson);
             }
 
-            String columnsJson = parts[1].substring(0, parts[1].indexOf(",\"data\":"));
-            columnsJson = columnsJson.trim();
+            // Lấy columns
+            String columnsJson = parts[1].substring(0, parts[1].indexOf(",\"data\":")).trim();
             if (columnsJson.startsWith("[") && columnsJson.endsWith("]")) {
                 columnsJson = columnsJson.substring(1, columnsJson.length() - 1);
                 if (!columnsJson.isEmpty()) {
@@ -96,6 +114,7 @@ public class JsonParser {
                 }
             }
 
+            // Lấy data
             String dataJson = parts[1].substring(parts[1].indexOf(",\"data\":") + 8);
             dataJson = dataJson.substring(1, dataJson.length() - 1);
             if (!dataJson.isEmpty()) {
@@ -116,7 +135,7 @@ public class JsonParser {
 
             return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn, primaryKeyColumns);
         } catch (Exception e) {
-            LogHandler.logError("Error parsing table data: " + e.getMessage(), e);
+            LogHandler.logError("Error parsing table data: " + e.getMessage() + " - " + e.getClass().getName(), e);
             return new ApiClient.TableDataResult(data, columnComments, columnTypes, keyColumn, primaryKeyColumns);
         }
     }
