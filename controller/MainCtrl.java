@@ -42,6 +42,8 @@ public class MainCtrl {
         checkBooking.autoProcessBooking("", "", "");
         CheckService checkService = new CheckService(this.contentPanel, tablePanel);
         checkService.autoProcessCheckService("", "");
+        CheckBill checkBill = new CheckBill("Bearer your-auth-token", this.contentPanel, tablePanel);
+        checkBill.autoProcessCheckBill("b2_hoadonchitiet", "","");
         // Khởi động server
         startServer(mainUI);
     }

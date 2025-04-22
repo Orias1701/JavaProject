@@ -6,7 +6,7 @@ public class Run {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             LogHandler.logInfo("Start");
-            new MainUI();
+            new MainUI();  
         });
     }
 }   
