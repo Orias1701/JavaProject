@@ -211,7 +211,7 @@ public class CheckBill {
      * @param keyValue Giá trị khóa
      * @return true nếu dữ liệu hợp lệ, false nếu không
      */
-    private boolean isDataValid(String tableName, String keyColumn, String keyValue) throws SQLException, Exception {
+    boolean isDataValid(String tableName, String keyColumn, String keyValue) throws SQLException, Exception {
         if (!tableName.equals("b2_hoadonchitiet")) {
             System.err.println("Bảng không hợp lệ: " + tableName);
             return false;

@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 import view.BillViewer;
 import view.MainRegion.ContentPanel;
 import view.MainRegion.TablePanel;
-
 public class BillHandler {
     private final CheckBill checkBill;
 
@@ -22,6 +21,12 @@ public class BillHandler {
 
     public void showInvoiceDetail(Frame parent, String maHoaDon) {
         try {
+            // Kiểm tra dữ liệu hóa đơn có hợp lệ không
+            if (!checkBill.isDataValid("b1_hoadon", "MaHoaDon", maHoaDon)) {
+                JOptionPane.showMessageDialog(parent, "Hóa đơn không tồn tại hoặc không hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             // 1. Lấy thông tin hóa đơn (dauhd)
             Map<String, String> hoaDonInfo = getThongTinHoaDon(maHoaDon);
 
@@ -38,7 +43,10 @@ public class BillHandler {
                 .mapToInt(row -> Integer.parseInt(row.getOrDefault("soluong", "0")))
                 .sum();
 
-            // 5. Hiển thị giao diện BillViewer
+            // 5. Cập nhật TongTien (tùy chọn, nếu cần đồng bộ với CheckBill)
+            checkBill.autoProcessCheckBill("b2_hoadonchitiet", "MaHoaDon", maHoaDon);
+
+            // 6. Hiển thị giao diện BillViewer
             BillViewer billViewer = new BillViewer(parent, hoaDonInfo, phongInfo, soLuongPhong, kiemTraPhongInfo, dichVuInfo, soLuongDichVuDaDat);
             billViewer.setVisible(true);
 
@@ -80,14 +88,14 @@ public class BillHandler {
                     hdc.MaPhong, 
                     lp.TenLoaiPhong, 
                     lp.GiaLoaiPhong, 
-                    dp.NgayNhan, 
-                    dp.NgayTra, 
+                    dp.NgayNhanPhong, 
+                    dp.NgayTraPhong, 
                     dp.NgayHen, 
-                    dp.Phat
+                    dp.TienPhat
                 FROM b2_hoadonchitiet hdc
                 JOIN c1_datphong dp ON hdc.MaDatPhong = dp.MaDatPhong
                 JOIN c2_phong p ON hdc.MaPhong = p.MaPhong
-                JOIN c3_loaiphong lp ON p.MaLoaiPhong = lp.MaLoaiPhong
+                JOIN c1_loaiphong lp ON p.MaLoai = lp.MaLoai
                 WHERE hdc.MaHoaDon = ?
             """;
             try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -100,14 +108,13 @@ public class BillHandler {
                         String giaPhong = rs.getString("GiaLoaiPhong");
                         row.put("giaphong", giaPhong);
 
-                        String ngayNhan = rs.getString("NgayNhan");
-                        String ngayTra = rs.getString("NgayTra");
+                        String ngayNhan = rs.getString("NgayNhanPhong");
+                        String ngayTra = rs.getString("NgayTraPhong");
                         String ngayHen = rs.getString("NgayHen");
                         row.put("ngaynhan", ngayNhan);
                         row.put("ngaytra", ngayTra);
                         row.put("ngayhen", ngayHen);
 
-                        // Tính tiền phòng: giá phòng * (ngày trả - ngày nhận)
                         long days = java.time.temporal.ChronoUnit.DAYS.between(
                             java.time.LocalDate.parse(ngayNhan.split(" ")[0]),
                             java.time.LocalDate.parse(ngayTra.split(" ")[0])
@@ -115,10 +122,10 @@ public class BillHandler {
                         long tienPhong = Long.parseLong(giaPhong) * days;
                         row.put("tienphong", String.valueOf(tienPhong));
 
-                        String tienPhat = rs.getString("Phat");
-                        row.put("tienphat", tienPhat);
+                        String tienPhat = rs.getString("TienPhat");
+                        row.put("tienphat", tienPhat != null ? tienPhat : "0");
 
-                        long tongTienPhong = tienPhong + Long.parseLong(tienPhat);
+                        long tongTienPhong = tienPhong + Long.parseLong(tienPhat != null ? tienPhat : "0");
                         row.put("tongtienphong", String.valueOf(tongTienPhong));
 
                         phongInfo.add(row);
@@ -132,7 +139,6 @@ public class BillHandler {
     private Map<String, Object> getKiemTraPhongInfo(String maHoaDon) throws Exception {
         Map<String, Object> kiemTraInfo = new HashMap<>();
         try (Connection conn = DatabaseUtil.getConnection()) {
-            // Kiểm tra tiền đền bù
             String queryDenBu = """
                 SELECT kt.TienDenBu
                 FROM b2_hoadonchitiet hdc
@@ -150,7 +156,6 @@ public class BillHandler {
             }
             kiemTraInfo.put("tiendenbu", String.valueOf(tienDenBu));
 
-            // Nếu tiền đền bù != 0, lấy chi tiết thiết bị hỏng
             if (tienDenBu != 0) {
                 List<Map<String, String>> thietBiHong = new ArrayList<>();
                 String queryChiTiet = """
