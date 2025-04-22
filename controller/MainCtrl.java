@@ -39,9 +39,9 @@ public class MainCtrl {
         checker.autoProcessCheckDetail("d4_kiemtrachitiet", "MaThietBi", "");
         //Xử lý kiểm tra đặt phòng
         CheckBooking checkBooking = new CheckBooking("Bearer your-auth-token", this.contentPanel, tablePanel);
-        checkBooking.autoProcessBooking("c3_datphong", "MaDatPhong", "");
+        checkBooking.autoProcessBooking("", "", "");
         CheckService checkService = new CheckService(this.contentPanel, tablePanel);
-        checkService.autoProcessCheckService("e3_chitietsddv", "MaSDDV");
+        checkService.autoProcessCheckService("", "");
         // Khởi động server
         startServer(mainUI);
     }

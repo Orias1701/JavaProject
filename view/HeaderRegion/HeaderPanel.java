@@ -1,8 +1,7 @@
 package view.HeaderRegion;
 
-import view.LoginPanel;
-import view.MainUI;
-import view.Style;
+import controller.LogHandler;
+import controller.UserSession;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -10,19 +9,19 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.RenderingHints;
+import java.sql.SQLException;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JOptionPane;
-
-import controller.LogHandler;
-import controller.UserSession;
+import javax.swing.JPanel;
 import model.ApiClient;
-import java.sql.SQLException;
-import java.util.Map;
+import view.LoginPanel;
+import view.MainUI;
+import view.Style;
 
 public class HeaderPanel extends javax.swing.JPanel {
     private JLabel userLabel;
