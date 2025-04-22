@@ -47,7 +47,7 @@ public class GridView {
         return containerPanel;
     }
 
-    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, List<String> columnTypes, List perderKeyColumns, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
+    public void updateView(List<Map<String, String>> data, List<String> columnNames, List<String> columnComments, List<String> columnTypes, List<String> primaryKeyColumns, FormDialogHandler formDialogHandler, boolean canAdd, boolean canEdit, boolean canDelete) {
         // Lưu các tham số để sử dụng khi resize
         this.data = data;
         this.columnNames = columnNames;
