@@ -212,25 +212,26 @@ public class CheckBill {
      * @return true nếu dữ liệu hợp lệ, false nếu không
      */
     boolean isDataValid(String tableName, String keyColumn, String keyValue) throws SQLException, Exception {
-        if (!tableName.equals("b2_hoadonchitiet")) {
+        // Kiểm tra bảng hợp lệ
+        if (!tableName.equals("b1_hoadon") && !tableName.equals("b2_hoadonchitiet")) {
             System.err.println("Bảng không hợp lệ: " + tableName);
             return false;
         }
         System.out.println("Bảng hợp lệ: " + tableName);
-
+    
         String query;
         if (keyValue == null || keyValue.trim().isEmpty()) {
-            query = "SELECT COUNT(*) FROM b2_hoadonchitiet";
+            query = "SELECT COUNT(*) FROM " + tableName;
         } else {
-            query = "SELECT COUNT(*) FROM b2_hoadonchitiet WHERE " + keyColumn + " = ?";
+            query = "SELECT COUNT(*) FROM " + tableName + " WHERE " + keyColumn + " = ?";
         }
-
+    
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             if (keyValue != null && !keyValue.trim().isEmpty()) {
                 pstmt.setString(1, keyValue);
             }
-
+    
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     int count = rs.getInt(1);
@@ -248,7 +249,7 @@ public class CheckBill {
         }
         return false;
     }
-
+    
     /**
      * Hiển thị thông báo lỗi.
      *

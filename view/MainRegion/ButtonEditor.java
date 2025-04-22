@@ -1,7 +1,6 @@
 package view.MainRegion;
 
 import java.awt.Component;
-
 import javax.swing.*;
 
 public class ButtonEditor extends DefaultCellEditor {

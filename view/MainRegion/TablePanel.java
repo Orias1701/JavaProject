@@ -3,6 +3,7 @@ package view.MainRegion;
 import controller.LogHandler;
 import controller.UserSession;
 import java.awt.*;
+import java.awt.event.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     private JPanel currentView;
     private List<Map<String, String>> currentData;
     private JPanel filterPanel;
-    private Map<String, Filter> columnFilters; // Lưu trữ bộ lọc cho từng cột
+    private Map<String, Filter> columnFilters;
     private static final SimpleDateFormat[] DATE_PARSERS = {
         new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"),
         new SimpleDateFormat("yyyy-MM-dd HH:mm"),
@@ -41,18 +42,17 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         new SimpleDateFormat("yyyy-MM-dd")
     };
 
-    // Lớp để lưu trữ thông tin bộ lọc cho một cột
     private static class Filter {
-        String condition; // Cho số/date: ">", ">=", "=", "<=", "<"; Cho string: null
-        String value; // Giá trị lọc
-        JTextField valueField; // Trường nhập giá trị
-        JComboBox<String> conditionCombo; // Bộ chọn điều kiện (cho số/date)
+        String condition;
+        String value;
+        JTextField valueField;
+        Component conditionComponent; // Thay JComboBox bằng Component để hỗ trợ JTextField
 
-        Filter(String condition, String value, JTextField valueField, JComboBox<String> conditionCombo) {
+        Filter(String condition, String value, JTextField valueField, Component conditionComponent) {
             this.condition = condition;
             this.value = value;
             this.valueField = valueField;
-            this.conditionCombo = conditionCombo;
+            this.conditionComponent = conditionComponent;
         }
     }
 
@@ -145,13 +145,8 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         boolean canEdit = UserSession.hasPermission(tableName, "20");
         boolean canDelete = UserSession.hasPermission(tableName, "30");
 
-        // Tạo FormDialogHandler mới để đồng bộ với bảng hiện tại
         this.formDialogHandler = new FormDialogPanel(this);
-
-        // Cập nhật filterPanel
         updateFilterPanel();
-
-        // Áp dụng bộ lọc để hiển thị dữ liệu
         applyFilters();
     }
 
@@ -174,13 +169,18 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
             filterColumnPanel.setBackground(Style.LIGHT_CL);
 
             JLabel label = new JLabel(columnComment + ":");
-            label.setFont(Style.ROB_12);
+            label.setFont(Style.ROB_B14);
             filterColumnPanel.add(label, BorderLayout.NORTH);
 
-            if (dataType.contains("varchar") || dataType.contains("text") || dataType.contains("char")) {
-                // Bộ lọc cho String
+            if (dataType.contains("varchar") || dataType.contains("text") || dataType.contains("char") || dataType.contains("enum")) {
                 JTextField filterField = new JTextField(10);
-                filterField.setFont(Style.ROB_12);
+                filterField.setFont(Style.ROB_B14);
+                filterField.setPreferredSize(new Dimension(100, 40));
+                filterField.setMaximumSize(new Dimension(100, 40));
+                filterField.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Style.MAIN_CL),  
+                    BorderFactory.createEmptyBorder(0, 10, 0, 10)
+                ));
                 filterField.addActionListener(e -> {
                     columnFilters.put(columnName, new Filter(null, filterField.getText().trim(), filterField, null));
                     applyFilters();
@@ -189,37 +189,76 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
                 columnFilters.put(columnName, new Filter(null, "", filterField, null));
             } else if (dataType.contains("int") || dataType.contains("decimal") || dataType.contains("float") ||
                        dataType.contains("date") || dataType.contains("datetime") || dataType.contains("timestamp")) {
-                // Bộ lọc cho Number/Date
-                JPanel inputPanel = new JPanel(new BorderLayout(5, 5));
-                inputPanel.setBackground(Style.LIGHT_CL);
+                JPanel filterItemPanel = new JPanel(new BorderLayout());
+                filterItemPanel.setBackground(Color.WHITE);
+                filterItemPanel.setPreferredSize(new Dimension(140, 25));
+                filterItemPanel.setMaximumSize(new Dimension(140, 25));
+                filterItemPanel.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(Style.MAIN_CL),
+                    BorderFactory.createEmptyBorder(0, 10, 0, 10)
+                ));
 
-                JComboBox<String> conditionCombo = new JComboBox<>(new String[]{">", ">=", "=", "<=", "<"});
-                conditionCombo.setFont(Style.ROB_12);
-                conditionCombo.setPreferredSize(new Dimension(60, 25));
+                // Text field hiển thị dấu điều kiện (thay cho JComboBox)
+                JTextField conditionField = new JTextField("=");
+                conditionField.setFont(Style.ROB_B14);
+                conditionField.setBorder(null);
+                conditionField.setBackground(Color.WHITE);
+                conditionField.setPreferredSize(new Dimension(20, 25));
+                conditionField.setEditable(false);
+                conditionField.setHorizontalAlignment(JTextField.CENTER);
+                
+                JTextField filterField = new JTextField();
+                // Tạo JPopupMenu để hiển thị danh sách điều kiện
+                JPopupMenu conditionPopup = new JPopupMenu();
+                String[] conditions = {">", ">=", "=", "<=", "<"};
+                for (String condition : conditions) {
+                    JMenuItem item = new JMenuItem(condition);
+                    item.addActionListener(e -> {
+                        conditionField.setText(condition);
+                        columnFilters.put(columnName, new Filter(
+                            condition,
+                            filterField.getText().trim(),
+                            filterField,
+                            conditionField
+                        ));
+                        applyFilters();
+                    });
+                    conditionPopup.add(item);
+                }
 
-                JTextField filterField = new JTextField(10);
-                filterField.setFont(Style.ROB_12);
-
-                inputPanel.add(conditionCombo, BorderLayout.WEST);
-                inputPanel.add(filterField, BorderLayout.CENTER);
-
-                conditionCombo.addActionListener(e -> {
-                    columnFilters.put(columnName, new Filter((String) conditionCombo.getSelectedItem(), 
-                                                            filterField.getText().trim(), filterField, conditionCombo));
-                    applyFilters();
+                // Hiển thị popup khi click vào conditionField
+                conditionField.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        conditionPopup.show(conditionField, 0, conditionField.getHeight());
+                    }
                 });
+
+                filterField.setFont(Style.ROB_B14);
+                filterField.setBorder(null);
+                filterField.setHorizontalAlignment(JTextField.LEFT);
+
+                // Thêm các thành phần vào panel
+                filterItemPanel.add(conditionField, BorderLayout.WEST);
+                filterItemPanel.add(filterField, BorderLayout.CENTER);
+
+                filterColumnPanel.add(filterItemPanel, BorderLayout.CENTER);
+
+                // Gắn filter logic
                 filterField.addActionListener(e -> {
-                    columnFilters.put(columnName, new Filter((String) conditionCombo.getSelectedItem(), 
-                                                            filterField.getText().trim(), filterField, conditionCombo));
+                    columnFilters.put(columnName, new Filter(
+                        conditionField.getText(),
+                        filterField.getText().trim(),
+                        filterField,
+                        conditionField
+                    ));
                     applyFilters();
                 });
 
-                filterColumnPanel.add(inputPanel, BorderLayout.CENTER);
-                columnFilters.put(columnName, new Filter("=", "", filterField, conditionCombo));
+                columnFilters.put(columnName, new Filter("=", "", filterField, conditionField));
             } else {
-                // Bộ lọc cho String
                 JTextField filterField = new JTextField(10);
-                filterField.setFont(Style.ROB_12);
+                filterField.setFont(Style.ROB_B14);
                 filterField.addActionListener(e -> {
                     columnFilters.put(columnName, new Filter(null, filterField.getText().trim(), filterField, null));
                     applyFilters();
@@ -264,12 +303,10 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
 
                     String dataType = columnTypes.get(columnNames.indexOf(column)).toLowerCase();
                     if (dataType.contains("varchar") || dataType.contains("text") || dataType.contains("char")) {
-                        // Lọc string: kiểm tra chứa chuỗi
                         if (!value.toLowerCase().contains(filter.value.toLowerCase())) {
                             return false;
                         }
                     } else if (dataType.contains("int") || dataType.contains("decimal") || dataType.contains("float")) {
-                        // Lọc số
                         try {
                             double rowValue = Double.parseDouble(value);
                             double filterValue = Double.parseDouble(filter.value);
@@ -291,10 +328,9 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
                                     break;
                             }
                         } catch (NumberFormatException e) {
-                            return false; // Giá trị không hợp lệ
+                            return false;
                         }
                     } else if (dataType.contains("date") || dataType.contains("datetime") || dataType.contains("timestamp")) {
-                        // Lọc date/datetime
                         try {
                             long rowTime = parseDate(value);
                             long filterTime = parseDate(filter.value);
@@ -316,7 +352,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
                                     break;
                             }
                         } catch (ParseException e) {
-                            return false; // Giá trị không hợp lệ
+                            return false;
                         }
                     }
                 }
@@ -405,6 +441,6 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
     }
 
     ContentPanel getContentPanel() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return parent;
     }
 }
