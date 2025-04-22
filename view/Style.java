@@ -37,6 +37,7 @@ public class Style {
     public static final Font MONS_28 = new Font("Montserrat", Font.BOLD, 28);
     public static final Font MONS_32 = new Font("Montserrat", Font.BOLD, 32);
     public static final Font MONS_L18 = new Font("Montserrat", Font.PLAIN, 18);
+    public static final Font ROB_12 = new Font("Roboto", Font.PLAIN, 12);
     public static final Font ROB_B14 = new Font("Roboto", Font.BOLD, 14);
     public static final Font ROB_14 = new Font("Roboto", Font.PLAIN, 14);
     public static final Font ROB_L16 = new Font("Roboto", Font.PLAIN, 16);
