@@ -2,8 +2,12 @@ package view.HeaderRegion;
 
 import view.MainUI;
 import view.Style;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+// import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -12,9 +16,13 @@ import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 // import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+// import javax.swing.UIManager;
 import javax.swing.JOptionPane;
 import controller.LogHandler;
 import controller.UserSession;
@@ -169,9 +177,7 @@ public class HeaderPanel extends javax.swing.JPanel {
         logoutButton.setBorder(BorderFactory.createEmptyBorder());
         logoutButton.setFocusPainted(false);
         logoutButton.setContentAreaFilled(false);
-        logoutButton.setToolTipText("Đăng xuất");
-        logoutButton.addActionListener(e -> {
-            // Kiểm tra nếu không có phiên thì không hiển thị dialog xác nhận
+        logoutButton.setToolTipText("Đăng xuất");logoutButton.addActionListener(e -> {
             if (UserSession.getCurrentUsername() == null) {
                 JOptionPane.showMessageDialog(
                     this,
@@ -182,17 +188,40 @@ public class HeaderPanel extends javax.swing.JPanel {
                 return;
             }
 
-            // Hiển thị dialog xác nhận
-            int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "Bạn có chắc chắn muốn đăng xuất?",
-                "Xác Nhận Đăng Xuất",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-            );
-            if (confirm == JOptionPane.YES_OPTION) {
+            // Tạo dialog tùy chỉnh
+            JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Xác Nhận Đăng Xuất");
+            dialog.setSize(350, 200);
+            dialog.setLayout(new BorderLayout());
+            dialog.setLocationRelativeTo(null);
+            dialog.getContentPane().setBackground(Style.LIGHT_CL);
+
+            // Label xác nhận
+            JLabel messageLabel = new JLabel("Bạn có chắc chắn muốn đăng xuất?", SwingConstants.CENTER);
+            messageLabel.setForeground(Style.DARK_CL);
+            messageLabel.setFont(Style.MONS_14);
+            messageLabel.setBorder(BorderFactory.createEmptyBorder(20, 20, 10, 20));
+            dialog.add(messageLabel, BorderLayout.CENTER);
+
+            // Tạo panel chứa nút
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+            buttonPanel.setBackground(Style.LIGHT_CL);
+
+            Style.RoundedButton logoutBtn = new Style.RoundedButton("Đăng Xuất");
+            logoutBtn.setFont(Style.MONS_14);
+            logoutBtn.setBackground(Style.RED);
+            logoutBtn.setForeground(Color.WHITE);
+            logoutBtn.setPreferredSize(new Dimension(120, 40));
+
+            Style.RoundedButton cancelBtn = new Style.RoundedButton("Hủy");
+            cancelBtn.setFont(Style.MONS_14);
+            cancelBtn.setBackground(Style.GRAY_CL);
+            cancelBtn.setForeground(Style.LIGHT_CL);
+            cancelBtn.setPreferredSize(new Dimension(120, 40));
+
+            // Action cho nút
+            logoutBtn.addActionListener(ev -> {
+                dialog.dispose();
                 try {
-                    // Lưu tham chiếu đến MainUI trước khi thay đổi giao diện
                     java.awt.Component topLevelAncestor = getTopLevelAncestor();
                     if (topLevelAncestor == null) {
                         LogHandler.logError("Không thể đăng xuất: getTopLevelAncestor trả về null");
@@ -210,17 +239,15 @@ public class HeaderPanel extends javax.swing.JPanel {
                     UserSession.clearSession();
                     ApiClient.clearAuthHeader();
 
-                    // Gọi showMainInterface để làm mới giao diện
                     mainUI.showMainInterface();
                     updateUserLabel();
 
-                    // Hiển thị thông báo sau khi chuyển giao diện
-                    JOptionPane.showMessageDialog(
-                        mainUI,
-                        "Đăng xuất thành công",
-                        "Thông báo",
-                        JOptionPane.INFORMATION_MESSAGE
-                    );
+                    // JOptionPane.showMessageDialog(
+                    //     mainUI,
+                    //     "Đăng xuất thành công",
+                    //     "Thông báo",
+                    //     JOptionPane.INFORMATION_MESSAGE
+                    // );
                 } catch (Exception ex) {
                     LogHandler.logError("Lỗi khi đăng xuất: " + ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(
@@ -230,8 +257,17 @@ public class HeaderPanel extends javax.swing.JPanel {
                         JOptionPane.ERROR_MESSAGE
                     );
                 }
-            }
+            });
+
+            cancelBtn.addActionListener(ev -> dialog.dispose());
+
+            buttonPanel.add(logoutBtn);
+            buttonPanel.add(cancelBtn);
+            dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+            dialog.setVisible(true);
         });
+
         gbc.gridx = 3;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
