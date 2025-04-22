@@ -218,10 +218,15 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
                 filterColumnPanel.add(inputPanel, BorderLayout.CENTER);
                 columnFilters.put(columnName, new Filter("=", "", filterField, conditionCombo));
             } else {
-                // Không hỗ trợ lọc cho kiểu dữ liệu khác
-                JLabel noFilterLabel = new JLabel("Không hỗ trợ lọc");
-                noFilterLabel.setFont(Style.ROB_12);
-                filterColumnPanel.add(noFilterLabel, BorderLayout.CENTER);
+                // Bộ lọc cho String
+                JTextField filterField = new JTextField(10);
+                filterField.setFont(Style.ROB_12);
+                filterField.addActionListener(e -> {
+                    columnFilters.put(columnName, new Filter(null, filterField.getText().trim(), filterField, null));
+                    applyFilters();
+                });
+                filterColumnPanel.add(filterField, BorderLayout.CENTER);
+                columnFilters.put(columnName, new Filter(null, "", filterField, null));
             }
 
             filterPanel.add(filterColumnPanel);
