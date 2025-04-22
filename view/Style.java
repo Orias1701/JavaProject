@@ -16,7 +16,7 @@ public class Style {
     public static final Color LIGHT_CL = Color.WHITE;
     public static final Color DARK_CL = Color.BLACK;
     public static final Color GREEN = Color.decode("#00A251");
-    public static final Color BLUE = Color.decode("#0072C6");
+    public static final Color BLUE = Color.decode("#7F55FF");
     public static final Color RED = Color.decode("#C90000");
     public static final Color GRAY_CL = Color.decode("#444444");
     public static final Color MAIN_CL = Color.decode("#9E88FF");
