@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -73,7 +74,7 @@ public class HeaderPanel extends javax.swing.JPanel {
         }
         userLabel = new JLabel(displayName);
         userLabel.setFont(Style.SC_S);
-        userLabel.setForeground(Style.MAIN_CL);
+        userLabel.setForeground(Style.ACT_CL);
         userLabel.setPreferredSize(new Dimension(150, 70));
         userLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         userLabel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -85,18 +86,60 @@ public class HeaderPanel extends javax.swing.JPanel {
                     try {
                         Map<String, String> employeeInfo = ApiClient.getEmployeeInfo(currentUsername);
                         if (!employeeInfo.isEmpty()) {
-                            String info = String.format(
-                                "Mã Nhân Viên: %s\nTên Nhân Viên: %s\nNhóm: %s",
-                                employeeInfo.getOrDefault("MaNhanVien", "N/A"),
-                                employeeInfo.getOrDefault("TenNhanVien", "N/A"),
-                                employeeInfo.getOrDefault("Group", "N/A")
-                            );
-                            JOptionPane.showMessageDialog(
-                                HeaderPanel.this,
-                                info,
-                                "Thông Tin Nhân Viên",
-                                JOptionPane.INFORMATION_MESSAGE
-                            );
+                            // Tạo JDialog hiện đại
+                            JDialog infoDialog = new JDialog((java.awt.Frame) null, "Thông Tin Nhân Viên", true);
+                            infoDialog.setLayout(new BorderLayout());
+                            infoDialog.getContentPane().setBackground(Style.LIGHT_CL);
+                            infoDialog.setResizable(false);
+
+                            // Panel chính với layout đẹp
+                            JPanel contentPanel = new JPanel(new GridBagLayout());
+                            contentPanel.setBackground(Style.LIGHT_CL);
+                            contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+
+                            GridBagConstraints gbc = new GridBagConstraints();
+                            gbc.insets = new Insets(10, 10, 10, 10);
+                            gbc.anchor = GridBagConstraints.WEST;
+                            gbc.fill = GridBagConstraints.HORIZONTAL;
+                            gbc.gridx = 0;
+                            gbc.gridy = 0;
+
+                            JLabel maNV = new JLabel("Mã Nhân Viên: " + employeeInfo.getOrDefault("MaNhanVien", "N/A"));
+                            maNV.setFont(Style.MONS_16);
+                            maNV.setForeground(Style.DARK_CL);
+                            contentPanel.add(maNV, gbc);
+
+                            gbc.gridy++;
+                            JLabel tenNV = new JLabel("Tên Nhân Viên: " + employeeInfo.getOrDefault("TenNhanVien", "N/A"));
+                            tenNV.setFont(Style.MONS_16);
+                            tenNV.setForeground(Style.DARK_CL);
+                            contentPanel.add(tenNV, gbc);
+
+                            gbc.gridy++;
+                            JLabel group = new JLabel("Nhóm: " + employeeInfo.getOrDefault("Group", "N/A"));
+                            group.setFont(Style.MONS_16);
+                            group.setForeground(Style.DARK_CL);
+                            contentPanel.add(group, gbc);
+
+                            // Nút đóng
+                            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                            buttonPanel.setBackground(Style.LIGHT_CL);
+                            Style.RoundedButton closeButton = new Style.RoundedButton("Đóng");
+                            closeButton.setFont(Style.MONS_14);
+                            closeButton.setBackground(Style.MAIN_CL);
+                            closeButton.setForeground(Color.WHITE);
+                            closeButton.setFocusPainted(false);
+                            closeButton.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+                            closeButton.addActionListener(evt -> infoDialog.dispose());
+                            buttonPanel.add(closeButton);
+
+                            // Gộp vào dialog
+                            infoDialog.add(contentPanel, BorderLayout.CENTER);
+                            infoDialog.add(buttonPanel, BorderLayout.SOUTH);
+                            infoDialog.pack();
+                            infoDialog.setLocationRelativeTo(null);
+                            infoDialog.setVisible(true);
+
                         } else {
                             JOptionPane.showMessageDialog(
                                 HeaderPanel.this,
@@ -124,6 +167,7 @@ public class HeaderPanel extends javax.swing.JPanel {
                 }
             }
         });
+
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
