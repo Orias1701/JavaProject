@@ -1,5 +1,6 @@
 package controller;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +13,7 @@ import model.ApiClient.ApiResponse;
 import model.TableDataOperationsClient;
 import view.MainRegion.ContentPanel;
 import view.MainRegion.TablePanel;
-import java.math.BigDecimal;
+
 public class CheckBill {
 
     private final TableDataOperationsClient client;
@@ -56,7 +57,7 @@ public class CheckBill {
                 System.out.println("✅ Dữ liệu dòng:");
                 System.out.println(res.getMessage());
 
-                updateTongTienHoaDonChiTiet(); // Cập nhật TongTien trong b2_hoadonchitiet
+                updateTongTienHoaDonChiTiet(); // Cập nhật TongTien trong b2_hoadonchitiet và b1_hoadon
                 tablePanel.refreshTable(); // Làm mới bảng hiển thị
             } else {
                 System.err.println("Lỗi: " + res.getMessage());
@@ -107,22 +108,22 @@ public class CheckBill {
     }
 
     /**
-     * Cập nhật cột TongTien trong bảng b2_hoadonchitiet dựa trên loại chi phí.
-     * - Dịch vụ: Lấy từ e2_sddv.TongTien
-     * - Phòng: GiaLoai * (NgayHenTra - NgayNhanPhong) + TienPhat
-     * - Đền bù: Lấy từ d3_kiemtraphong.TongTien
+     * Cập nhật cột TongTien trong bảng b2_hoadonchitiet và b1_hoadon.
+     * - b2_hoadonchitiet.TongTien = tienphong + d3_kiemtraphong.TongTien + e2_sddv.TongTien
+     * - tienphong = c1_loaiphong.GiaLoai * (c3_datphong.NgayHen - c3_datphong.NgayNhanPhong) + c3_datphong.TienPhat
+     * - b1_hoadon.TongTien = SUM(b2_hoadonchitiet.TongTien) WHERE b2_hoadonchitiet.MaHoaDon = b1_hoadon.MaHoaDon
      */
     private void updateTongTienHoaDonChiTiet() throws Exception {
         try (Connection conn = DatabaseUtil.getConnection()) {
-            // Lấy dữ liệu từ b2_hoadonchitiet và các bảng liên quan để tính TongTien
+            // Bước 1: Tính TongTien cho b2_hoadonchitiet
             String selectQuery = """
                 SELECT 
                     hdc.MaHoaDon, hdc.MaPhong, hdc.MaSDDV, hdc.MaKiemTra, hdc.MaDatPhong,
-                    sddv.TongTien AS TongTienSDDV,
+                    COALESCE(sddv.TongTien, 0) AS TongTienSDDV,
                     DATEDIFF(dp.NgayHen, dp.NgayNhanPhong) AS SoNgayThue,
-                    lp.GiaLoai,
-                    dp.TienPhat,
-                    kt.TongTien AS TongTienDenBu
+                    COALESCE(lp.GiaLoai, 0) AS GiaLoai,
+                    COALESCE(dp.TienPhat, 0) AS TienPhat,
+                    COALESCE(kt.TongTien, 0) AS TongTienDenBu
                 FROM b2_hoadonchitiet hdc
                 LEFT JOIN e2_sddv sddv ON hdc.MaSDDV = sddv.MaSDDV
                 LEFT JOIN c3_datphong dp ON hdc.MaDatPhong = dp.MaDatPhong
@@ -131,50 +132,47 @@ public class CheckBill {
                 LEFT JOIN d3_kiemtraphong kt ON hdc.MaKiemTra = kt.MaKiemTra
             """;
 
-            Map<String, Double> tongTienMap = new HashMap<>();
+            Map<String, BigDecimal> tongTienMap = new HashMap<>();
 
             try (PreparedStatement pstmt = conn.prepareStatement(selectQuery);
                  ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     String maHoaDon = rs.getString("MaHoaDon");
                     String maPhong = rs.getString("MaPhong");
-                    String loaiChiPhi = determineLoaiChiPhi(rs.getString("MaSDDV"), 
-                        rs.getString("MaDatPhong"), rs.getString("MaKiemTra"));
-                    double tongTien = 0;
 
-                    if ("Dịch vụ".equalsIgnoreCase(loaiChiPhi) && rs.getString("MaSDDV") != null) {
-                        tongTien = rs.getBigDecimal("TongTien");
-                    } else if ("Phòng".equalsIgnoreCase(loaiChiPhi) && rs.getString("MaDatPhong") != null) {
-                        int soNgayThue = rs.getInt("SoNgayThue");
-                        double giaLoai = rs.getObject("GiaLoai") != null ? rs.getDouble("GiaLoai") : 0;
-                        double tienPhat = rs.getObject("TienPhat") != null ? rs.getDouble("TienPhat") : 0;
-                        BigDecimal giaLoaiBD = rs.getBigDecimal("GiaLoai") != null ? rs.getBigDecimal("GiaLoai") : BigDecimal.ZERO;
-                        BigDecimal tienPhatBD = rs.getBigDecimal("TienPhat") != null ? rs.getBigDecimal("TienPhat") : BigDecimal.ZERO;
-                        BigDecimal soNgayThueBD = BigDecimal.valueOf(soNgayThue);
-                        tongTien = giaLoaiBD.multiply(soNgayThueBD).add(tienPhatBD).doubleValue();
-                    } else if ("Đền bù".equalsIgnoreCase(loaiChiPhi) && rs.getString("MaKiemTra") != null) {
-                        tongTien = rs.getDouble("TongTien");
-                    }
+                    // Lấy các giá trị cần thiết
+                    BigDecimal tongTienSDDV = rs.getBigDecimal("TongTienSDDV") != null ? rs.getBigDecimal("TongTienSDDV") : BigDecimal.ZERO;
+                    BigDecimal tongTienDenBu = rs.getBigDecimal("TongTienDenBu") != null ? rs.getBigDecimal("TongTienDenBu") : BigDecimal.ZERO;
+                    int soNgayThue = rs.getInt("SoNgayThue");
+                    BigDecimal giaLoai = rs.getBigDecimal("GiaLoai") != null ? rs.getBigDecimal("GiaLoai") : BigDecimal.ZERO;
+                    BigDecimal tienPhat = rs.getBigDecimal("TienPhat") != null ? rs.getBigDecimal("TienPhat") : BigDecimal.ZERO;
+
+                    // Tính tiền phòng (tienphong)
+                    BigDecimal soNgayThueBD = BigDecimal.valueOf(soNgayThue);
+                    BigDecimal tienPhong = giaLoai.multiply(soNgayThueBD).add(tienPhat);
+
+                    // Tính tổng tiền chi tiết (hoadonct.tongtien)
+                    BigDecimal tongTien = tienPhong.add(tongTienDenBu).add(tongTienSDDV);
 
                     tongTienMap.put(maHoaDon + "|" + maPhong, tongTien);
                 }
             }
 
-            // Cập nhật TongTien vào b2_hoadonchitiet
-            String updateQuery = """
+            // Bước 2: Cập nhật TongTien vào b2_hoadonchitiet
+            String updateHoadonChiTietQuery = """
                 UPDATE b2_hoadonchitiet
                 SET TongTien = ?
                 WHERE MaHoaDon = ? AND MaPhong = ?
             """;
 
-            try (PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
-                for (Map.Entry<String, Double> entry : tongTienMap.entrySet()) {
+            try (PreparedStatement pstmt = conn.prepareStatement(updateHoadonChiTietQuery)) {
+                for (Map.Entry<String, BigDecimal> entry : tongTienMap.entrySet()) {
                     String[] keys = entry.getKey().split("\\|");
                     String maHoaDon = keys[0];
                     String maPhong = keys[1];
-                    double tongTien = entry.getValue();
+                    BigDecimal tongTien = entry.getValue();
 
-                    pstmt.setDouble(1, tongTien);
+                    pstmt.setBigDecimal(1, tongTien);
                     pstmt.setString(2, maHoaDon);
                     pstmt.setString(3, maPhong);
                     pstmt.addBatch();
@@ -182,6 +180,21 @@ public class CheckBill {
 
                 int[] rows = pstmt.executeBatch();
                 System.out.println("✔ Đã cập nhật " + rows.length + " dòng trong bảng b2_hoadonchitiet (TongTien)");
+            }
+
+            // Bước 3: Cập nhật TongTien vào b1_hoadon (hoadon.tongtien = SUM(hoadonct.tongtien))
+            String updateHoadonQuery = """
+                UPDATE b1_hoadon hd
+                SET hd.TongTien = (
+                    SELECT COALESCE(SUM(hdc.TongTien), 0)
+                    FROM b2_hoadonchitiet hdc
+                    WHERE hdc.MaHoaDon = hd.MaHoaDon
+                )
+            """;
+
+            try (PreparedStatement pstmt = conn.prepareStatement(updateHoadonQuery)) {
+                int rows = pstmt.executeUpdate();
+                System.out.println("✔ Đã cập nhật " + rows + " dòng trong bảng b1_hoadon (TongTien)");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -234,26 +247,6 @@ public class CheckBill {
             throw e;
         }
         return false;
-    }
-
-    /**
-     * Xác định loại chi phí dựa trên các mã tham chiếu.
-     *
-     * @param maSDDV Mã sử dụng dịch vụ
-     * @param maDatPhong Mã đặt phòng
-     * @param maKiemTra Mã kiểm tra phòng
-     * @return Loại chi phí ("Dịch vụ", "Phòng", "Đền bù", hoặc "Khác")
-     */
-    private String determineLoaiChiPhi(String maSDDV, String maDatPhong, String maKiemTra) {
-        if (maSDDV != null && !maSDDV.isEmpty()) {
-            return "Dịch vụ";
-        } else if (maDatPhong != null && !maDatPhong.isEmpty()) {
-            return "Phòng";
-        } else if (maKiemTra != null && !maKiemTra.isEmpty()) {
-            return "Đền bù";
-        } else {
-            return "Khác";
-        }
     }
 
     /**

@@ -102,6 +102,11 @@ public class ApiClient {
         }
     }
 
+    public static void clearAuthHeader() {
+        authHeader = null;
+        LogHandler.logInfo("Auth header cleared");
+    }
+    
     public static Map<String, String> getTableInfo() {
         try {
             HttpUtil.HttpResponse response = httpUtil.sendRequest(

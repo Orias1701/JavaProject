@@ -1,7 +1,7 @@
 package view.HeaderRegion;
 
-import controller.LogHandler;
-import controller.UserSession;
+import view.MainUI;
+import view.Style;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -9,19 +9,18 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.RenderingHints;
-import java.sql.SQLException;
-import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
+// import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
+import controller.LogHandler;
+import controller.UserSession;
 import model.ApiClient;
-import view.LoginPanel;
-import view.MainUI;
-import view.Style;
+import java.sql.SQLException;
+import java.util.Map;
 
 public class HeaderPanel extends javax.swing.JPanel {
     private JLabel userLabel;
@@ -73,9 +72,10 @@ public class HeaderPanel extends javax.swing.JPanel {
         userLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (username != null) {
+                String currentUsername = UserSession.getCurrentUsername();
+                if (currentUsername != null) {
                     try {
-                        Map<String, String> employeeInfo = ApiClient.getEmployeeInfo(username);
+                        Map<String, String> employeeInfo = ApiClient.getEmployeeInfo(currentUsername);
                         if (!employeeInfo.isEmpty()) {
                             String info = String.format(
                                 "Mã Nhân Viên: %s\nTên Nhân Viên: %s\nNhóm: %s",
@@ -153,12 +153,10 @@ public class HeaderPanel extends javax.swing.JPanel {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-                g2d.setColor(Style.GRAY_CL);
+                g2d.setColor(Style.ACT_CL);
                 int[] xDoors = {30, 10, 10, 30, 25, 15, 15, 25};
                 int[] yDoors = {10, 10, 40, 40, 35, 35, 15, 15};
                 g2d.fillPolygon(xDoors, yDoors, 8);
-
                 int[] xOuts = {33, 43, 33, 33, 25, 22, 25, 33};
                 int[] yOuts = {31, 25, 19, 22, 22, 25, 28, 28};
                 g2d.fillPolygon(xOuts, yOuts, 8);
@@ -173,18 +171,65 @@ public class HeaderPanel extends javax.swing.JPanel {
         logoutButton.setContentAreaFilled(false);
         logoutButton.setToolTipText("Đăng xuất");
         logoutButton.addActionListener(e -> {
-            try {
-                UserSession.logOut();
-                UserSession.clearSession(); // Xóa phiên người dùng
-                JOptionPane.showMessageDialog(this, "Đăng xuất thành công", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                // Chuyển về LoginPanel
-                getTopLevelAncestor().removeAll();
-                ((JFrame) getTopLevelAncestor()).add(new LoginPanel((MainUI) getTopLevelAncestor()));
-                updateUserLabel(); // Cập nhật nhãn về "Guest"
-                getTopLevelAncestor().revalidate();
-                getTopLevelAncestor().repaint();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi khi đăng xuất: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            // Kiểm tra nếu không có phiên thì không hiển thị dialog xác nhận
+            if (UserSession.getCurrentUsername() == null) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Bạn chưa đăng nhập.",
+                    "Thông Báo",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+                return;
+            }
+
+            // Hiển thị dialog xác nhận
+            int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Bạn có chắc chắn muốn đăng xuất?",
+                "Xác Nhận Đăng Xuất",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    // Lưu tham chiếu đến MainUI trước khi thay đổi giao diện
+                    java.awt.Component topLevelAncestor = getTopLevelAncestor();
+                    if (topLevelAncestor == null) {
+                        LogHandler.logError("Không thể đăng xuất: getTopLevelAncestor trả về null");
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Lỗi hệ thống: Không thể xác định cửa sổ chính để đăng xuất.",
+                            "Lỗi",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
+                    MainUI mainUI = (MainUI) topLevelAncestor;
+
+                    UserSession.logOut();
+                    UserSession.clearSession();
+                    ApiClient.clearAuthHeader();
+
+                    // Gọi showMainInterface để làm mới giao diện
+                    mainUI.showMainInterface();
+                    updateUserLabel();
+
+                    // Hiển thị thông báo sau khi chuyển giao diện
+                    JOptionPane.showMessageDialog(
+                        mainUI,
+                        "Đăng xuất thành công",
+                        "Thông báo",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                } catch (Exception ex) {
+                    LogHandler.logError("Lỗi khi đăng xuất: " + ex.getMessage(), ex);
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Lỗi khi đăng xuất: " + ex.getMessage(),
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
             }
         });
         gbc.gridx = 3;
@@ -195,7 +240,6 @@ public class HeaderPanel extends javax.swing.JPanel {
         add(logoutButton, gbc);
     }
 
-    // Phương thức để cập nhật lại nhãn người dùng khi cần
     public void updateUserLabel() {
         String username = UserSession.getCurrentUsername();
         String displayName = "Guest";
