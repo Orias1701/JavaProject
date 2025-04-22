@@ -39,4 +39,5 @@ int main(){
 	if(hoadonct.mahd=hoadon.mahd){
 		hoadon.tongtien=sum(hoadonct.tongtien);
 	}
+	print(hoadon.tongtien); 
 } 

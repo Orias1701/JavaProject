@@ -254,6 +254,37 @@ public class CheckBill {
      *
      * @param message Thông điệp lỗi
      */
+    public Map<String, Object> getInvoiceDetail(String maChiTiet) {
+        // Mô phỏng truy vấn CSDL
+        Map<String, Object> data = new HashMap<>();
+        try {
+            var conn = DatabaseUtil.getConnection();
+            var query = """
+                SELECT TenDichVu, TenThietBi, MaPhong, SoLuong, DonGia, ThanhTien
+                FROM b2_hoadonchitiet
+                WHERE MaChiTiet = ?
+            """;
+            try (var pstmt = conn.prepareStatement(query)) {
+                pstmt.setString(1, maChiTiet);
+                var rs = pstmt.executeQuery();
+                if (rs.next()) {
+                    data.put("success", true);
+                    data.put("TenDichVu", rs.getString("TenDichVu"));
+                    data.put("TenThietBi", rs.getString("TenThietBi"));
+                    data.put("MaPhong", rs.getString("MaPhong"));
+                    data.put("SoLuong", rs.getInt("SoLuong"));
+                    data.put("DonGia", rs.getInt("DonGia"));
+                    data.put("ThanhTien", rs.getInt("ThanhTien"));
+                } else {
+                    data.put("success", false);
+                }
+            }
+        } catch (Exception e) {
+            data.put("success", false);
+            e.printStackTrace();
+        }
+        return data;
+    }
     private void showErrorDialog(String message) {
         JOptionPane.showMessageDialog(
             null,
