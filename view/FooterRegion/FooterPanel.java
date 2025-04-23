@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 public class FooterPanel extends JPanel {
     public FooterPanel() {
-        setPreferredSize(new Dimension(Style.WIN_WIDTH, 40));
+        setPreferredSize(new Dimension(Style.WIN_WIDTH, Style.FOOT_HEIGHT));
         setBackground(new Color(0x43327C));
         setLayout(new GridBagLayout());
 

@@ -19,7 +19,7 @@ public class MenuPanel extends JPanel {
     private TableSelectionListener tableSelectionListener;
     private Runnable homeSelectionListener;
 
-    private static final int MENU_WIDTH = 200;
+    private static final int MENU_WIDTH = Style.MENU_WIDTH;
     private static final int BUTTON_HEIGHT = 36;
     private static final int ACTIVE_BUTTON_HEIGHT = 50;
     private static final int HOME_BUTTON_HEIGHT = 50;
