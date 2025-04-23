@@ -376,7 +376,7 @@ public class TablePanel extends JPanel implements TableViewDataHandler {
         scrollPane.repaint();
     }
 
-    private long parseDate(String dateStr) throws ParseException {
+    long parseDate(String dateStr) throws ParseException {
         if (dateStr == null || dateStr.trim().isEmpty()) {
             throw new ParseException("Empty date string", 0);
         }
