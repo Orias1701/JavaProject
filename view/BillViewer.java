@@ -254,7 +254,7 @@ public class BillViewer extends JFrame {
                         html.append("</tr>");
                     }
                     html.append("</table>");
-                }
+                }            
 
                 // Services
                 html.append("<h2>Dịch vụ sử dụng</h2>");

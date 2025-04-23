@@ -43,7 +43,7 @@ public class FormDialogPanel implements FormDialogHandler {
             return;
         }
 
-        // Xử lý đặc biệt cho actionType="detail" và bảng b2_hoadonchitiet
+        // Xử lý đặc biệt cho actionType="detail" và bảng b1_hoadon
         if (actionType.equals("detail") && "b1_hoadon".equals(tablePanel.getTableName())) {
             try {
                 if (rowIndex < 0 || rowIndex >= tablePanel.getTable().getRowCount()) {

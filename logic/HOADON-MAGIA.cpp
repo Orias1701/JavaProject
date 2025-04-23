@@ -51,7 +51,7 @@ class tb{
 }; 
 void dauhd{
 	print(hd.mahd);
-	print(nv.manv);
+	tenkh=(hd.makh->kh.makh->tenkh) 
 	print(nv.tennv);
 	print(hd.ngaynhap);
 }
