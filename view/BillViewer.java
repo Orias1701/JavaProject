@@ -32,8 +32,8 @@ public class BillViewer extends JFrame {
         hoaDonPanel.setBorder(BorderFactory.createTitledBorder("Thông tin hóa đơn"));
         JLabel[] labels = {
             new JLabel("Mã hóa đơn:"), new JLabel(hoaDonInfo.getOrDefault("mahoadon", "")),
-            new JLabel("Khách hàng:"), new JLabel(hoaDonInfo.getOrDefault("tenkhachhang", "")),
             new JLabel("Ngày lập:"), new JLabel(hoaDonInfo.getOrDefault("ngaylap", "")),
+            new JLabel("Khách hàng:"), new JLabel(hoaDonInfo.getOrDefault("tenkhachhang", "")),
             new JLabel("Tổng tiền:"), new JLabel(hoaDonInfo.getOrDefault("tongtien", ""))
         };
         for (JLabel label : labels) {
@@ -176,7 +176,7 @@ public class BillViewer extends JFrame {
         mainPanel.add(Box.createVerticalStrut(30));
 
         // Export to HTML Button
-        JButton exportButton = new JButton("Xuất HTML");
+        JButton exportButton = new JButton("Xuất File hóa đơn chi tiết");
         exportButton.setFont(Style.MONS_14);
         exportButton.setBackground(Style.MAIN_CL);
         exportButton.setForeground(Style.LIGHT_CL);
@@ -212,8 +212,8 @@ public class BillViewer extends JFrame {
                 // Bill Information
                 html.append("<h2>Thông tin hóa đơn</h2>");
                 html.append("<label>Mã hóa đơn: ").append(hoaDonInfo.getOrDefault("mahoadon", "")).append("</label>");
-                html.append("<label>Khách hàng: ").append(hoaDonInfo.getOrDefault("tenkhachhang", "")).append("</label>");
                 html.append("<label>Ngày lập: ").append(hoaDonInfo.getOrDefault("ngaylap", "")).append("</label>");
+                html.append("<label>Khách hàng: ").append(hoaDonInfo.getOrDefault("tenkhachhang", "")).append("</label>");
                 html.append("<label>Tổng tiền: ").append(hoaDonInfo.getOrDefault("tongtien", "")).append("</label>");
 
                 // Room Information
@@ -253,7 +253,6 @@ public class BillViewer extends JFrame {
                         html.append("<td>").append(row.get("tongtienden")).append("</td>");
                         html.append("</tr>");
                     }
-                    html.append("</table]");
                     html.append("</table>");
                 }
 
