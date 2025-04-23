@@ -32,7 +32,7 @@ public class HeaderPanel extends javax.swing.JPanel {
 
     public HeaderPanel() {
         setBackground(Color.WHITE);
-        setPreferredSize(new Dimension(Style.WIN_WIDTH, 70));
+        setPreferredSize(new Dimension(Style.WIN_WIDTH, Style.HEAD_HEIGHT));
         setBorder(BorderFactory.createMatteBorder(0, 0, 7, 0, Style.ACT_CL));
         setLayout(new GridBagLayout());
 

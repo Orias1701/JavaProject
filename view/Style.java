@@ -58,12 +58,15 @@ public class Style {
     public static final Font SC_S = new Font("Overlock SC", Font.BOLD, 18);
 
     // Size
-    public static final Dimension MENU_WIDTH = new Dimension(240, 0);
+
     public static final Dimension BUTTON_SIZE = new Dimension(240, 50);
 
     // Padding & spacing
     public static final int WIN_WIDTH = 1440;
     public static final int WIN_HEIGHT = 900;
+    public static final int MENU_WIDTH = 240;
+    public static final int HEAD_HEIGHT = 70;
+    public static final int FOOT_HEIGHT = 40;
     public static final int MENU_TOP_PADDING = 20;
     public static final int MENU_BOTTOM_PADDING = 10;
     public static final int BUTTON_SPACING = 7;
