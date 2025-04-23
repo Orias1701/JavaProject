@@ -6,23 +6,20 @@ import controller.UserSession;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-
 import model.ApiClient;
 import model.ApiClient.TableDataResult;
 import view.FooterRegion.FooterPanel;
 import view.HeaderRegion.HeaderPanel;
 import view.MainRegion.ContentPanel;
 import view.MenuRegion.MenuPanel;
-
 public class MainUI extends JFrame {
     private ContentPanel contentPanel;
     private HeaderPanel headerPanel;
-
+    private MainCtrl mainCtrl;
     public MainUI() {
         setTitle("Hotel Management System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -115,7 +112,7 @@ public class MainUI extends JFrame {
         add(menuScroll, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 
-        new MainCtrl(contentPanel, menuPanel, this);
+        mainCtrl = new MainCtrl(contentPanel, menuPanel, this);
 
         menuPanel.refreshTableList();
         contentPanel.showHomePanel();

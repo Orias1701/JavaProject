@@ -32,7 +32,7 @@ public class BillViewer extends JFrame {
         hoaDonPanel.setBorder(BorderFactory.createTitledBorder("Thông tin hóa đơn"));
         JLabel[] labels = {
             new JLabel("Mã hóa đơn:"), new JLabel(hoaDonInfo.getOrDefault("mahoadon", "")),
-            new JLabel("Nhân viên:"), new JLabel(hoaDonInfo.getOrDefault("tennhanvien", "")),
+            new JLabel("Khách hàng:"), new JLabel(hoaDonInfo.getOrDefault("tenkhachhang", "")),
             new JLabel("Ngày lập:"), new JLabel(hoaDonInfo.getOrDefault("ngaylap", "")),
             new JLabel("Tổng tiền:"), new JLabel(hoaDonInfo.getOrDefault("tongtien", ""))
         };
@@ -212,7 +212,7 @@ public class BillViewer extends JFrame {
                 // Bill Information
                 html.append("<h2>Thông tin hóa đơn</h2>");
                 html.append("<label>Mã hóa đơn: ").append(hoaDonInfo.getOrDefault("mahoadon", "")).append("</label>");
-                html.append("<label>Nhân viên: ").append(hoaDonInfo.getOrDefault("tennhanvien", "")).append("</label>");
+                html.append("<label>Khách hàng: ").append(hoaDonInfo.getOrDefault("tenkhachhang", "")).append("</label>");
                 html.append("<label>Ngày lập: ").append(hoaDonInfo.getOrDefault("ngaylap", "")).append("</label>");
                 html.append("<label>Tổng tiền: ").append(hoaDonInfo.getOrDefault("tongtien", "")).append("</label>");
 
@@ -253,6 +253,7 @@ public class BillViewer extends JFrame {
                         html.append("<td>").append(row.get("tongtienden")).append("</td>");
                         html.append("</tr>");
                     }
+                    html.append("</table]");
                     html.append("</table>");
                 }
 

@@ -61,9 +61,9 @@ public class BillHandler {
         Map<String, String> data = new HashMap<>();
         try (Connection conn = DatabaseUtil.getConnection()) {
             String query = """
-                SELECT hd.MaHoaDon, nv.TenNhanVien AS TenNhanVien, hd.Ngay, hd.TongTien
+                SELECT hd.MaHoaDon, kh.TenKhachHang AS TenKhachHang, hd.Ngay, hd.TongTien
                 FROM b1_hoadon hd
-                JOIN f1_nhanvien nv ON hd.MaNhanVien = nv.MaNhanVien
+                JOIN a1_khachhang kh ON hd.MaKhachHang = kh.MaKhachHang
                 WHERE hd.MaHoaDon = ?
             """;
             try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -71,7 +71,7 @@ public class BillHandler {
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next()) {
                         data.put("mahoadon", rs.getString("MaHoaDon"));
-                        data.put("tennhanvien", rs.getString("TenNhanVien"));
+                        data.put("tenkhachhang", rs.getString("TenKhachHang"));
                         data.put("ngaylap", rs.getString("Ngay"));
                         data.put("tongtien", rs.getString("TongTien"));
                     }
