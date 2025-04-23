@@ -1,35 +1,31 @@
 package view.HeaderRegion;
 
-import view.MainUI;
-import view.Style;
-
+import controller.LogHandler;
+import controller.UserSession;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-// import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.sql.SQLException;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-// import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-// import javax.swing.UIManager;
-import javax.swing.JOptionPane;
-import controller.LogHandler;
-import controller.UserSession;
 import model.ApiClient;
-import java.sql.SQLException;
-import java.util.Map;
+import view.MainUI;
+import view.Style;
 
 public class HeaderPanel extends javax.swing.JPanel {
     private JLabel userLabel;
@@ -97,29 +93,29 @@ public class HeaderPanel extends javax.swing.JPanel {
                             contentPanel.setBackground(Style.LIGHT_CL);
                             contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-                            GridBagConstraints gbc = new GridBagConstraints();
-                            gbc.insets = new Insets(10, 10, 10, 10);
-                            gbc.anchor = GridBagConstraints.WEST;
-                            gbc.fill = GridBagConstraints.HORIZONTAL;
-                            gbc.gridx = 0;
-                            gbc.gridy = 0;
+                            GridBagConstraints gbcDialog = new GridBagConstraints();
+                            gbcDialog.insets = new Insets(10, 10, 10, 10);
+                            gbcDialog.anchor = GridBagConstraints.WEST;
+                            gbcDialog.fill = GridBagConstraints.HORIZONTAL;
+                            gbcDialog.gridx = 0;
+                            gbcDialog.gridy = 0;
 
                             JLabel maNV = new JLabel("Mã Nhân Viên: " + employeeInfo.getOrDefault("MaNhanVien", "N/A"));
                             maNV.setFont(Style.MONS_16);
                             maNV.setForeground(Style.DARK_CL);
-                            contentPanel.add(maNV, gbc);
+                            contentPanel.add(maNV, gbcDialog);
 
-                            gbc.gridy++;
+                            gbcDialog.gridy++;
                             JLabel tenNV = new JLabel("Tên Nhân Viên: " + employeeInfo.getOrDefault("TenNhanVien", "N/A"));
                             tenNV.setFont(Style.MONS_16);
                             tenNV.setForeground(Style.DARK_CL);
-                            contentPanel.add(tenNV, gbc);
+                            contentPanel.add(tenNV, gbcDialog);
 
-                            gbc.gridy++;
+                            gbcDialog.gridy++;
                             JLabel group = new JLabel("Nhóm: " + employeeInfo.getOrDefault("Group", "N/A"));
                             group.setFont(Style.MONS_16);
                             group.setForeground(Style.DARK_CL);
-                            contentPanel.add(group, gbc);
+                            contentPanel.add(group, gbcDialog);
 
                             // Nút đóng
                             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -198,6 +194,74 @@ public class HeaderPanel extends javax.swing.JPanel {
         gbc.insets = new java.awt.Insets(10, 5, 10, 5);
         add(circlePanel, gbc);
 
+        // Nút Refresh
+        JButton refreshButton = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(Style.ACT_CL);
+                // Vẽ biểu tượng refresh (mũi tên vòng tròn đơn giản)
+                g2d.setStroke(new java.awt.BasicStroke(3));
+                g2d.drawArc(10, 10, 30, 30, 45, 270); // Vòng cung 3/4
+                int[] xArrow = {35, 30, 40};
+                int[] yArrow = {15, 20, 20};
+                g2d.fillPolygon(xArrow, yArrow, 3); // Mũi tên
+            }
+        };
+        refreshButton.setPreferredSize(new Dimension(45, 50));
+        refreshButton.setMinimumSize(new Dimension(45, 50));
+        refreshButton.setMaximumSize(new Dimension(45, 50));
+        refreshButton.setBackground(Color.WHITE);
+        refreshButton.setBorder(BorderFactory.createEmptyBorder());
+        refreshButton.setFocusPainted(false);
+        refreshButton.setContentAreaFilled(false);
+        refreshButton.setToolTipText("Làm mới ứng dụng");
+        refreshButton.addActionListener(e -> {
+            try {
+                java.awt.Component topLevelAncestor = getTopLevelAncestor();
+                if (topLevelAncestor instanceof MainUI) {
+                    MainUI mainUI = (MainUI) topLevelAncestor;
+                    mainUI.showMainInterface(); // Làm mới giao diện chính
+                    // Đóng tất cả các cửa sổ con (nếu cần)
+                    for (java.awt.Window window : java.awt.Window.getWindows()) {
+                        if (window != mainUI && window.isVisible()) {
+                            window.dispose();
+                        }
+                    }
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Ứng dụng đã được làm mới.",
+                        "Thông Báo",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                } else {
+                    LogHandler.logError("Không thể làm mới: getTopLevelAncestor không phải MainUI");
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Lỗi hệ thống: Không thể xác định cửa sổ chính để làm mới.",
+                        "Lỗi",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            } catch (Exception ex) {
+                LogHandler.logError("Lỗi khi làm mới ứng dụng: " + ex.getMessage(), ex);
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Lỗi khi làm mới: " + ex.getMessage(),
+                    "Lỗi",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        gbc.weightx = 0.0;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new java.awt.Insets(10, 5, 10, 5);
+        add(refreshButton, gbc);
+
         // Nút đăng xuất với biểu tượng cánh cửa tự vẽ
         JButton logoutButton = new JButton() {
             @Override
@@ -221,7 +285,8 @@ public class HeaderPanel extends javax.swing.JPanel {
         logoutButton.setBorder(BorderFactory.createEmptyBorder());
         logoutButton.setFocusPainted(false);
         logoutButton.setContentAreaFilled(false);
-        logoutButton.setToolTipText("Đăng xuất");logoutButton.addActionListener(e -> {
+        logoutButton.setToolTipText("Đăng xuất");
+        logoutButton.addActionListener(e -> {
             if (UserSession.getCurrentUsername() == null) {
                 JOptionPane.showMessageDialog(
                     this,
@@ -285,13 +350,6 @@ public class HeaderPanel extends javax.swing.JPanel {
 
                     mainUI.showMainInterface();
                     updateUserLabel();
-
-                    // JOptionPane.showMessageDialog(
-                    //     mainUI,
-                    //     "Đăng xuất thành công",
-                    //     "Thông báo",
-                    //     JOptionPane.INFORMATION_MESSAGE
-                    // );
                 } catch (Exception ex) {
                     LogHandler.logError("Lỗi khi đăng xuất: " + ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(
@@ -312,7 +370,7 @@ public class HeaderPanel extends javax.swing.JPanel {
             dialog.setVisible(true);
         });
 
-        gbc.gridx = 3;
+        gbc.gridx = 4;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
         gbc.anchor = GridBagConstraints.EAST;

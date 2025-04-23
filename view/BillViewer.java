@@ -277,7 +277,7 @@ public class BillViewer extends JFrame {
                 try (FileWriter writer = new FileWriter(fileChooser.getSelectedFile())) {
                     writer.write(html.toString());
                 }
-                JOptionPane.showMessageDialog(this, "Xuất HTML thành công! Mở file và in thành PDF nếu cần.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Xuất thành công! Mở file và in thành PDF nếu cần.", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Lỗi khi xuất HTML: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
