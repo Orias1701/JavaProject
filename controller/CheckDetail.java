@@ -158,7 +158,7 @@ public class CheckDetail {
             updateTongTienKiemTraPhong();
             // Cập nhật bảng hiển thị
             contentPanel.updateTableData(result.data, result.columnComments, result.columnTypes, keyColumn, tableName, "Chi tiết kiểm tra");
-
+            tablePanel.refreshTable();
             System.out.println("Done check detail");
         } catch (Exception e) {
             showErrorDialog("Lỗi khi xử lý: " + e.getMessage());
