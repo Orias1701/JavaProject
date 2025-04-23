@@ -1,5 +1,6 @@
 package view.MainRegion;
 
+import controller.BillHandler;
 import controller.LogHandler;
 import controller.MainCtrl;
 import java.awt.*;
@@ -42,7 +43,32 @@ public class FormDialogPanel implements FormDialogHandler {
             return;
         }
 
-        // Tạo dialog chứa form nhập liệu
+        // Xử lý đặc biệt cho actionType="detail" và bảng b2_hoadonchitiet
+        if (actionType.equals("detail") && "b1_hoadon".equals(tablePanel.getTableName())) {
+            try {
+                if (rowIndex < 0 || rowIndex >= tablePanel.getTable().getRowCount()) {
+                    JOptionPane.showMessageDialog(tablePanel, "Hàng được chọn không hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // Lấy maHoaDon từ cột đầu tiên của hàng được chọn
+                String maHoaDon = tablePanel.getTable().getValueAt(rowIndex, 0).toString();
+                LogHandler.logInfo("Showing invoice detail for table: b2_hoadonchitiet, maHoaDon: " + maHoaDon);
+                
+                BillHandler billHandler = new BillHandler(tablePanel.getContentPanel(), tablePanel);
+                Window window = SwingUtilities.getWindowAncestor(tablePanel);
+                if (window instanceof Frame frame) {
+                    billHandler.showInvoiceDetail(frame, maHoaDon);
+                } else {
+                    JOptionPane.showMessageDialog(tablePanel, "Parent window is not a Frame!", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                LogHandler.logError("Lỗi khi hiển thị chi tiết hóa đơn: " + e.getMessage(), e);
+                JOptionPane.showMessageDialog(tablePanel, "Lỗi khi hiển thị chi tiết hóa đơn: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+            return; // Thoát ngay, không hiển thị dialog
+        }
+
+        // Tạo dialog chứa form nhập liệu cho các trường hợp khác
         JDialog dialog = new JDialog((Frame) null, true);
         dialog.setTitle(actionType.equals("add") ? "Thêm dữ liệu" :
                 actionType.equals("edit") ? "Sửa dữ liệu" :
