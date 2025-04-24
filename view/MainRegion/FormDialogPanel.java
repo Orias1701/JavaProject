@@ -43,7 +43,7 @@ public class FormDialogPanel implements FormDialogHandler {
             return;
         }
 
-        // Xử lý đặc biệt cho actionType="detail" và bảng b2_hoadonchitiet
+        // Xử lý đặc biệt cho actionType="detail" và bảng b1
         if (actionType.equals("detail") && "b1_hoadon".equals(tablePanel.getTableName())) {
             try {
                 if (rowIndex < 0 || rowIndex >= tablePanel.getTable().getRowCount()) {
@@ -52,7 +52,7 @@ public class FormDialogPanel implements FormDialogHandler {
                 }
                 // Lấy maHoaDon từ cột đầu tiên của hàng được chọn
                 String maHoaDon = tablePanel.getTable().getValueAt(rowIndex, 0).toString();
-                LogHandler.logInfo("Showing invoice detail for table: b2_hoadonchitiet, maHoaDon: " + maHoaDon);
+                LogHandler.logInfo("Showing invoice detail for table: b1_hoadon, maHoaDon: " + maHoaDon);
                 
                 BillHandler billHandler = new BillHandler(tablePanel.getContentPanel(), tablePanel);
                 Window window = SwingUtilities.getWindowAncestor(tablePanel);
