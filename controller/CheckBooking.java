@@ -133,7 +133,6 @@ public class CheckBooking {
                                     "Lỗi", JOptionPane.WARNING_MESSAGE);
                                 continue;
                             case "Đã trả":
-                            case "Hủy":
                                 newTinhTrangPhong = "Trống";
                                 newTinhTrangKhach = "Đã rời";
                                 break;
@@ -181,7 +180,6 @@ public class CheckBooking {
                                 updateTienPhat(conn, maDatPhong, tienPhat);
                                 break;
                             case "Đã trả":
-                            case "Hủy":
                                 newTinhTrangPhong = "Trống";
                                 newTinhTrangKhach = "Đã rời";
                                 break;
